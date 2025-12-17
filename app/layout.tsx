@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    description: "Easy PDS - Secure donation platform.",
+    description: "Easy PDS - Hosting service platform.",
   },
 };
 

@@ -1,10 +1,10 @@
 # Easy PDS
 
-A full-stack TypeScript application using Next.js for processing donations.
+A full-stack TypeScript application using Next.js for processing hosting service purchases.
 
 ## Features
 
-- **Checkout** - Custom amount donations with hosted and embedded checkout
+- **Checkout** - Custom amount hosting service purchases with hosted checkout
 - **Payment Elements** - Custom payment form with Payment Element
 - **Webhook handling** - Server-side webhook processing for payment events
 
@@ -82,6 +82,7 @@ webhook listen --forward-to localhost:3000/api/webhooks
 ## Testing
 
 Use test cards for testing payments. Common test cards:
+
 - `4242 4242 4242 4242` - Successful payment
 - `4000 0027 6000 3184` - 3D Secure authentication required
 

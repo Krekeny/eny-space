@@ -11,10 +11,10 @@ export default function IndexPage(): JSX.Element {
     <ul className="card-list">
       <li>
         <Link
-          href="/donate-with-checkout"
+          href="/checkout"
           className="card checkout-style-background"
         >
-          <h2 className="bottom">Donate</h2>
+          <h2 className="bottom">Purchase Hosting</h2>
           <img src="/checkout-one-time-payments.svg" />
         </Link>
       </li>

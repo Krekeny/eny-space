@@ -3,14 +3,14 @@ import type { Metadata } from "next";
 import CheckoutForm from "@/components/CheckoutForm";
 
 export const metadata: Metadata = {
-  title: "Donate",
+  title: "Purchase Hosting",
 };
 
 export default function DonatePage(): JSX.Element {
   return (
     <div className="page-container">
-      <h1>Donate</h1>
-      <p>Donate to our project 💖</p>
+      <h1>Purchase Hosting Service</h1>
+      <p>Select your hosting plan and complete your purchase</p>
       <CheckoutForm uiMode="hosted" />
     </div>
   );

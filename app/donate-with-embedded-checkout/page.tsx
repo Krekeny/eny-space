@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function DonatePage() {
-  redirect("/donate-with-checkout");
+  redirect("/checkout");
 }
