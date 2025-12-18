@@ -1,4 +1,6 @@
-# Easy PDS
+# eny.space
+
+your data, your space, use it enywhere.
 
 A full-stack TypeScript application using Next.js for processing hosting service purchases.
 

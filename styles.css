@@ -1,13 +1,12 @@
 /* Variables */
 :root {
-  --body-color: #fcfdfe;
+  --body-color: #050505;
+  --body-text-color: #f5f5f5;
   --checkout-color: #8f6ed5;
-  --elements-color: #6772e5;
-  --body-font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --h1-color: #1a1f36;
-  --h2-color: #7b818a;
-  --h3-color: #a3acb9;
+  --elements-color: #7c7cff;
+  --h1-color: #f9fafb;
+  --h2-color: #e5e7eb;
+  --h3-color: #9ca3af;
   --radius: 6px;
   --container-width-max: 1280px;
   --page-width-max: 600px;
@@ -18,13 +17,13 @@ body {
   margin: 0;
   padding: 0;
   background: var(--body-color);
+  color: var(--body-text-color);
   overflow-y: scroll;
 }
 
 * {
   box-sizing: border-box;
-  font-family: var(--body-font-family);
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 }
 
 #__next {
@@ -68,7 +67,7 @@ h3 {
 }
 
 a {
-  color: var(--checkout-color);
+  color: #ffffff;
   text-decoration: none;
 }
 
@@ -113,9 +112,9 @@ li {
   width: 33%;
   margin: 0 20px 20px 0;
   text-decoration: none;
-  box-shadow:
-    -20px 20px 60px #abacad,
-    20px -20px 60px #ffffff;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+  background: #0b0b0f;
 }
 .card h2 {
   color: #fff;
@@ -144,7 +143,8 @@ input[type="text"] {
   border-radius: var(--radius);
   padding: 5px 12px;
   width: 100%;
-  background: #fff;
+  background: #111827;
+  color: var(--body-text-color);
   appearance: none;
   font-size: 16px;
   margin-top: 10px;
@@ -182,22 +182,21 @@ button:disabled {
   transition: box-shadow var(--transition-duration);
 }
 .card.elements-style-background:hover {
-  box-shadow:
-    20px 20px 60px #464e9c,
-    -20px -20px 60px #8896ff;
+  box-shadow: 20px 20px 60px #464e9c, -20px -20px 60px #8896ff;
 }
 .checkout-style {
   color: var(--checkout-color);
   border: 1px solid var(--checkout-color);
 }
 .checkout-style-background {
-  background: var(--checkout-color);
-  transition: box-shadow var(--transition-duration);
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  transition: box-shadow var(--transition-duration), transform 0.15s ease;
 }
 .card.checkout-style-background:hover {
-  box-shadow:
-    20px 20px 60px #614b91,
-    -20px -20px 60px #bd91ff;
+  box-shadow: 0 0 0 2px #ffffff;
+  transform: translateY(-2px);
 }
 
 /* Test card number */
@@ -225,7 +224,7 @@ code,
 pre {
   font-family: "SF Mono", "IBM Plex Mono", "Menlo", monospace;
   font-size: 12px;
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   padding: 12px;
   border-radius: var(--radius);
   max-height: 500px;
@@ -237,12 +236,11 @@ pre {
   max-width: 825px;
   margin: 0 auto;
   font-size: 14px;
-  background: var(--body-color);
-  color: #6a7c94;
+  background: #111827;
+  color: #e5e7eb;
   border-radius: 50px;
-  box-shadow:
-    -20px 20px 60px #abacad,
-    20px -20px 60px #ffffff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   box-sizing: border-box;
