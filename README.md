@@ -100,3 +100,43 @@ Make sure to set all required environment variables in your deployment platform.
 - `lib/` - Payment processor client configuration
 - `components/` - React components for payment forms
 - `utils/` - Utility functions
+
+## Multi-Remote Git Setup
+
+This repo syncs to two servers (tangled.sh primary, GitHub mirror) using a custom `all` remote. Running `git push all` updates both simultaneously.
+
+### Current Config
+
+```bash
+all     git@tangled.sh:samsour.de/eny-space (fetch)
+all     git@github.com:Krekeny/eny-space.git (push)
+origin  git@tangled.sh:samsour.de/eny-space (fetch)
+origin  git@tangled.sh:samsour.de/eny-space (push)
+```
+
+### Setup (New Clones)
+
+```bash
+# Clone primary
+git clone git@tangled.sh:samsour.de/eny-space
+
+# Add GitHub mirror push
+cd eny-space
+git remote rename origin tangled
+git remote add all git@tangled.sh:samsour.de/eny-space
+git remote set-url --add --push all git@github.com:Krekeny/eny-space.git
+
+# Push everything
+git push all --all
+git push all --tags
+```
+
+### How to Contribute
+
+1. Clone: `git clone git@tangled.sh:samsour.de/eny-space`
+2. Branch: `git checkout -b your-feature`
+3. Work: edit → `git add . && git commit -m "Your message"`
+4. Push: `git push all` (syncs both servers!)
+5. Update: `git fetch --all && git checkout main && git pull tangled main`
+
+Pro tip: add an alias `pushall="git push all"` in your shell config (e.g. `~/.bashrc` or `~/.zshrc`) for speed.
