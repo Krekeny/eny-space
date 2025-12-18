@@ -52,7 +52,7 @@ export async function createCheckoutSession(
         cancel_url: `${origin}/checkout`,
       }),
       ...(ui_mode === "embedded" && {
-        return_url: `${origin}/donate-with-embedded-checkout/result?session_id={CHECKOUT_SESSION_ID}`,
+        return_url: `${origin}/checkout/result?session_id={CHECKOUT_SESSION_ID}`,
       }),
       ui_mode,
     });
