@@ -49,7 +49,7 @@ export default function IndexPage(): JSX.Element {
         >
           Request early access
         </Link>
-        {/* <Link
+        <Link
           href="/checkout"
           style={{
             display: "inline-block",
@@ -63,7 +63,7 @@ export default function IndexPage(): JSX.Element {
           }}
         >
           Get yours
-        </Link> */}
+        </Link>
       </div>
     </main>
   );

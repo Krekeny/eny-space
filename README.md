@@ -112,9 +112,12 @@ This repo syncs to two servers (tangled.sh primary, GitHub mirror) using a custo
 ```bash
 all     git@tangled.sh:samsour.de/eny-space (fetch)
 all     git@github.com:Krekeny/eny-space.git (push)
+all     git@tangled.sh:samsour.de/eny-space (push)
 origin  git@tangled.sh:samsour.de/eny-space (fetch)
 origin  git@tangled.sh:samsour.de/eny-space (push)
 ```
+
+Note: I previously had `all` with `git@tangled.sh:samsour.de/eny-space` as **fetch only**, so pushes were only going to GitHub and the tangled.sh repo wasn’t in sync. The config above fixes that by adding tangled.sh as a push URL on `all`.
 
 ### Setup (New Clones)
 
@@ -122,11 +125,12 @@ origin  git@tangled.sh:samsour.de/eny-space (push)
 # Clone primary
 git clone git@tangled.sh:samsour.de/eny-space
 
-# Add GitHub mirror push
+# Add GitHub mirror + tangled push
 cd eny-space
 git remote rename origin tangled
 git remote add all git@tangled.sh:samsour.de/eny-space
 git remote set-url --add --push all git@github.com:Krekeny/eny-space.git
+git remote set-url --add --push all git@tangled.sh:samsour.de/eny-space
 
 # Push everything
 git push all --all
