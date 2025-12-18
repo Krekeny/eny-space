@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import "../styles.css";
 
@@ -24,13 +25,12 @@ export default function RootLayout({ children }: LayoutProps) {
         <div className="container">
           <header>
             <div className="header-content">
-              <h1>
-                Easy PDS
-              </h1>
+              <h1>Easy PDS</h1>
             </div>
           </header>
           {children}
         </div>
+        <SpeedInsights />
       </body>
     </html>
   );

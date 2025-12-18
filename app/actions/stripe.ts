@@ -9,16 +9,16 @@ import { formatAmountForStripe } from "@/utils/stripe-helpers";
 import { stripe } from "@/lib/stripe";
 
 export async function createCheckoutSession(
-  data: FormData,
+  data: FormData
 ): Promise<{ client_secret: string | null; url: string | null }> {
   const ui_mode = data.get(
-    "uiMode",
+    "uiMode"
   ) as Stripe.Checkout.SessionCreateParams.UiMode;
 
   const headersList = await headers();
   const originHeader = headersList.get("origin");
   const hostHeader = headersList.get("host");
-  
+
   let origin: string;
   if (originHeader) {
     origin = originHeader;
@@ -42,7 +42,7 @@ export async function createCheckoutSession(
             },
             unit_amount: formatAmountForStripe(
               Number(data.get("customDonation") as string),
-              CURRENCY,
+              CURRENCY
             ),
           },
         },
@@ -64,13 +64,13 @@ export async function createCheckoutSession(
 }
 
 export async function createPaymentIntent(
-  data: FormData,
+  data: FormData
 ): Promise<{ client_secret: string }> {
   const paymentIntent: Stripe.PaymentIntent =
     await stripe.paymentIntents.create({
       amount: formatAmountForStripe(
         Number(data.get("customDonation") as string),
-        CURRENCY,
+        CURRENCY
       ),
       automatic_payment_methods: { enabled: true },
       currency: CURRENCY,

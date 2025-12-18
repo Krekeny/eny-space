@@ -28,7 +28,7 @@ export default function CheckoutForm(props: CheckoutFormProps): JSX.Element {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (
-    e,
+    e
   ): void =>
     setInput({
       ...input,
@@ -37,7 +37,7 @@ export default function CheckoutForm(props: CheckoutFormProps): JSX.Element {
 
   const formAction = async (data: FormData): Promise<void> => {
     const uiMode = data.get(
-      "uiMode",
+      "uiMode"
     ) as Stripe.Checkout.SessionCreateParams.UiMode;
     const { client_secret, url } = await createCheckoutSession(data);
 
@@ -66,7 +66,8 @@ export default function CheckoutForm(props: CheckoutFormProps): JSX.Element {
           type="submit"
           disabled={loading}
         >
-          Purchase {formatAmountForDisplay(input.customDonation, config.CURRENCY)}
+          Purchase{" "}
+          {formatAmountForDisplay(input.customDonation, config.CURRENCY)}
         </button>
       </form>
       {clientSecret ? (
