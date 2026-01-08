@@ -27,12 +27,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body className={fontSans.className}>
         <div className="max-w-[1280px] px-6 py-11 flex flex-row">
           <header className="relative flex-[0_0_250px] pr-12">
             <div className="sticky top-11">
-              <h1 className="font-semibold text-[#f9fafb] my-1.5 text-[27px] leading-8">eny.space</h1>
+              <h1 className="font-semibold text-foreground my-1.5 text-[27px] leading-8">eny.space</h1>
             </div>
           </header>
           {children}
