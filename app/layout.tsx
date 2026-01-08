@@ -3,7 +3,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { Space_Grotesk } from "next/font/google";
 
-import "../styles.css";
+import "./globals.css";
 
 const fontSans = Space_Grotesk({
   subsets: ["latin"],
@@ -29,10 +29,10 @@ export default function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="en">
       <body className={fontSans.className}>
-        <div className="container">
-          <header>
-            <div className="header-content">
-              <h1>eny.space</h1>
+        <div className="max-w-[1280px] px-6 py-11 flex flex-row">
+          <header className="relative flex-[0_0_250px] pr-12">
+            <div className="sticky top-11">
+              <h1 className="font-semibold text-[#f9fafb] my-1.5 text-[27px] leading-8">eny.space</h1>
             </div>
           </header>
           {children}

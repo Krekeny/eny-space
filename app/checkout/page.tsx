@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function DonatePage(): JSX.Element {
   return (
-    <div className="page-container">
+    <div className="pb-[60px] max-w-[600px]">
       <h1>Purchase Hosting Service</h1>
       <p>Select your hosting plan and complete your purchase</p>
       <CheckoutForm uiMode="hosted" />

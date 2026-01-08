@@ -51,7 +51,7 @@ export default function CheckoutForm(props: CheckoutFormProps): JSX.Element {
       <form action={formAction}>
         <input type="hidden" name="uiMode" value={props.uiMode} />
         <CustomDonationInput
-          className="checkout-style"
+          className="text-[#8f6ed5] border border-[#8f6ed5]"
           name="customDonation"
           min={config.MIN_AMOUNT}
           max={config.MAX_AMOUNT}
@@ -62,7 +62,7 @@ export default function CheckoutForm(props: CheckoutFormProps): JSX.Element {
         />
         <TestCards />
         <button
-          className="checkout-style-background"
+          className="bg-black text-white border border-white transition-[box-shadow,transform] duration-[2s,0.15s] hover:shadow-[0_0_0_2px_#ffffff] hover:-translate-y-0.5 rounded-[6px] text-base border-0 py-3 px-4 mt-2.5 font-semibold cursor-pointer block w-full disabled:opacity-50 disabled:cursor-not-allowed"
           type="submit"
           disabled={loading}
         >

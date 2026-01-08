@@ -10,7 +10,7 @@ export default function ResultLayout({
   children: React.ReactNode;
 }): JSX.Element {
   return (
-    <div className="page-container">
+    <div className="pb-[60px] max-w-[600px]">
       <h1>Checkout Session Result</h1>
       {children}
     </div>

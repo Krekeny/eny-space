@@ -17,7 +17,7 @@ export default async function ResultPage({
 
   if (!sessionId) {
     return (
-      <div className="page-container">
+      <div className="pb-[60px] max-w-[600px]">
         <h2>No session found</h2>
         <p>
           It looks like you didn't complete a checkout session, or the session
@@ -59,7 +59,7 @@ export default async function ResultPage({
     );
   } catch (error) {
     return (
-      <div className="page-container">
+      <div className="pb-[60px] max-w-[600px]">
         <h2>Error retrieving session</h2>
         <p>The checkout session could not be retrieved. Please try again.</p>
         <Link

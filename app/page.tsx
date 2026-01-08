@@ -6,9 +6,9 @@ export const metadata: Metadata = {
   title: "eny.space – your data, your space, use it enywhere",
 };
 
-export default function IndexPage(): JSX.Element {
+export default function IndexPage() {
   return (
-    <main className="page-container">
+    <main className="pb-[60px] max-w-[600px]">
       <h1>Your own custom PDS in seconds</h1>
       <h2>One-click ATProto hosting with eny.space</h2>
       <p>
