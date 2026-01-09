@@ -18,7 +18,7 @@ export default function CustomDonationInput({
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   value: number;
   className?: string;
-}): JSX.Element {
+}) {
   return (
     <label>
       Service amount ({formatAmountForDisplay(min, currency)}-

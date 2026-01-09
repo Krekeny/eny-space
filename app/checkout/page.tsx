@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Purchase Hosting",
 };
 
-export default function DonatePage(): JSX.Element {
+export default function DonatePage() {
   return (
     <div className="pb-[60px] max-w-[600px]">
       <h1>Purchase Hosting Service</h1>

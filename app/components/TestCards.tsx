@@ -1,4 +1,4 @@
-export default function TestCards(): JSX.Element {
+export default function TestCards() {
   return (
     <div className="block mt-4 mb-4">
       Use test cards for testing, e.g.{" "}

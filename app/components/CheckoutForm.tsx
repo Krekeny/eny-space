@@ -20,7 +20,7 @@ interface CheckoutFormProps {
   uiMode: Stripe.Checkout.SessionCreateParams.UiMode;
 }
 
-export default function CheckoutForm(props: CheckoutFormProps): JSX.Element {
+export default function CheckoutForm(props: CheckoutFormProps) {
   const [loading] = useState<boolean>(false);
   const [input, setInput] = useState<{ customDonation: number }>({
     customDonation: Math.round(config.MAX_AMOUNT / config.AMOUNT_STEP),

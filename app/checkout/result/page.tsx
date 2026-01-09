@@ -9,7 +9,7 @@ export default async function ResultPage({
   searchParams,
 }: {
   searchParams: Promise<{ session_id?: string | string[] }>;
-}): Promise<JSX.Element> {
+}) {
   const params = await searchParams;
   const sessionId = Array.isArray(params.session_id)
     ? params.session_id[0]
