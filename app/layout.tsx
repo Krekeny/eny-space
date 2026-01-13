@@ -3,7 +3,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { Space_Grotesk } from "next/font/google";
 
-import "../styles.css";
+import "./globals.css";
 
 const fontSans = Space_Grotesk({
   subsets: ["latin"],

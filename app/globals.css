@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* Variables */
 :root {
   --body-color: #050505;
