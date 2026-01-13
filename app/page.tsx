@@ -35,7 +35,7 @@ export default function IndexPage(): JSX.Element {
         style={{ display: "flex", gap: 12, marginTop: 24, flexWrap: "wrap" }}
       >
         <Link
-          href="mailto:hello@eny.space?subject=I%27d%20like%20early%20access%20to%20eny.space%20PDS"
+          href="mailto:hello@krekeny.com?subject=I%27d%20like%20early%20access%20to%20eny.space%20PDS"
           style={{
             display: "inline-block",
             padding: "12px 24px",
