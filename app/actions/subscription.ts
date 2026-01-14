@@ -6,107 +6,90 @@ import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import type { Stripe } from "stripe";
 
-export async function getSubscriptionStatus() {
+/**
+ * Get user's Stripe customer ID from database (minimal storage)
+ */
+async function getStripeCustomerId(): Promise<string | null> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { subscribed: false, subscription: null };
+    return null;
   }
 
   const { data: subscription } = await supabase
     .from("subscriptions")
-    .select("*")
+    .select("stripe_customer_id")
     .eq("user_id", user.id)
-    .in("status", ["active", "trialing"])
-    .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
+  return subscription?.stripe_customer_id || null;
+}
+
+/**
+ * Get active subscription directly from Stripe (source of truth)
+ */
+export async function getActiveSubscription(): Promise<Stripe.Subscription | null> {
+  const customerId = await getStripeCustomerId();
+  if (!customerId) {
+    return null;
+  }
+
+  try {
+    // Get all subscriptions for this customer
+    const subscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "all",
+      limit: 10,
+    });
+
+    // Find active or trialing subscription
+    const activeSubscription = subscriptions.data.find(
+      (sub) => (sub.status === "active" || sub.status === "trialing") && !sub.cancel_at_period_end
+    );
+
+    return activeSubscription || null;
+  } catch (error) {
+    console.error("Error fetching subscription from Stripe:", error);
+    return null;
+  }
+}
+
+/**
+ * Get subscription status for UI (always from Stripe)
+ */
+export async function getSubscriptionStatus() {
+  const subscription = await getActiveSubscription();
+
   return {
-    subscribed: !!subscription && (subscription.status === "active" || subscription.status === "trialing"),
+    subscribed: !!subscription,
+    subscription: subscription ? {
+      status: subscription.status,
+      cancel_at_period_end: subscription.cancel_at_period_end,
+      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+    } : null,
+  };
+}
+
+/**
+ * Verify active subscription for protected routes (always checks Stripe)
+ */
+export async function verifyActiveSubscription(): Promise<{ active: boolean; subscription: Stripe.Subscription | null }> {
+  const subscription = await getActiveSubscription();
+
+  return {
+    active: !!subscription,
     subscription,
   };
 }
 
-export async function syncSubscriptionFromCheckoutSession(sessionId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
-  try {
-    // Retrieve the checkout session from Stripe
-    const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ["subscription"],
-    });
-
-    // SECURITY: Verify the session belongs to this user
-    if (session.metadata?.user_id !== user.id) {
-      console.error(`Session ${sessionId} does not belong to user ${user.id}`);
-      return { success: false, error: "Session does not belong to this user" };
-    }
-
-    // SECURITY: Verify payment was successful
-    if (session.payment_status !== "paid") {
-      return { success: false, error: "Payment not completed" };
-    }
-
-    if (session.mode === "subscription" && session.subscription) {
-      const subscription = typeof session.subscription === "string"
-        ? await stripe.subscriptions.retrieve(session.subscription)
-        : session.subscription;
-
-      // SECURITY: Verify subscription customer matches session customer
-      if (subscription.customer !== session.customer) {
-        return { success: false, error: "Subscription customer mismatch" };
-      }
-
-      // Use admin client to bypass RLS (this is a validated update from Stripe)
-      // If admin client not available, we can't update (security: prevents user manipulation)
-      let supabaseClient;
-      try {
-        supabaseClient = createAdminClient();
-      } catch (error) {
-        console.error("Admin client required for subscription sync:", error);
-        return { 
-          success: false, 
-          error: "Server configuration error. Please contact support." 
-        };
-      }
-      
-      const { error: dbError } = await supabaseClient.from("subscriptions").upsert({
-        user_id: user.id,
-        stripe_customer_id: subscription.customer as string,
-        stripe_subscription_id: subscription.id,
-        stripe_price_id: subscription.items.data[0]?.price.id,
-        status: subscription.status,
-        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-        cancel_at_period_end: subscription.cancel_at_period_end,
-      });
-
-      if (dbError) {
-        console.error("Database error:", dbError);
-        return { success: false, error: "Failed to sync subscription" };
-      }
-
-      return { success: true };
-    }
-
-    return { success: false, error: "Not a subscription session" };
-  } catch (error) {
-    console.error("Error syncing subscription:", error);
-    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
-  }
-}
-
+/**
+ * Create checkout session for new subscription
+ */
 export async function createSubscriptionCheckout(priceId: string) {
   const supabase = await createClient();
   const {
@@ -118,16 +101,9 @@ export async function createSubscriptionCheckout(priceId: string) {
   }
 
   // Get or create Stripe customer
-  let customerId: string;
-  const { data: existingSubscription } = await supabase
-    .from("subscriptions")
-    .select("stripe_customer_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  let customerId = await getStripeCustomerId();
 
-  if (existingSubscription?.stripe_customer_id) {
-    customerId = existingSubscription.stripe_customer_id;
-  } else {
+  if (!customerId) {
     const customer = await stripe.customers.create({
       email: user.email!,
       metadata: {
@@ -136,11 +112,10 @@ export async function createSubscriptionCheckout(priceId: string) {
     });
     customerId = customer.id;
 
-    // Store customer ID in database (users can now insert their own records)
+    // Store only customer ID in database (minimal)
     await supabase.from("subscriptions").upsert({
       user_id: user.id,
       stripe_customer_id: customerId,
-      status: "incomplete",
     });
   }
 
@@ -167,4 +142,99 @@ export async function createSubscriptionCheckout(priceId: string) {
   });
 
   return { url: checkoutSession.url };
+}
+
+/**
+ * Cancel subscription (sets cancel_at_period_end)
+ */
+export async function cancelSubscription() {
+  const subscription = await getActiveSubscription();
+
+  if (!subscription) {
+    return { success: false, error: "No active subscription found" };
+  }
+
+  try {
+    await stripe.subscriptions.update(subscription.id, {
+      cancel_at_period_end: true,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error canceling subscription:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to cancel subscription",
+    };
+  }
+}
+
+/**
+ * Resume subscription (removes cancel_at_period_end)
+ */
+export async function resumeSubscription() {
+  const customerId = await getStripeCustomerId();
+  if (!customerId) {
+    return { success: false, error: "No subscription found" };
+  }
+
+  try {
+    // Find subscription that's scheduled for cancellation
+    const subscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "all",
+      limit: 10,
+    });
+
+    const cancelingSubscription = subscriptions.data.find(
+      (sub) => sub.cancel_at_period_end === true && (sub.status === "active" || sub.status === "trialing")
+    );
+
+    if (!cancelingSubscription) {
+      return { success: false, error: "No subscription scheduled for cancellation found" };
+    }
+
+    await stripe.subscriptions.update(cancelingSubscription.id, {
+      cancel_at_period_end: false,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error resuming subscription:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to resume subscription",
+    };
+  }
+}
+
+/**
+ * Create billing portal session
+ */
+export async function createBillingPortalSession() {
+  const customerId = await getStripeCustomerId();
+
+  if (!customerId) {
+    return { success: false, error: "No subscription found" };
+  }
+
+  const headersList = await headers();
+  const originHeader = headersList.get("origin");
+  const hostHeader = headersList.get("host");
+  const origin = originHeader || `https://${hostHeader}` || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+  try {
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: `${origin}/dashboard`,
+    });
+
+    return { success: true, url: session.url };
+  } catch (error) {
+    console.error("Error creating billing portal session:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to create billing portal session",
+    };
+  }
 }
