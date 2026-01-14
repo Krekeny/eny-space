@@ -1,13 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getSubscriptionStatus, syncSubscriptionFromCheckoutSession } from "@/actions/subscription";
+import { getSubscriptionStatus } from "@/actions/subscription";
 import DashboardClient from "./dashboard-client";
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ session_id?: string }>;
-}) {
+export default async function DashboardPage() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -17,13 +13,7 @@ export default async function DashboardPage({
     redirect("/login");
   }
 
-  const params = await searchParams;
-  
-  // If we have a session_id, try to sync the subscription (fallback if webhook hasn't fired)
-  if (params.session_id) {
-    await syncSubscriptionFromCheckoutSession(params.session_id);
-  }
-
+  // Always fetch subscription status directly from Stripe (source of truth)
   const { subscribed, subscription } = await getSubscriptionStatus();
 
   return (

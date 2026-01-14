@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getSubscriptionStatus } from "@/actions/subscription";
+import { verifyActiveSubscription } from "@/actions/subscription";
 
 export async function POST(
   req: Request,
@@ -18,11 +18,12 @@ export async function POST(
     );
   }
 
-  const { subscribed } = await getSubscriptionStatus();
+  // Always verify subscription status directly from Stripe (source of truth)
+  const { active } = await verifyActiveSubscription();
 
-  if (!subscribed) {
+  if (!active) {
     return NextResponse.json(
-      { message: "Subscription required" },
+      { message: "Active subscription required" },
       { status: 403 }
     );
   }
