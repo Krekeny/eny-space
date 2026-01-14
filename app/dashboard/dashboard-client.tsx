@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { createSubscriptionCheckout, cancelSubscription, resumeSubscription, createBillingPortalSession } from "@/actions/subscription";
+import {
+  createSubscriptionCheckout,
+  cancelSubscription,
+  resumeSubscription,
+  createBillingPortalSession,
+} from "@/actions/subscription";
 
 interface DashboardClientProps {
   subscribed: boolean;
@@ -9,13 +14,19 @@ interface DashboardClientProps {
   priceId: string;
 }
 
-export default function DashboardClient({ subscribed, subscription, priceId }: DashboardClientProps) {
+export default function DashboardClient({
+  subscribed,
+  subscription,
+  priceId,
+}: DashboardClientProps) {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const handleSubscribe = async () => {
     if (!priceId) {
-      alert("Stripe price ID not configured. Please set NEXT_PUBLIC_STRIPE_PRICE_ID in your environment variables.");
+      alert(
+        "Stripe price ID not configured. Please set NEXT_PUBLIC_STRIPE_PRICE_ID in your environment variables."
+      );
       return;
     }
 
@@ -48,17 +59,27 @@ export default function DashboardClient({ subscribed, subscription, priceId }: D
       alert(`Success: ${JSON.stringify(data, null, 2)}`);
     } catch (error) {
       console.error("Error making server call:", error);
-      alert(`Error: ${error instanceof Error ? error.message : "Unknown error"}`);
+      alert(
+        `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
     }
   };
 
   // Show subscription management
   const hasSubscription = !!subscription;
-  const isCanceled = subscription?.status === "canceled" || subscription?.status === "past_due";
+  const isCanceled =
+    subscription?.status === "canceled" || subscription?.status === "past_due";
 
   if (!hasSubscription) {
     return (
-      <div style={{ marginTop: "32px", padding: "24px", border: "1px solid #ccc", borderRadius: "8px" }}>
+      <div
+        style={{
+          marginTop: "32px",
+          padding: "24px",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+        }}
+      >
         <h2>Subscribe to Access</h2>
         <p>You need an active subscription to access the server features.</p>
         <button
@@ -84,9 +105,19 @@ export default function DashboardClient({ subscribed, subscription, priceId }: D
 
   if (isCanceled) {
     return (
-      <div style={{ marginTop: "32px", padding: "24px", border: "1px solid #ccc", borderRadius: "8px", backgroundColor: "#f5f5f5" }}>
+      <div
+        style={{
+          marginTop: "32px",
+          padding: "24px",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+          backgroundColor: "#f5f5f5",
+        }}
+      >
         <h2 style={{ color: "#666", marginTop: 0 }}>Subscription Canceled</h2>
-        <p>Your subscription has been canceled. Subscribe again to regain access.</p>
+        <p>
+          Your subscription has been canceled. Subscribe again to regain access.
+        </p>
         <button
           onClick={handleSubscribe}
           disabled={loading}
@@ -109,7 +140,11 @@ export default function DashboardClient({ subscribed, subscription, priceId }: D
   }
 
   const handleCancel = async () => {
-    if (!confirm("Are you sure you want to cancel your subscription? You'll have access until the end of your billing period.")) {
+    if (
+      !confirm(
+        "Are you sure you want to cancel your subscription? You'll have access until the end of your billing period."
+      )
+    ) {
       return;
     }
 
@@ -117,7 +152,9 @@ export default function DashboardClient({ subscribed, subscription, priceId }: D
     try {
       const result = await cancelSubscription();
       if (result.success) {
-        alert("Subscription canceled. You'll have access until the end of your billing period.");
+        alert(
+          "Subscription canceled. You'll have access until the end of your billing period."
+        );
         window.location.reload();
       } else {
         alert(`Error: ${result.error}`);
@@ -171,7 +208,15 @@ export default function DashboardClient({ subscribed, subscription, priceId }: D
 
   return (
     <div style={{ marginTop: "32px" }}>
-      <div style={{ padding: "24px", border: `1px solid ${statusColor}`, borderRadius: "8px", backgroundColor: statusBg, marginBottom: "24px" }}>
+      <div
+        style={{
+          padding: "24px",
+          border: `1px solid ${statusColor}`,
+          borderRadius: "8px",
+          backgroundColor: statusBg,
+          marginBottom: "24px",
+        }}
+      >
         <h2 style={{ color: statusColor, marginTop: 0 }}>
           {isCanceling ? "⚠️ Subscription Canceling" : "✓ Active Subscription"}
         </h2>
@@ -182,9 +227,8 @@ export default function DashboardClient({ subscribed, subscription, priceId }: D
             </p>
             {subscription.current_period_end && (
               <p>
-                <strong>
-                  {isCanceling ? "Access until:" : "Renews:"}
-                </strong> {new Date(subscription.current_period_end).toLocaleDateString()}
+                <strong>{isCanceling ? "Access until:" : "Renews:"}</strong>{" "}
+                {new Date(subscription.current_period_end).toLocaleDateString()}
               </p>
             )}
             {isCanceling && (
@@ -195,7 +239,14 @@ export default function DashboardClient({ subscribed, subscription, priceId }: D
           </div>
         )}
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "16px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+            marginTop: "16px",
+          }}
+        >
           <button
             onClick={handleManageBilling}
             disabled={actionLoading !== null}
@@ -210,7 +261,9 @@ export default function DashboardClient({ subscribed, subscription, priceId }: D
               opacity: actionLoading !== null ? 0.6 : 1,
             }}
           >
-            {actionLoading === "billing" ? "Loading..." : "Manage Payment Method"}
+            {actionLoading === "billing"
+              ? "Loading..."
+              : "Manage Payment Method"}
           </button>
 
           {isCanceling ? (
@@ -228,7 +281,9 @@ export default function DashboardClient({ subscribed, subscription, priceId }: D
                 opacity: actionLoading !== null ? 0.6 : 1,
               }}
             >
-              {actionLoading === "resume" ? "Loading..." : "Resume Subscription"}
+              {actionLoading === "resume"
+                ? "Loading..."
+                : "Resume Subscription"}
             </button>
           ) : (
             <button
@@ -245,17 +300,32 @@ export default function DashboardClient({ subscribed, subscription, priceId }: D
                 opacity: actionLoading !== null ? 0.6 : 1,
               }}
             >
-              {actionLoading === "cancel" ? "Loading..." : "Cancel Subscription"}
+              {actionLoading === "cancel"
+                ? "Loading..."
+                : "Cancel Subscription"}
             </button>
           )}
         </div>
       </div>
 
-      <div style={{ padding: "24px", border: "1px solid #ccc", borderRadius: "8px" }}>
+      <div
+        style={{
+          padding: "24px",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+        }}
+      >
         <h2>Server Actions</h2>
         <p>You have access to the following server endpoints:</p>
-        
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "16px" }}>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            marginTop: "16px",
+          }}
+        >
           <button
             onClick={() => handleServerCall("action1")}
             style={{
@@ -270,7 +340,7 @@ export default function DashboardClient({ subscribed, subscription, priceId }: D
           >
             Call Server Action 1
           </button>
-          
+
           <button
             onClick={() => handleServerCall("action2")}
             style={{
