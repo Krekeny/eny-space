@@ -20,9 +20,9 @@ export default async function DashboardPage() {
     <main className="page-container">
       <h1>Dashboard</h1>
       <p>Welcome, {user.email}!</p>
-      
-      <DashboardClient 
-        subscribed={subscribed} 
+
+      <DashboardClient
+        subscribed={subscribed}
         subscription={subscription}
         priceId={process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || ""}
       />

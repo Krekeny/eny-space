@@ -48,7 +48,9 @@ export async function getActiveSubscription(): Promise<Stripe.Subscription | nul
 
     // Find active or trialing subscription
     const activeSubscription = subscriptions.data.find(
-      (sub) => (sub.status === "active" || sub.status === "trialing") && !sub.cancel_at_period_end
+      (sub) =>
+        (sub.status === "active" || sub.status === "trialing") &&
+        !sub.cancel_at_period_end
     );
 
     return activeSubscription || null;
@@ -66,19 +68,28 @@ export async function getSubscriptionStatus() {
 
   return {
     subscribed: !!subscription,
-    subscription: subscription ? {
-      status: subscription.status,
-      cancel_at_period_end: subscription.cancel_at_period_end,
-      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-    } : null,
+    subscription: subscription
+      ? {
+          status: subscription.status,
+          cancel_at_period_end: subscription.cancel_at_period_end,
+          current_period_end: new Date(
+            subscription.current_period_end * 1000
+          ).toISOString(),
+          current_period_start: new Date(
+            subscription.current_period_start * 1000
+          ).toISOString(),
+        }
+      : null,
   };
 }
 
 /**
  * Verify active subscription for protected routes (always checks Stripe)
  */
-export async function verifyActiveSubscription(): Promise<{ active: boolean; subscription: Stripe.Subscription | null }> {
+export async function verifyActiveSubscription(): Promise<{
+  active: boolean;
+  subscription: Stripe.Subscription | null;
+}> {
   const subscription = await getActiveSubscription();
 
   return {
@@ -122,7 +133,11 @@ export async function createSubscriptionCheckout(priceId: string) {
   const headersList = await headers();
   const originHeader = headersList.get("origin");
   const hostHeader = headersList.get("host");
-  const origin = originHeader || `https://${hostHeader}` || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const origin =
+    originHeader ||
+    `https://${hostHeader}` ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    "http://localhost:3000";
 
   const checkoutSession = await stripe.checkout.sessions.create({
     customer: customerId,
@@ -164,7 +179,10 @@ export async function cancelSubscription() {
     console.error("Error canceling subscription:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to cancel subscription",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to cancel subscription",
     };
   }
 }
@@ -187,11 +205,16 @@ export async function resumeSubscription() {
     });
 
     const cancelingSubscription = subscriptions.data.find(
-      (sub) => sub.cancel_at_period_end === true && (sub.status === "active" || sub.status === "trialing")
+      (sub) =>
+        sub.cancel_at_period_end === true &&
+        (sub.status === "active" || sub.status === "trialing")
     );
 
     if (!cancelingSubscription) {
-      return { success: false, error: "No subscription scheduled for cancellation found" };
+      return {
+        success: false,
+        error: "No subscription scheduled for cancellation found",
+      };
     }
 
     await stripe.subscriptions.update(cancelingSubscription.id, {
@@ -203,7 +226,10 @@ export async function resumeSubscription() {
     console.error("Error resuming subscription:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to resume subscription",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to resume subscription",
     };
   }
 }
@@ -221,7 +247,11 @@ export async function createBillingPortalSession() {
   const headersList = await headers();
   const originHeader = headersList.get("origin");
   const hostHeader = headersList.get("host");
-  const origin = originHeader || `https://${hostHeader}` || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const origin =
+    originHeader ||
+    `https://${hostHeader}` ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    "http://localhost:3000";
 
   try {
     const session = await stripe.billingPortal.sessions.create({
@@ -234,7 +264,10 @@ export async function createBillingPortalSession() {
     console.error("Error creating billing portal session:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create billing portal session",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to create billing portal session",
     };
   }
 }

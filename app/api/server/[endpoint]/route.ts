@@ -12,10 +12,7 @@ export async function POST(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json(
-      { message: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   // Always verify subscription status directly from Stripe (source of truth)
@@ -56,7 +53,10 @@ export async function POST(
   } catch (error) {
     console.error("Error making server call:", error);
     return NextResponse.json(
-      { message: "Failed to make server call", error: error instanceof Error ? error.message : "Unknown error" },
+      {
+        message: "Failed to make server call",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }

@@ -12,14 +12,14 @@ export async function POST(req: Request) {
     event = stripe.webhooks.constructEvent(
       await (await req.blob()).text(),
       req.headers.get("stripe-signature") as string,
-      process.env.STRIPE_WEBHOOK_SECRET as string,
+      process.env.STRIPE_WEBHOOK_SECRET as string
     );
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error";
     console.log(`❌ Webhook Error: ${errorMessage}`);
     return NextResponse.json(
       { message: `Webhook Error: ${errorMessage}` },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -33,9 +33,10 @@ export async function POST(req: Request) {
 
     if (session.mode === "subscription" && session.customer) {
       const userId = session.metadata?.user_id;
-      const customerId = typeof session.customer === "string" 
-        ? session.customer 
-        : session.customer.id;
+      const customerId =
+        typeof session.customer === "string"
+          ? session.customer
+          : session.customer.id;
 
       if (userId && customerId) {
         // Only store user_id -> stripe_customer_id mapping (minimal)

@@ -40,24 +40,39 @@ export default async function RootLayout({ children }: LayoutProps) {
         <div className="container">
           <header>
             <div className="header-content">
-              <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
+              <Link
+                href="/"
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
                 <h1>eny.space</h1>
               </Link>
-              <nav style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "24px" }}>
+              <nav
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
+                  marginTop: "24px",
+                }}
+              >
                 {user ? (
                   <>
-                    <Link href="/dashboard" style={{ color: "var(--h2-color)" }}>Dashboard</Link>
+                    <Link
+                      href="/dashboard"
+                      style={{ color: "var(--h2-color)" }}
+                    >
+                      Dashboard
+                    </Link>
                     <form action={signOut} style={{ margin: 0 }}>
-                      <button 
-                        type="submit" 
-                        style={{ 
-                          background: "none", 
-                          border: "none", 
-                          cursor: "pointer", 
+                      <button
+                        type="submit"
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
                           color: "var(--h2-color)",
                           padding: 0,
                           textAlign: "left",
-                          font: "inherit"
+                          font: "inherit",
                         }}
                       >
                         Sign Out
@@ -66,8 +81,12 @@ export default async function RootLayout({ children }: LayoutProps) {
                   </>
                 ) : (
                   <>
-                    <Link href="/login" style={{ color: "var(--h2-color)" }}>Login</Link>
-                    <Link href="/signup" style={{ color: "var(--h2-color)" }}>Sign Up</Link>
+                    <Link href="/login" style={{ color: "var(--h2-color)" }}>
+                      Login
+                    </Link>
+                    <Link href="/signup" style={{ color: "var(--h2-color)" }}>
+                      Sign Up
+                    </Link>
                   </>
                 )}
               </nav>

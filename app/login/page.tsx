@@ -3,11 +3,20 @@ import Link from "next/link";
 
 export default function LoginPage() {
   return (
-    <main className="page-container" style={{ maxWidth: "400px", margin: "0 auto" }}>
+    <main
+      className="page-container"
+      style={{ maxWidth: "400px", margin: "0 auto" }}
+    >
       <h1>Login</h1>
-      <form action={signIn} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <form
+        action={signIn}
+        style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+      >
         <div>
-          <label htmlFor="email" style={{ display: "block", marginBottom: "8px" }}>
+          <label
+            htmlFor="email"
+            style={{ display: "block", marginBottom: "8px" }}
+          >
             Email
           </label>
           <input
@@ -24,7 +33,10 @@ export default function LoginPage() {
           />
         </div>
         <div>
-          <label htmlFor="password" style={{ display: "block", marginBottom: "8px" }}>
+          <label
+            htmlFor="password"
+            style={{ display: "block", marginBottom: "8px" }}
+          >
             Password
           </label>
           <input
