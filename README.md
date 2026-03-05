@@ -107,7 +107,6 @@ stripe listen --forward-to localhost:3000/api/webhooks
 1. Deploy your application and copy the webhook URL (e.g., `https://your-domain.com/api/webhooks`).
 
 2. In your Stripe dashboard, go to Developers → Webhooks and add an endpoint:
-
    - URL: `https://your-domain.com/api/webhooks`
    - Events to listen to:
      - `checkout.session.completed`
@@ -196,3 +195,5 @@ git push all --tags
 5. Update: `git fetch --all && git checkout main && git pull tangled main`
 
 Pro tip: add an alias `pushall="git push all"` in your shell config (e.g. `~/.bashrc` or `~/.zshrc`) for speed.
+
+# This is a test for commit
