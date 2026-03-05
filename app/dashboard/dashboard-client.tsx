@@ -65,38 +65,16 @@ export default function DashboardClient({
     }
   };
 
-  // Show subscription management
   const hasSubscription = !!subscription;
   const isCanceled =
     subscription?.status === "canceled" || subscription?.status === "past_due";
 
   if (!hasSubscription) {
     return (
-      <div
-        style={{
-          marginTop: "32px",
-          padding: "24px",
-          border: "1px solid #ccc",
-          borderRadius: "8px",
-        }}
-      >
+      <div>
         <h2>Subscribe to Access</h2>
         <p>You need an active subscription to access the server features.</p>
-        <button
-          onClick={handleSubscribe}
-          disabled={loading}
-          style={{
-            marginTop: "16px",
-            padding: "12px 24px",
-            borderRadius: "6px",
-            backgroundColor: "#000000",
-            color: "#ffffff",
-            border: "1px solid #ffffff",
-            cursor: loading ? "not-allowed" : "pointer",
-            fontWeight: 600,
-            opacity: loading ? 0.6 : 1,
-          }}
-        >
+        <button onClick={handleSubscribe} disabled={loading}>
           {loading ? "Loading..." : "Subscribe Now"}
         </button>
       </div>
@@ -105,34 +83,12 @@ export default function DashboardClient({
 
   if (isCanceled) {
     return (
-      <div
-        style={{
-          marginTop: "32px",
-          padding: "24px",
-          border: "1px solid #ccc",
-          borderRadius: "8px",
-          backgroundColor: "#f5f5f5",
-        }}
-      >
-        <h2 style={{ color: "#666", marginTop: 0 }}>Subscription Canceled</h2>
+      <div>
+        <h2>Subscription Canceled</h2>
         <p>
           Your subscription has been canceled. Subscribe again to regain access.
         </p>
-        <button
-          onClick={handleSubscribe}
-          disabled={loading}
-          style={{
-            marginTop: "16px",
-            padding: "12px 24px",
-            borderRadius: "6px",
-            backgroundColor: "#000000",
-            color: "#ffffff",
-            border: "1px solid #ffffff",
-            cursor: loading ? "not-allowed" : "pointer",
-            fontWeight: 600,
-            opacity: loading ? 0.6 : 1,
-          }}
-        >
+        <button onClick={handleSubscribe} disabled={loading}>
           {loading ? "Loading..." : "Subscribe Again"}
         </button>
       </div>
@@ -203,160 +159,66 @@ export default function DashboardClient({
   };
 
   const isCanceling = subscription?.cancel_at_period_end === true;
-  const statusColor = isCanceling ? "#ff9800" : "#4caf50";
-  const statusBg = isCanceling ? "#fff3e0" : "#f0f9f0";
 
   return (
-    <div style={{ marginTop: "32px" }}>
-      <div
-        style={{
-          padding: "24px",
-          border: `1px solid ${statusColor}`,
-          borderRadius: "8px",
-          backgroundColor: statusBg,
-          marginBottom: "24px",
-        }}
-      >
-        <h2 style={{ color: statusColor, marginTop: 0 }}>
-          {isCanceling ? "⚠️ Subscription Canceling" : "✓ Active Subscription"}
-        </h2>
-        {subscription && (
-          <div style={{ marginBottom: "16px" }}>
+    <div>
+      <h2>{isCanceling ? "Subscription Canceling" : "Active Subscription"}</h2>
+      {subscription && (
+        <div>
+          <p>
+            <strong>Status:</strong> {subscription.status}
+          </p>
+          {subscription.current_period_end && (
             <p>
-              <strong>Status:</strong> {subscription.status}
+              <strong>{isCanceling ? "Access until:" : "Renews:"}</strong>{" "}
+              {new Date(subscription.current_period_end).toLocaleDateString()}
             </p>
-            {subscription.current_period_end && (
-              <p>
-                <strong>{isCanceling ? "Access until:" : "Renews:"}</strong>{" "}
-                {new Date(subscription.current_period_end).toLocaleDateString()}
-              </p>
-            )}
-            {isCanceling && (
-              <p style={{ color: "#ff9800", fontWeight: 600 }}>
-                Your subscription will cancel at the end of the billing period.
-              </p>
-            )}
-          </div>
-        )}
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-            marginTop: "16px",
-          }}
-        >
-          <button
-            onClick={handleManageBilling}
-            disabled={actionLoading !== null}
-            style={{
-              padding: "10px 20px",
-              borderRadius: "6px",
-              backgroundColor: "#000000",
-              color: "#ffffff",
-              border: "1px solid #ffffff",
-              cursor: actionLoading !== null ? "not-allowed" : "pointer",
-              fontWeight: 600,
-              opacity: actionLoading !== null ? 0.6 : 1,
-            }}
-          >
-            {actionLoading === "billing"
-              ? "Loading..."
-              : "Manage Payment Method"}
-          </button>
-
-          {isCanceling ? (
-            <button
-              onClick={handleResume}
-              disabled={actionLoading !== null}
-              style={{
-                padding: "10px 20px",
-                borderRadius: "6px",
-                backgroundColor: "#4caf50",
-                color: "#ffffff",
-                border: "1px solid #4caf50",
-                cursor: actionLoading !== null ? "not-allowed" : "pointer",
-                fontWeight: 600,
-                opacity: actionLoading !== null ? 0.6 : 1,
-              }}
-            >
-              {actionLoading === "resume"
-                ? "Loading..."
-                : "Resume Subscription"}
-            </button>
-          ) : (
-            <button
-              onClick={handleCancel}
-              disabled={actionLoading !== null}
-              style={{
-                padding: "10px 20px",
-                borderRadius: "6px",
-                backgroundColor: "transparent",
-                color: "#ff5722",
-                border: "1px solid #ff5722",
-                cursor: actionLoading !== null ? "not-allowed" : "pointer",
-                fontWeight: 600,
-                opacity: actionLoading !== null ? 0.6 : 1,
-              }}
-            >
-              {actionLoading === "cancel"
-                ? "Loading..."
-                : "Cancel Subscription"}
-            </button>
+          )}
+          {isCanceling && (
+            <p>
+              Your subscription will cancel at the end of the billing period.
+            </p>
           )}
         </div>
-      </div>
+      )}
 
-      <div
-        style={{
-          padding: "24px",
-          border: "1px solid #ccc",
-          borderRadius: "8px",
-        }}
-      >
-        <h2>Server Actions</h2>
-        <p>You have access to the following server endpoints:</p>
+      <p>
+        <button onClick={handleManageBilling} disabled={actionLoading !== null}>
+          {actionLoading === "billing"
+            ? "Loading..."
+            : "Manage Payment Method"}
+        </button>
+      </p>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "12px",
-            marginTop: "16px",
-          }}
-        >
-          <button
-            onClick={() => handleServerCall("action1")}
-            style={{
-              padding: "12px 24px",
-              borderRadius: "6px",
-              backgroundColor: "#000000",
-              color: "#ffffff",
-              border: "1px solid #ffffff",
-              cursor: "pointer",
-              fontWeight: 600,
-            }}
-          >
-            Call Server Action 1
+      <p>
+        {isCanceling ? (
+          <button onClick={handleResume} disabled={actionLoading !== null}>
+            {actionLoading === "resume"
+              ? "Loading..."
+              : "Resume Subscription"}
           </button>
-
-          <button
-            onClick={() => handleServerCall("action2")}
-            style={{
-              padding: "12px 24px",
-              borderRadius: "6px",
-              backgroundColor: "#000000",
-              color: "#ffffff",
-              border: "1px solid #ffffff",
-              cursor: "pointer",
-              fontWeight: 600,
-            }}
-          >
-            Call Server Action 2
+        ) : (
+          <button onClick={handleCancel} disabled={actionLoading !== null}>
+            {actionLoading === "cancel"
+              ? "Loading..."
+              : "Cancel Subscription"}
           </button>
-        </div>
-      </div>
+        )}
+      </p>
+
+      <hr />
+      <h2>Server Actions</h2>
+      <p>You have access to the following server endpoints:</p>
+      <p>
+        <button onClick={() => handleServerCall("action1")}>
+          Call Server Action 1
+        </button>
+      </p>
+      <p>
+        <button onClick={() => handleServerCall("action2")}>
+          Call Server Action 2
+        </button>
+      </p>
     </div>
   );
 }

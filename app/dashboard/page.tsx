@@ -13,14 +13,12 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  // Always fetch subscription status directly from Stripe (source of truth)
   const { subscribed, subscription } = await getSubscriptionStatus();
 
   return (
-    <main className="page-container">
+    <main>
       <h1>Dashboard</h1>
       <p>Welcome, {user.email}!</p>
-
       <DashboardClient
         subscribed={subscribed}
         subscription={subscription}

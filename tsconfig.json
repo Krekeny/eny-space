@@ -27,9 +27,6 @@
       "@/components/*": [
         "app/components/*"
       ],
-      "@/config": [
-        "config/"
-      ],
       "@/lib/*": [
         "lib/*"
       ],
