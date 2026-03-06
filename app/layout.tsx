@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { signOut } from "@/actions/auth";
+import { SiteHeader } from "@/actions/components/site-header";
 
 import "./globals.css";
 import { Noto_Sans } from "next/font/google";
 
-const notoSans = Noto_Sans({variable:'--font-sans'});
-
+const notoSans = Noto_Sans({ variable: "--font-sans" });
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -35,28 +33,7 @@ export default async function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="en" className={notoSans.variable}>
       <body>
-        <header>
-          <Link href="/">eny.space</Link>
-          {" | "}
-          <nav style={{ display: "inline" }}>
-            {user ? (
-              <>
-                <Link href="/dashboard">Dashboard</Link>
-                {" | "}
-                <form action={signOut} style={{ display: "inline" }}>
-                  <button type="submit">Sign Out</button>
-                </form>
-              </>
-            ) : (
-              <>
-                <Link href="/login">Login</Link>
-                {" | "}
-                <Link href="/signup">Sign Up</Link>
-              </>
-            )}
-          </nav>
-        </header>
-        <hr />
+        <SiteHeader user={user} />
         {children}
         <SpeedInsights />
         <Analytics />

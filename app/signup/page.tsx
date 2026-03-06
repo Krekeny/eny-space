@@ -1,76 +1,64 @@
-import { signUp } from "@/actions/auth";
 import Link from "next/link";
+import { signUp } from "@/actions/auth";
+import { Button } from "@/actions/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/actions/components/ui/card";
+import { Input } from "@/actions/components/ui/input";
+import { Label } from "@/actions/components/ui/label";
 
 export default function SignUpPage() {
   return (
-    <main
-      className="page-container"
-      style={{ maxWidth: "400px", margin: "0 auto" }}
-    >
-      <h1>Sign Up</h1>
-      <form
-        action={signUp}
-        style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-      >
-        <div>
-          <label
-            htmlFor="email"
-            style={{ display: "block", marginBottom: "8px" }}
-          >
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            style={{
-              width: "100%",
-              padding: "8px",
-              borderRadius: "4px",
-              border: "1px solid #ccc",
-            }}
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="password"
-            style={{ display: "block", marginBottom: "8px" }}
-          >
-            Password
-          </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            minLength={6}
-            style={{
-              width: "100%",
-              padding: "8px",
-              borderRadius: "4px",
-              border: "1px solid #ccc",
-            }}
-          />
-        </div>
-        <button
-          type="submit"
-          style={{
-            padding: "12px 24px",
-            borderRadius: "6px",
-            backgroundColor: "#000000",
-            color: "#ffffff",
-            border: "1px solid #ffffff",
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
-        >
-          Sign Up
-        </button>
-      </form>
-      <p style={{ marginTop: "16px", textAlign: "center" }}>
-        Already have an account? <Link href="/login">Login</Link>
-      </p>
+    <main className="flex min-h-[60vh] items-center justify-center px-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>Create account</CardTitle>
+          <CardDescription>
+            Get started with eny.space in a few seconds.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form action={signUp} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                minLength={6}
+                autoComplete="new-password"
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              Sign Up
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-center text-sm text-muted-foreground">
+          <span>
+            Already have an account?{" "}
+            <Link href="/login" className="underline underline-offset-4">
+              Login
+            </Link>
+          </span>
+        </CardFooter>
+      </Card>
     </main>
   );
 }
