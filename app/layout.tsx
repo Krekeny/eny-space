@@ -6,6 +6,10 @@ import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/actions/auth";
 
 import "./globals.css";
+import { Noto_Sans } from "next/font/google";
+
+const notoSans = Noto_Sans({variable:'--font-sans'});
+
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -29,7 +33,7 @@ export default async function RootLayout({ children }: LayoutProps) {
   } = await supabase.auth.getUser();
 
   return (
-    <html lang="en">
+    <html lang="en" className={notoSans.variable}>
       <body>
         <header>
           <Link href="/">eny.space</Link>
