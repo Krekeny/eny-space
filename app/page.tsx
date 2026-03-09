@@ -2,6 +2,7 @@ import { Hero } from "@/components/hero/hero";
 import { LogoBar } from "@/components/logo-bar";
 import { FeaturesSection } from "@/components/features";
 import { PricingSection } from "@/components/pricing";
+import { TestimonialsSection } from "@/components/testimonials";
 
 export default function Page() {
   return (
@@ -10,6 +11,7 @@ export default function Page() {
       <LogoBar />
       <FeaturesSection />
       <PricingSection />
+      <TestimonialsSection />
     </>
   );
 }
