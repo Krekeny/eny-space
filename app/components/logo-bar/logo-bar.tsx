@@ -13,10 +13,10 @@ import { Paragraph } from "@/components/paragraph";
 const PLACEHOLDER_LINKS = [
   { label: "Short", href: "#", icon: BoxIcon },
   { label: "Medium Label", href: "#", icon: SparklesIcon },
-  { label: "DescriptiveTxt", href: "#", icon: CircleIcon },
+  { label: "Descriptive Text", href: "#", icon: CircleIcon },
   { label: "Another Link", href: "#", icon: LayersIcon },
-  { label: "QuickLabel", href: "#", icon: CircleDotIcon },
-  { label: "LabelName123", href: "#", icon: SquareIcon },
+  { label: "Quick Label", href: "#", icon: CircleDotIcon },
+  { label: "Label Name Text", href: "#", icon: SquareIcon },
   { label: "Final Example", href: "#", icon: HexagonIcon },
 ];
 
