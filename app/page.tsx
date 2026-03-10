@@ -4,6 +4,7 @@ import { FeaturesSection } from "@/components/features";
 import { PricingSection } from "@/components/pricing";
 import { TestimonialsSection } from "@/components/testimonials";
 import { FAQSection } from "@/components/faq";
+import { CTASection } from "@/components/cta";
 
 export default function Page() {
   return (
@@ -14,6 +15,7 @@ export default function Page() {
       <PricingSection />
       <TestimonialsSection />
       <FAQSection />
+      <CTASection />
     </>
   );
 }

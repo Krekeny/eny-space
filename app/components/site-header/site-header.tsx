@@ -23,7 +23,6 @@ export function SiteHeader({ user }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-neutral-950">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-        {/* Logo */}
         <Link
           href="/"
           className="flex items-center gap-2 font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
@@ -39,7 +38,6 @@ export function SiteHeader({ user }: SiteHeaderProps) {
           <span className="text-lg">eny.space</span>
         </Link>
 
-        {/* Desktop nav */}
         <nav className="hidden flex-1 justify-center gap-1 md:flex">
           <Link href="/" className={navLinkClass}>
             Home
@@ -54,7 +52,6 @@ export function SiteHeader({ user }: SiteHeaderProps) {
           </Link>
         </nav>
 
-        {/* Desktop actions */}
         <div className="hidden items-center gap-2 md:flex">
           {user ? (
             <form action={signOut}>
@@ -91,7 +88,6 @@ export function SiteHeader({ user }: SiteHeaderProps) {
           )}
         </div>
 
-        {/* Mobile menu toggle */}
         <button
           type="button"
           aria-label="Toggle navigation"
@@ -106,7 +102,6 @@ export function SiteHeader({ user }: SiteHeaderProps) {
         </button>
       </div>
 
-      {/* Mobile menu panel */}
       {mobileOpen && (
         <div className="border-t border-white/10 bg-neutral-950 px-4 pb-4 pt-3 md:hidden">
           <nav className="flex flex-col gap-2">
@@ -177,3 +172,4 @@ export function SiteHeader({ user }: SiteHeaderProps) {
     </header>
   );
 }
+

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { createClient } from "@/lib/supabase/server";
-import { SiteHeader } from "@/actions/components/site-header";
+import { SiteHeader } from "@/components/site-header";
 
 import "./globals.css";
 import { Noto_Sans } from "next/font/google";
