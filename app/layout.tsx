@@ -3,6 +3,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { createClient } from "@/lib/supabase/server";
 import { SiteHeader } from "@/components/site-header";
+import { Footer } from "@/components/footer";
 
 import "./globals.css";
 import { Noto_Sans } from "next/font/google";
@@ -35,6 +36,7 @@ export default async function RootLayout({ children }: LayoutProps) {
       <body>
         <SiteHeader user={user} />
         {children}
+        <Footer />
         <SpeedInsights />
         <Analytics />
       </body>
