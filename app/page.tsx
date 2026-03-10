@@ -3,6 +3,7 @@ import { LogoBar } from "@/components/logo-bar";
 import { FeaturesSection } from "@/components/features";
 import { PricingSection } from "@/components/pricing";
 import { TestimonialsSection } from "@/components/testimonials";
+import { FAQSection } from "@/components/faq";
 
 export default function Page() {
   return (
@@ -12,6 +13,7 @@ export default function Page() {
       <FeaturesSection />
       <PricingSection />
       <TestimonialsSection />
+      <FAQSection />
     </>
   );
 }
