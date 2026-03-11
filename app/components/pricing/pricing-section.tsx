@@ -86,7 +86,7 @@ export function PricingSection() {
             className={[
               "flex h-full flex-col justify-between rounded-3xl border-none bg-gradient-to-b from-neutral-800/90 to-neutral-900/90 p-6 text-white shadow-xl/30",
               plan.highlight
-                ? "relative bg-gradient-to-b from-lime-400/90 via-lime-400/80 to-lime-500/90 text-neutral-950 shadow-[0_0_40px_rgba(190,242,100,0.4)]"
+                ? "relative bg-gradient-to-b from-amber-400/90 via-amber-400/80 to-amber-500/90 text-neutral-950 shadow-[0_0_40px_rgba(190,242,100,0.4)]"
                 : "",
             ]
               .filter(Boolean)
@@ -98,7 +98,7 @@ export function PricingSection() {
                   {plan.name}
                 </CardTitle>
                 {plan.badge ? (
-                  <span className="rounded-full bg-neutral-900/80 px-3 py-1 text-xs font-medium uppercase tracking-wide text-lime-300 md:text-[11px]">
+                  <span className="rounded-full bg-neutral-900/80 px-3 py-1 text-xs font-medium uppercase tracking-wide text-amber-300 md:text-[11px]">
                     {plan.badge}
                   </span>
                 ) : null}
@@ -127,7 +127,7 @@ export function PricingSection() {
                 className={[
                   "w-full rounded-full px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide transition",
                   plan.highlight
-                    ? "bg-neutral-950 text-lime-300 hover:bg-neutral-900"
+                    ? "bg-neutral-950 text-amber-300 hover:bg-neutral-900"
                     : "bg-white text-neutral-950 hover:bg-neutral-200",
                 ].join(" ")}
               >
@@ -154,8 +154,10 @@ export function PricingSection() {
                           : "text-white/75",
                       ].join(" ")}
                     >
-                      <span className="mt-1 inline-block size-1.5 rounded-full bg-lime-400" />
-                      <span>{feature}</span>
+                      <div className="inline-flex items-center gap-2">
+                        <span className="inline-block size-1.5 rounded-full bg-amber-400" />
+                        <span>{feature}</span>
+                      </div>
                     </li>
                   ))}
                 </ul>

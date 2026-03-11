@@ -91,7 +91,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
         <button
           type="button"
           aria-label="Toggle navigation"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/20 text-white md:hidden"
+          className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/20 text-white md:hidden"
           onClick={() => setMobileOpen((open) => !open)}
         >
           {mobileOpen ? (

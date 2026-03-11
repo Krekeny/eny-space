@@ -74,7 +74,11 @@ export default function DashboardClient({
       <div>
         <h2>Subscribe to Access</h2>
         <p>You need an active subscription to access the server features.</p>
-        <button onClick={handleSubscribe} disabled={loading}>
+        <button
+          className="cursor-pointer"
+          onClick={handleSubscribe}
+          disabled={loading}
+        >
           {loading ? "Loading..." : "Subscribe Now"}
         </button>
       </div>
@@ -88,7 +92,11 @@ export default function DashboardClient({
         <p>
           Your subscription has been canceled. Subscribe again to regain access.
         </p>
-        <button onClick={handleSubscribe} disabled={loading}>
+        <button
+          className="cursor-pointer"
+          onClick={handleSubscribe}
+          disabled={loading}
+        >
           {loading ? "Loading..." : "Subscribe Again"}
         </button>
       </div>
@@ -183,7 +191,11 @@ export default function DashboardClient({
       )}
 
       <p>
-        <button onClick={handleManageBilling} disabled={actionLoading !== null}>
+        <button
+          className="cursor-pointer"
+          onClick={handleManageBilling}
+          disabled={actionLoading !== null}
+        >
           {actionLoading === "billing"
             ? "Loading..."
             : "Manage Payment Method"}
@@ -192,13 +204,21 @@ export default function DashboardClient({
 
       <p>
         {isCanceling ? (
-          <button onClick={handleResume} disabled={actionLoading !== null}>
+          <button
+            className="cursor-pointer"
+            onClick={handleResume}
+            disabled={actionLoading !== null}
+          >
             {actionLoading === "resume"
               ? "Loading..."
               : "Resume Subscription"}
           </button>
         ) : (
-          <button onClick={handleCancel} disabled={actionLoading !== null}>
+          <button
+            className="cursor-pointer"
+            onClick={handleCancel}
+            disabled={actionLoading !== null}
+          >
             {actionLoading === "cancel"
               ? "Loading..."
               : "Cancel Subscription"}
@@ -210,12 +230,18 @@ export default function DashboardClient({
       <h2>Server Actions</h2>
       <p>You have access to the following server endpoints:</p>
       <p>
-        <button onClick={() => handleServerCall("action1")}>
+        <button
+          className="cursor-pointer"
+          onClick={() => handleServerCall("action1")}
+        >
           Call Server Action 1
         </button>
       </p>
       <p>
-        <button onClick={() => handleServerCall("action2")}>
+        <button
+          className="cursor-pointer"
+          onClick={() => handleServerCall("action2")}
+        >
           Call Server Action 2
         </button>
       </p>

@@ -42,7 +42,7 @@ export function CTASection() {
           </ButtonLink>
           <ButtonLink
             href="/signup"
-            className="px-6 text-xs font-semibold uppercase tracking-wide text-neutral-950 shadow-[0_0_40px_rgba(190,242,100,0.45)] bg-lime-400 hover:bg-lime-300"
+            className="px-6 text-xs font-semibold uppercase tracking-wide text-neutral-950 shadow-[0_0_40px_rgba(190,242,100,0.45)] bg-amber-400 hover:bg-amber-300"
             endIcon={<ArrowRightIcon className="size-4" aria-hidden />}
           >
             Start free trial
