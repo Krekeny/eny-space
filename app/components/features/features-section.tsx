@@ -53,7 +53,7 @@ export function FeaturesSection() {
   return (
     <section
       id="features"
-      className="relative w-full bg-neutral-950 px-4 py-16 sm:px-6 sm:py-20"
+      className="relative w-full px-4 py-16 sm:px-6 sm:py-20"
     >
       <div className="mx-auto max-w-5xl text-center">
         <Heading

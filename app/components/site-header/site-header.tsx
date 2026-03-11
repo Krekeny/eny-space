@@ -21,7 +21,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
   const closeMobile = () => setMobileOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-neutral-950">
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-slate-950/85">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link
           href="/"
@@ -103,7 +103,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-white/10 bg-neutral-950 px-4 pb-4 pt-3 md:hidden">
+        <div className="border-t border-white/10 bg-slate-950/95 px-4 pb-4 pt-3 md:hidden">
           <nav className="flex flex-col gap-2">
             <Link
               href="/"

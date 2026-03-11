@@ -6,7 +6,7 @@ import { ArrowRightIcon } from "lucide-react";
 
 export function CTASection() {
   return (
-    <section className="relative w-full bg-neutral-950 px-4 py-16 sm:px-6 sm:py-20">
+    <section className="relative w-full px-4 py-16 sm:px-6 sm:py-20">
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 text-center sm:gap-7">
         <div className="flex items-center gap-2 text-white/80">
           <Image

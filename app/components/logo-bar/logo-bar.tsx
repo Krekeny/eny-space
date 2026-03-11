@@ -78,7 +78,7 @@ function LogoBarScroll() {
 
 export function LogoBar() {
   return (
-    <section className="w-full bg-neutral-950">
+    <section className="w-full">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <Paragraph className="mx-auto max-w-2xl text-center text-base text-white/60">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
