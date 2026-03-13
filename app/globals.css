@@ -5,72 +5,74 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.65 0.18 132);
-  --primary-foreground: oklch(0.99 0.03 121);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.9 0.18 127);
-  --chart-2: oklch(0.85 0.21 129);
-  --chart-3: oklch(0.77 0.2 131);
-  --chart-4: oklch(0.65 0.18 132);
-  --chart-5: oklch(0.53 0.14 132);
+  --background: oklch(1 0 0); /* pure white */
+  --foreground: oklch(0.145 0 0); /* very dark neutral (near black) */
+  --card: oklch(1 0 0); /* pure white */
+  --card-foreground: oklch(0.145 0 0); /* very dark neutral */
+  --popover: oklch(1 0 0); /* pure white */
+  --popover-foreground: oklch(0.145 0 0); /* very dark neutral */
+  /* Softer, lighter lilac primary for light mode */
+  --primary: oklch(0.88 0.16 325); /* light lilac / fuchsia */
+  --primary-foreground: oklch(0.22 0.05 325); /* deep plum text on lilac */
+  --secondary: oklch(0.967 0.001 286.375); /* very light cool gray with violet tint */
+  --secondary-foreground: oklch(0.21 0.006 285.885); /* deep cool gray text */
+  --muted: oklch(0.97 0 0); /* very light neutral gray */
+  --muted-foreground: oklch(0.556 0 0); /* medium neutral gray text */
+  --accent: oklch(0.97 0 0); /* very light neutral gray (accent bg) */
+  --accent-foreground: oklch(0.205 0 0); /* dark neutral text on accent */
+  --destructive: oklch(0.58 0.22 27); /* vivid warm red/orange */
+  --border: oklch(0.922 0 0); /* light neutral gray border */
+  --input: oklch(0.922 0 0); /* light neutral gray input */
+  --ring: oklch(0.708 0 0); /* medium neutral gray focus ring */
+  --chart-1: oklch(0.9 0.16 325); /* very light lilac */
+  --chart-2: oklch(0.86 0.18 325); /* light lilac */
+  --chart-3: oklch(0.82 0.19 325); /* mid lilac */
+  --chart-4: oklch(0.78 0.19 325); /* deeper lilac */
+  --chart-5: oklch(0.72 0.18 325); /* deepest lilac */
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.65 0.18 132);
-  --sidebar-primary-foreground: oklch(0.99 0.03 121);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.985 0 0); /* off-white sidebar */
+  --sidebar-foreground: oklch(0.145 0 0); /* very dark neutral text */
+  --sidebar-primary: oklch(0.82 0.19 325); /* saturated lilac sidebar accent */
+  --sidebar-primary-foreground: oklch(0.99 0.02 325); /* soft near-white on lilac */
+  --sidebar-accent: oklch(0.97 0 0); /* very light neutral accent */
+  --sidebar-accent-foreground: oklch(0.205 0 0); /* dark neutral on accent */
+  --sidebar-border: oklch(0.922 0 0); /* light gray sidebar border */
+  --sidebar-ring: oklch(0.708 0 0); /* medium gray sidebar ring */
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.77 0.2 131);
-  --primary-foreground: oklch(0.27 0.07 132);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.371 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.9 0.18 127);
-  --chart-2: oklch(0.85 0.21 129);
-  --chart-3: oklch(0.77 0.2 131);
-  --chart-4: oklch(0.65 0.18 132);
-  --chart-5: oklch(0.53 0.14 132);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.85 0.21 129);
-  --sidebar-primary-foreground: oklch(0.27 0.07 132);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: oklch(0.145 0 0); /* almost-black charcoal */
+  --foreground: oklch(0.985 0 0); /* near-white text */
+  --card: oklch(0.205 0 0); /* very dark gray card */
+  --card-foreground: oklch(0.985 0 0); /* near-white card text */
+  --popover: oklch(0.205 0 0); /* very dark gray popover */
+  --popover-foreground: oklch(0.985 0 0); /* near-white popover text */
+  /* Slightly lighter lilac primary for dark mode */
+  --primary: oklch(0.82 0.17 325); /* bright lilac / fuchsia */
+  --primary-foreground: oklch(0.2 0.06 325); /* deep plum on lilac */
+  --secondary: oklch(0.274 0.006 286.033); /* deep cool gray with violet tint */
+  --secondary-foreground: oklch(0.985 0 0); /* near-white on secondary */
+  --muted: oklch(0.269 0 0); /* dark muted gray */
+  --muted-foreground: oklch(0.708 0 0); /* medium gray on muted */
+  --accent: oklch(0.371 0 0); /* medium-dark accent gray */
+  --accent-foreground: oklch(0.985 0 0); /* near-white on accent */
+  --destructive: oklch(0.704 0.191 22.216); /* bright warm red/orange */
+  --border: oklch(1 0 0 / 10%); /* subtle light border on dark */
+  --input: oklch(1 0 0 / 15%); /* subtle light input on dark */
+  --ring: oklch(0.556 0 0); /* medium gray ring on dark */
+  --chart-1: oklch(0.88 0.17 325); /* very light lilac on dark */
+  --chart-2: oklch(0.84 0.19 325); /* light lilac on dark */
+  --chart-3: oklch(0.8 0.2 325); /* mid lilac on dark */
+  --chart-4: oklch(0.75 0.2 325); /* deeper lilac on dark */
+  --chart-5: oklch(0.7 0.19 325); /* deepest lilac on dark */
+  --sidebar: oklch(0.205 0 0); /* very dark gray sidebar */
+  --sidebar-foreground: oklch(0.985 0 0); /* near-white sidebar text */
+  --sidebar-primary: oklch(0.8 0.2 325); /* saturated lilac sidebar accent */
+  --sidebar-primary-foreground: oklch(0.2 0.06 325); /* deep plum text on accent */
+  --sidebar-accent: oklch(0.269 0 0); /* dark accent gray */
+  --sidebar-accent-foreground: oklch(0.985 0 0); /* near-white on accent */
+  --sidebar-border: oklch(1 0 0 / 10%); /* subtle light sidebar border */
+  --sidebar-ring: oklch(0.556 0 0); /* medium gray sidebar ring */
 }
 
 @theme inline {
