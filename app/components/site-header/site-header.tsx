@@ -7,6 +7,7 @@ import { signOut } from "@/actions/auth";
 import { Button } from "@/actions/components/ui/button";
 import { ArrowUpRightIcon, MenuIcon, XIcon } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
+import { MobileMenu } from "./mobile-menu";
 
 interface SiteHeaderProps {
   user: User | null;
@@ -155,16 +156,24 @@ export function SiteHeader({ user }: SiteHeaderProps) {
         </div>
 
         <button
-          className="md:hidden text-white"
-          onClick={() => setMobileOpen(!mobileOpen)}
+          type="button"
+          aria-label="Toggle navigation"
+          className="inline-flex h-9 w-9 cursor-pointer items-center justify-center text-white md:hidden"
+          onClick={() => setMobileOpen((open) => !open)}
         >
           {mobileOpen ? (
-            <XIcon className="size-5" />
+            <XIcon className="size-5" aria-hidden />
           ) : (
-            <MenuIcon className="size-5" />
+            <MenuIcon className="size-5" aria-hidden />
           )}
         </button>
       </div>
+
+      <MobileMenu
+        user={user}
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+      />
     </header>
   );
 }
