@@ -16,7 +16,7 @@ export function HeroBackground() {
     ["0%", "-48%", "-64%"],
   );
 
-  // "Camera angle" milestone – planet grows and shifts between 0.4–0.6
+  // "Camera angle" milestone – planets grow and shift between 0.4–0.6
   const planetScale = useTransform(
     scrollYProgress,
     [0, 0.4, 0.6, 1],
@@ -121,7 +121,7 @@ export function HeroBackground() {
         }}
         aria-hidden
       >
-        <div className="absolute bottom-[-22%] right-[2%] h-[360px] w-[360px] overflow-hidden rounded-full">
+        <div className="absolute bottom-[-22%] right-[2%] h-[360px] w-[360px] overflow-hidden rounded-full opacity-80">
           <Image
             src="/jupiter2.png"
             alt="Gas giant planet"
@@ -132,7 +132,7 @@ export function HeroBackground() {
         </div>
       </motion.div>
 
-      {/* LAYER 3b – Secondary planet (Earth image) */}
+      {/* LAYER 3b – Secondary planets (Earth, Mars, Venus, Neptune images) */}
       <motion.div
         className="pointer-events-none fixed inset-0 -z-[1]"
         style={{
@@ -146,6 +146,33 @@ export function HeroBackground() {
         <div className="absolute bottom-[10%] left-[6%] h-[220px] w-[220px] overflow-hidden rounded-full">
           <Image
             src="/earth.png"
+            alt="Blue planet"
+            fill
+            priority={false}
+            className="object-cover object-center"
+          />
+        </div>
+        <div className="absolute top-[54%] right-[30%] h-[120px] w-[120px] overflow-hidden rounded-full opacity-80">
+          <Image
+            src="/mars.png"
+            alt="Red planet"
+            fill
+            priority={false}
+            className="object-cover object-center"
+          />
+        </div>
+        <div className="absolute top-[50%] right-[20%] h-[70px] w-[100px] overflow-hidden rounded-full opacity-80">
+          <Image
+            src="/venus.png"
+            alt="Yellow planet"
+            fill
+            priority={false}
+            className="object-cover object-center"
+          />
+        </div>
+        <div className="absolute top-[30%] left-[35%] h-[60px] w-[60px] overflow-hidden rounded-full opacity-80">
+          <Image
+            src="/neptune.png"
             alt="Blue planet"
             fill
             priority={false}

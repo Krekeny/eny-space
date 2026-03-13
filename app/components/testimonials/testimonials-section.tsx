@@ -59,8 +59,8 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
           </div>
         </div>
         <div className="flex items-center gap-2 text-sm font-semibold text-white/85">
-          <span className="flex size-6 items-center justify-center rounded-full bg-amber-400/15">
-            <SparklesIcon className="size-3.5 text-amber-300" aria-hidden />
+          <span className="flex size-6 items-center justify-center rounded-full bg-fuchsia-400/15">
+            <SparklesIcon className="size-3.5 text-fuchsia-300" aria-hidden />
           </span>
           <span>{testimonial.company}</span>
         </div>

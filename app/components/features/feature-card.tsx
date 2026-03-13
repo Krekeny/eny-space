@@ -22,7 +22,7 @@ export function FeatureCard({
         className,
       )}
     >
-      <div className="mb-1 inline-flex size-10 items-center justify-center rounded-xl bg-amber-400/15 text-amber-300 shadow-[0_0_30px_rgba(190,242,100,0.6)]">
+      <div className="mb-1 inline-flex size-10 items-center justify-center rounded-xl bg-fuchsia-400/15 text-fuchsia-300 shadow-[0_0_30px_rgba(232,121,249,0.6)]">
         {icon}
       </div>
       <Heading
