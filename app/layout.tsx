@@ -6,9 +6,18 @@ import { SiteHeader } from "@/components/site-header";
 import { Footer } from "@/components/footer";
 
 import "./globals.css";
-import { Noto_Sans } from "next/font/google";
+import { Doto, Fira_Mono } from "next/font/google";
 
-const notoSans = Noto_Sans({ variable: "--font-sans" });
+const firaMono = Fira_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-sans",
+});
+
+const doto = Doto({
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -32,7 +41,7 @@ export default async function RootLayout({ children }: LayoutProps) {
   } = await supabase.auth.getUser();
 
   return (
-    <html lang="en" className={notoSans.variable}>
+    <html lang="en" className={`${firaMono.variable} ${doto.variable}`}>
       <body>
         <SiteHeader user={user} />
         {children}
