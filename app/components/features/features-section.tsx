@@ -12,39 +12,33 @@ import { FeatureCard } from "./feature-card";
 
 const FEATURES = [
   {
-    title: "Example Feature One.",
+    title: "One‑click managed PDS.",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus efficitur urna a augue pulvinar, vitae facilisis massa dictum.",
+      "Create a Personal Data Server directly from the eny.space UI—no Kubernetes clusters, Docker images or cloud consoles to wire up. Choose your settings, attach a domain and go live in minutes.",
     icon: <NetworkIcon className="size-5" aria-hidden />,
   },
   {
-    title: "Sample Multi-Network.",
+    title: "Dashboard‑first administration.",
     description:
-      "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse potenti.",
+      "Invite users to your PDS, manage access and roles, and handle tasks you would normally script on the command line from a clear web dashboard.",
     icon: <CloudIcon className="size-5" aria-hidden />,
   },
   {
-    title: "Lorem Scalability.",
+    title: "Live resource insights.",
     description:
-      "Suspendisse vitae dictum lectus. Ut bibendum, leo eu tempor ullamcorper, eros ex euismod nunc, nec cursus nisi ex non purus.",
+      "Track active users, storage, CPU and RAM as intuitive percentages so you instantly see how loaded your server is, instead of digging through logs.",
     icon: <ScaleIcon className="size-5" aria-hidden />,
   },
   {
-    title: "Secure Example.",
+    title: "AT Protocol‑native access.",
     description:
-      "Etiam egestas, erat sit amet dictum cursus, sapien quam gravida ex, nec imperdiet libero sem at sapien faucibus consequat.",
+      "Built for AT Protocol and Bluesky power users who arrive with an email and handle, not yet another social login. Your PDS becomes your social cloud space.",
     icon: <ShieldCheckIcon className="size-5" aria-hidden />,
   },
-  // {
-  //   title: "Instant Launchpad.",
-  //   description:
-  //     "Quisque congue elit eu velit maximus auctor. Nullam ac mauris quam. Nullam eget erat convallis, consequat purus non, cursus enim.",
-  //   icon: <RocketIcon className="size-5" aria-hidden />,
-  // },
   {
-    title: "Performance Demo.",
+    title: "PDS explorer UI.",
     description:
-      "Praesent iaculis urna non eros pretium, in posuere lectus cursus. Sed facilisis facilisis ex, ac molestie tellus posuere vitae.",
+      "Browse everything on your PDS like a file explorer—posts, images, PDFs and collections. See what’s stored, which apps use it and treat your PDS as a real, visual space.",
     icon: <ZapIcon className="size-5" aria-hidden />,
   },
 ];
@@ -60,11 +54,12 @@ export function FeaturesSection() {
           as="h2"
           className="text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-4xl"
         >
-          Lorem Ipsum Dolor Sit Amet - Fast, Reliable, Easy.
+          Managed PDS hosting for AT Protocol power users.
         </Heading>
         <Paragraph className="mt-4 text-sm text-white/70 sm:text-base">
-          Pellentesque habitant morbi tristique senectus et netus et malesuada
-          fames ac turpis egestas. Proin facilisis nec erat eu molestie.
+          Create, monitor and manage your Personal Data Server from a single
+          dashboard. eny.space automates the infrastructure so you can focus on
+          your data, apps and community.
         </Paragraph>
       </div>
 

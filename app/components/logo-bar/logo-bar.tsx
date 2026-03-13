@@ -81,9 +81,9 @@ export function LogoBar() {
     <section className="w-full bg-neutral-950">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <Paragraph className="mx-auto max-w-2xl text-center text-base text-white/60">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation.
+          Built for AT Protocol and Bluesky power users who want to see and
+          manage their Personal Data Server through a modern interface instead
+          of raw APIs and command‑line tools.
         </Paragraph>
         <LogoBarScroll />
       </div>

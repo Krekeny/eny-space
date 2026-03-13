@@ -10,12 +10,13 @@ export function HeroLeft() {
         as="h1"
         className="text-4xl leading-tight tracking-tight text-white sm:text-5xl md:text-6xl"
       >
-        Lorem ipsum dolor sit amet
+        Managed PDS hosting with a real UI.
       </Heading>
       <Paragraph className="text-lg text-white/90 sm:text-xl">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam.
+        eny.space lets you run your own Personal Data Server without touching
+        Kubernetes, Docker or cloud consoles. Spin up a PDS in one click, bring
+        your own domain, and manage users, access and resources from a clear, AT
+        Protocol-native dashboard.
       </Paragraph>
       <div className="flex flex-wrap gap-3">
         <ButtonLink
@@ -23,14 +24,14 @@ export function HeroLeft() {
           className="border border-white/80 bg-transparent uppercase tracking-wide text-white hover:bg-white/10 hover:border-white focus-visible:ring-white/50"
           endIcon={<ArrowUpRightIcon className="size-4" aria-hidden />}
         >
-          Button 1
+          Launch your PDS
         </ButtonLink>
         <ButtonLink
           href="/dashboard"
           className="border border-white/80 bg-transparent uppercase tracking-wide text-white hover:bg-white/10 hover:border-white focus-visible:ring-white/50"
           endIcon={<ArrowUpRightIcon className="size-4" aria-hidden />}
         >
-          Button 2
+          View PDS dashboard
         </ButtonLink>
       </div>
     </div>
