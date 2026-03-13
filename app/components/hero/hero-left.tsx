@@ -8,7 +8,7 @@ export function HeroLeft() {
     <div className="flex max-w-xl flex-col gap-6">
       <Heading
         as="h1"
-        className="text-4xl leading-tight tracking-tight text-white sm:text-5xl md:text-6xl"
+        className="font-heading text-4xl leading-tight tracking-tight text-white sm:text-5xl md:text-6xl"
       >
         Managed PDS hosting with a real UI.
       </Heading>
