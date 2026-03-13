@@ -42,13 +42,13 @@ export function MobileMenu({ user, open, onClose }: MobileMenuProps) {
         </Link>
       </nav>
 
-      <div className="mt-3 flex flex-col gap-2">
+      <div className="mt-3 flex flex-col items-start gap-2">
         {user ? (
           <form action={signOut}>
             <Button
               type="submit"
               size="default"
-              className="inline-flex h-9 items-center justify-center rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-white/90"
+              className="inline-flex h-9 w-[min(33vw,200px)] min-w-0 items-center justify-center rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-white/90"
             >
               <span>Sign out</span>
               <ArrowUpRightIcon className="ml-1 size-3.5" aria-hidden />
@@ -59,7 +59,7 @@ export function MobileMenu({ user, open, onClose }: MobileMenuProps) {
             <Button
               variant="outline"
               size="default"
-              className="inline-flex h-9 w-full items-center justify-center rounded-full border-white/20 bg-transparent px-4 text-xs font-medium uppercase tracking-wide text-white/90 hover:bg-white/10 hover:text-white"
+              className="inline-flex h-9 w-[min(33vw,200px)] min-w-0 items-center justify-center rounded-full border-white/20 bg-transparent px-4 text-xs font-medium uppercase tracking-wide text-white/90 hover:bg-white/10 hover:text-white"
               asChild
             >
               <Link href="/login" onClick={onClose}>
@@ -68,7 +68,7 @@ export function MobileMenu({ user, open, onClose }: MobileMenuProps) {
             </Button>
             <Button
               size="default"
-              className="inline-flex h-9 w-full items-center justify-center rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-white/90"
+              className="inline-flex h-9 w-[min(33vw,200px)] min-w-0 items-center justify-center rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-white/90"
               asChild
             >
               <Link href="/signup" onClick={onClose}>
