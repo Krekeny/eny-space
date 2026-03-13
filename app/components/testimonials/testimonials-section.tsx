@@ -59,8 +59,8 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
           </div>
         </div>
         <div className="flex items-center gap-2 text-sm font-semibold text-white/85">
-          <span className="flex size-6 items-center justify-center rounded-full bg-amber-400/15">
-            <SparklesIcon className="size-3.5 text-amber-300" aria-hidden />
+          <span className="flex size-6 items-center justify-center rounded-full bg-fuchsia-400/15">
+            <SparklesIcon className="size-3.5 text-fuchsia-300" aria-hidden />
           </span>
           <span>{testimonial.company}</span>
         </div>
@@ -71,7 +71,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 
 export function TestimonialsSection() {
   return (
-    <section className="relative w-full bg-neutral-950 px-4 py-20 sm:px-6 sm:py-24">
+    <section className="relative w-full px-4 py-20 sm:px-6 sm:py-24">
       <div className="mx-auto max-w-5xl text-center">
         <Heading
           as="h2"
@@ -87,11 +87,11 @@ export function TestimonialsSection() {
       <div className="mx-auto mt-12 max-w-6xl">
         <div className="relative w-full overflow-hidden py-4">
           <div
-            className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-neutral-950 to-transparent z-10"
+            className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-slate-950/80 to-transparent z-10"
             aria-hidden="true"
           />
           <div
-            className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-neutral-950 to-transparent z-10"
+            className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-slate-950/80 to-transparent z-10"
             aria-hidden="true"
           />
           <div className="flex w-max animate-marquee items-stretch gap-6 [transform:translateZ(0)]">

@@ -6,7 +6,7 @@ import { ArrowRightIcon } from "lucide-react";
 
 export function CTASection() {
   return (
-    <section className="relative w-full bg-neutral-950 px-4 py-16 sm:px-6 sm:py-20">
+    <section className="relative w-full px-4 py-16 sm:px-6 sm:py-20">
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 text-center sm:gap-7">
         <div className="flex items-center gap-2 text-white/80">
           <Image
@@ -42,7 +42,7 @@ export function CTASection() {
           </ButtonLink>
           <ButtonLink
             href="/signup"
-            className="px-6 text-xs font-semibold uppercase tracking-wide text-neutral-950 shadow-[0_0_40px_rgba(190,242,100,0.45)] bg-amber-400 hover:bg-amber-300"
+            className="px-6 text-xs font-semibold uppercase tracking-wide text-neutral-950 shadow-[0_0_40px_rgba(232,121,249,0.45)] bg-fuchsia-400 hover:bg-fuchsia-300"
             endIcon={<ArrowRightIcon className="size-4" aria-hidden />}
           >
             Start free trial

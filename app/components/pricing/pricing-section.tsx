@@ -64,7 +64,7 @@ export function PricingSection() {
   return (
     <section
       id="pricing"
-      className="relative w-full bg-neutral-950 px-4 py-20 sm:px-6 sm:py-24"
+      className="relative w-full px-4 py-20 sm:px-6 sm:py-24"
     >
       <div className="mx-auto max-w-5xl text-center">
         <Heading
@@ -84,9 +84,9 @@ export function PricingSection() {
           <Card
             key={plan.name}
             className={[
-              "flex h-full flex-col justify-between rounded-3xl border-none bg-gradient-to-b from-neutral-800/90 to-neutral-900/90 p-6 text-white shadow-xl/30",
+              "flex h-full flex-col justify-between rounded-3xl border-none bg-gradient-to-b from-slate-900/65 to-slate-950/75 p-6 text-white shadow-xl/30",
               plan.highlight
-                ? "relative bg-gradient-to-b from-amber-400/90 via-amber-400/80 to-amber-500/90 text-neutral-950 shadow-[0_0_40px_rgba(190,242,100,0.4)]"
+                ? "relative bg-gradient-to-b from-fuchsia-500/65 via-fuchsia-500/55 to-fuchsia-600/70 text-neutral-950 shadow-[0_0_36px_rgba(232,121,249,0.3)]"
                 : "",
             ]
               .filter(Boolean)
@@ -98,7 +98,7 @@ export function PricingSection() {
                   {plan.name}
                 </CardTitle>
                 {plan.badge ? (
-                  <span className="rounded-full bg-neutral-900/80 px-3 py-1 text-xs font-medium uppercase tracking-wide text-amber-300 md:text-[11px]">
+                  <span className="rounded-full bg-neutral-900/80 px-3 py-1 text-xs font-medium uppercase tracking-wide text-fuchsia-300 md:text-[11px]">
                     {plan.badge}
                   </span>
                 ) : null}
@@ -127,7 +127,7 @@ export function PricingSection() {
                 className={[
                   "w-full rounded-full px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide transition",
                   plan.highlight
-                    ? "bg-neutral-950 text-amber-300 hover:bg-neutral-900"
+                    ? "bg-neutral-950 text-fuchsia-200 hover:bg-neutral-900"
                     : "bg-white text-neutral-950 hover:bg-neutral-200",
                 ].join(" ")}
               >
@@ -155,7 +155,7 @@ export function PricingSection() {
                       ].join(" ")}
                     >
                       <div className="inline-flex items-center gap-2">
-                        <span className="inline-block size-1.5 rounded-full bg-amber-400" />
+                        <span className="inline-block size-1.5 rounded-full bg-fuchsia-400" />
                         <span>{feature}</span>
                       </div>
                     </li>
