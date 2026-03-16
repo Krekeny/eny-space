@@ -13,6 +13,9 @@ interface SiteHeaderProps {
   user: User | null;
 }
 
+const headerCtaClass =
+  "inline-flex items-center gap-1.5 rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950 cursor-pointer hover:bg-primary/80";
+
 export function SiteHeader({ user }: SiteHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [displayText, setDisplayText] = useState(".");
@@ -134,7 +137,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
           {!user ? (
             <Button
               size="default"
-              className="rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-white/90"
+              className={headerCtaClass}
               asChild
             >
               <Link href="/signup">
@@ -147,9 +150,10 @@ export function SiteHeader({ user }: SiteHeaderProps) {
               <Button
                 type="submit"
                 size="default"
-                className="rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950"
+                className={headerCtaClass}
               >
                 Sign out
+                <ArrowUpRightIcon className="ml-0.5 size-3.5" />
               </Button>
             </form>
           )}

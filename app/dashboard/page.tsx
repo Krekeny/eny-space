@@ -8,7 +8,9 @@ import {
   CardTitle,
   CardDescription,
 } from "@/actions/components/ui/card";
-import { Button } from "@/actions/components/ui/button";
+import { ButtonLink } from "@/components/button-link";
+import { Heading } from "@/components/heading";
+import { Paragraph } from "@/components/paragraph";
 import DashboardClient from "./dashboard-client";
 
 export default async function DashboardPage() {
@@ -34,24 +36,28 @@ export default async function DashboardPage() {
     <main className="flex flex-col gap-6 px-4 py-6">
       <Card>
         <CardHeader>
-          <CardTitle>My PDS</CardTitle>
-          <CardDescription>
+          <Heading as="h1" className="text-xl font-semibold text-white">
+            My PDS
+          </Heading>
+          <Paragraph className="text-sm text-white/80">
             Authenticated as {user.email}. This is your Personal Data Server
             overview.
-          </CardDescription>
+          </Paragraph>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2 text-white">
             <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">
+              <Paragraph className="text-sm font-medium text-white/80">
                 Status
-              </p>
-              <p className="text-base font-semibold capitalize">{pdsStatus}</p>
+              </Paragraph>
+              <Paragraph className="text-base font-semibold capitalize">
+                {pdsStatus}
+              </Paragraph>
             </div>
             <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">
+              <Paragraph className="text-sm font-medium text-white/80">
                 URL / Hostname
-              </p>
+              </Paragraph>
               <a
                 href={pdsDashboardUrl}
                 target="_blank"
@@ -63,33 +69,40 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="mt-4 space-y-2 rounded-md border bg-muted/40 p-4">
-            <p className="text-sm font-medium text-muted-foreground">
+          <div className="mt-4 space-y-2 rounded-md border border-white/10 bg-white/5 p-4 text-white backdrop-blur-xl">
+            <Paragraph className="text-sm font-medium text-white/80">
               Usage summary
-            </p>
-            <p className="text-sm text-muted-foreground">
+            </Paragraph>
+            <Paragraph className="text-sm text-white/70">
               Usage analytics for your PDS (storage, bandwidth, user count, and
               more) will appear here.
-            </p>
+            </Paragraph>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-3">
-            <Button asChild variant="outline">
-              <a href="/dashboard/manage">Manage</a>
-            </Button>
-            <Button asChild variant="default">
-              <a href={pdsDashboardUrl} target="_blank" rel="noreferrer">
-                Open dashboard
-              </a>
-            </Button>
+            <ButtonLink
+              href="/dashboard/manage"
+              className="border border-white/80 bg-transparent uppercase tracking-wide text-white hover:bg-white/10 hover:border-white focus-visible:ring-white/50"
+            >
+              Manage
+            </ButtonLink>
+            <ButtonLink
+              href={pdsDashboardUrl}
+              className="border border-white/80 bg-transparent uppercase tracking-wide text-white hover:bg-white/10 hover:border-white focus-visible:ring-white/50"
+            >
+              Open dashboard
+            </ButtonLink>
           </div>
 
           <hr className="my-6" />
 
-          <section className="space-y-2">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          <section className="space-y-2 text-white">
+            <Heading
+              as="h2"
+              className="text-sm font-semibold uppercase tracking-wide text-white/80"
+            >
               Billing & Subscription
-            </h2>
+            </Heading>
             <DashboardClient
               subscribed={subscribed}
               subscription={subscription}
