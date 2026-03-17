@@ -46,11 +46,10 @@ export async function getActiveSubscription(): Promise<Stripe.Subscription | nul
       limit: 10,
     });
 
-    // Find active or trialing subscription
+    // Find active or trialing subscription (still counts as subscribed even if cancel_at_period_end)
     const activeSubscription = subscriptions.data.find(
       (sub) =>
-        (sub.status === "active" || sub.status === "trialing") &&
-        !sub.cancel_at_period_end
+        sub.status === "active" || sub.status === "trialing"
     );
 
     return activeSubscription || null;
@@ -61,26 +60,71 @@ export async function getActiveSubscription(): Promise<Stripe.Subscription | nul
 }
 
 /**
- * Get subscription status for UI (always from Stripe)
+ * Get latest subscription for UI (shows canceled history too)
  */
 export async function getSubscriptionStatus() {
-  const subscription = await getActiveSubscription();
+  const customerId = await getStripeCustomerId();
+  if (!customerId) {
+    return {
+      subscribed: false,
+      subscription: null,
+    };
+  }
 
-  return {
-    subscribed: !!subscription,
-    subscription: subscription
-      ? {
-          status: subscription.status,
-          cancel_at_period_end: subscription.cancel_at_period_end,
-          current_period_end: new Date(
-            subscription.current_period_end * 1000
-          ).toISOString(),
-          current_period_start: new Date(
-            subscription.current_period_start * 1000
-          ).toISOString(),
-        }
-      : null,
-  };
+  try {
+    const subscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "all",
+      limit: 10,
+    });
+
+    if (!subscriptions.data.length) {
+      return {
+        subscribed: false,
+        subscription: null,
+      };
+    }
+
+    // Pick the most recently created subscription
+    const latest = subscriptions.data.reduce<Stripe.Subscription | null>(
+      (acc, sub) => {
+        if (!acc) return sub;
+        return sub.created > acc.created ? sub : acc;
+      },
+      null
+    );
+
+    if (!latest) {
+      return {
+        subscribed: false,
+        subscription: null,
+      };
+    }
+
+    const isCurrentlySubscribed =
+      (latest.status === "active" || latest.status === "trialing") &&
+      latest.cancel_at_period_end === false;
+
+    return {
+      subscribed: isCurrentlySubscribed,
+      subscription: {
+        status: latest.status,
+        cancel_at_period_end: latest.cancel_at_period_end,
+        current_period_end: new Date(
+          latest.current_period_end * 1000
+        ).toISOString(),
+        current_period_start: new Date(
+          latest.current_period_start * 1000
+        ).toISOString(),
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching subscription status from Stripe:", error);
+    return {
+      subscribed: false,
+      subscription: null,
+    };
+  }
 }
 
 /**

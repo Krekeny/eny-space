@@ -28,7 +28,7 @@ export default function DashboardClient({
   const handleSubscribe = async () => {
     if (!priceId) {
       alert(
-        "Stripe price ID not configured. Please set NEXT_PUBLIC_STRIPE_PRICE_ID in your environment variables."
+        "Stripe price ID not configured. Please set NEXT_PUBLIC_STRIPE_PRICE_ID in your environment variables.",
       );
       return;
     }
@@ -63,7 +63,7 @@ export default function DashboardClient({
     } catch (error) {
       console.error("Error making server call:", error);
       alert(
-        `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   };
@@ -95,12 +95,11 @@ export default function DashboardClient({
   if (isCanceled) {
     return (
       <div className="space-y-3 text-white">
-        <Heading as="h2" className="text-base font-semibold">
+        <Heading as="h2" className="text-base font-semibold text-rose-300">
           Subscription Canceled
         </Heading>
         <Paragraph className="text-sm text-white/80">
-          Your subscription has been canceled. Subscribe again to regain
-          access.
+          Your subscription has been canceled. Subscribe again to regain access.
         </Paragraph>
         <Button
           onClick={handleSubscribe}
@@ -116,7 +115,7 @@ export default function DashboardClient({
   const handleCancel = async () => {
     if (
       !confirm(
-        "Are you sure you want to cancel your subscription? You'll have access until the end of your billing period."
+        "Are you sure you want to cancel your subscription? You'll have access until the end of your billing period.",
       )
     ) {
       return;
@@ -127,7 +126,7 @@ export default function DashboardClient({
       const result = await cancelSubscription();
       if (result.success) {
         alert(
-          "Subscription canceled. You'll have access until the end of your billing period."
+          "Subscription canceled. You'll have access until the end of your billing period.",
         );
         window.location.reload();
       } else {
@@ -180,8 +179,13 @@ export default function DashboardClient({
 
   return (
     <div className="space-y-4 text-white">
-      <Heading as="h2" className="text-base font-semibold">
-        {isCanceling ? "Subscription Canceling" : "Active Subscription"}
+      <Heading
+        as="h2"
+        className={`text-base font-semibold ${
+          isCanceling ? "text-amber-300" : "text-emerald-300"
+        }`}
+      >
+        {isCanceling ? "Cancellation scheduled" : "Active Subscription"}
       </Heading>
       {subscription && (
         <div className="space-y-1 text-sm text-white/80">
