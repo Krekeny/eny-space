@@ -12,6 +12,7 @@ import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import DashboardClient from "./dashboard-client";
+import { ServiceDetailsClient } from "./service-details-client";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -73,10 +74,7 @@ export default async function DashboardPage() {
             <Paragraph className="text-sm font-medium text-white/80">
               Usage summary
             </Paragraph>
-            <Paragraph className="text-sm text-white/70">
-              Usage analytics for your PDS (storage, bandwidth, user count, and
-              more) will appear here.
-            </Paragraph>
+            <ServiceDetailsClient mode="stats" />
           </div>
 
           <div className="mt-4 flex flex-wrap gap-3">
@@ -95,6 +93,8 @@ export default async function DashboardPage() {
           </div>
 
           <hr className="my-6" />
+
+          <ServiceDetailsClient mode="details" />
 
           <section className="space-y-2 text-white">
             <Heading
