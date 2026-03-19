@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   createSubscriptionCheckout,
   cancelSubscription,
@@ -15,15 +15,39 @@ interface DashboardClientProps {
   subscribed: boolean;
   subscription: any;
   priceId: string;
+  autoCheckoutFromPlan?: boolean;
+  pdsPlan?: string;
+  pdsUsername?: string;
+  pdsHostname?: string;
+  pdsDisksizeGb?: string;
 }
 
 export default function DashboardClient({
   subscribed,
   subscription,
   priceId,
+  autoCheckoutFromPlan,
+  pdsPlan,
+  pdsUsername,
+  pdsHostname,
+  pdsDisksizeGb,
 }: DashboardClientProps) {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const hasAutoStartedCheckout = useRef(false);
+
+  const planBasedDisksize = useMemo(() => {
+    if (pdsDisksizeGb && Number(pdsDisksizeGb) > 0) {
+      return Number(pdsDisksizeGb);
+    }
+
+    if (pdsPlan === "growth") return 50;
+    if (pdsPlan === "pro") return 200;
+    return 10;
+  }, [pdsDisksizeGb, pdsPlan]);
+
+  const selectedUsername = pdsUsername || undefined;
+  const selectedHostname = pdsHostname || undefined;
 
   const handleSubscribe = async () => {
     if (!priceId) {
@@ -35,7 +59,11 @@ export default function DashboardClient({
 
     setLoading(true);
     try {
-      const { url } = await createSubscriptionCheckout(priceId);
+      const { url } = await createSubscriptionCheckout(priceId, {
+        username: selectedUsername,
+        hostname: selectedHostname,
+        disksizeGb: planBasedDisksize,
+      });
       if (url) {
         window.location.href = url;
       }
@@ -46,6 +74,18 @@ export default function DashboardClient({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (
+      autoCheckoutFromPlan &&
+      !subscribed &&
+      !loading &&
+      !hasAutoStartedCheckout.current
+    ) {
+      hasAutoStartedCheckout.current = true;
+      void handleSubscribe();
+    }
+  }, [autoCheckoutFromPlan, subscribed, loading]);
 
   const handleServerCall = async (endpoint: string) => {
     try {
@@ -81,6 +121,14 @@ export default function DashboardClient({
         <Paragraph className="text-sm text-white/80">
           You need an active subscription to access the server features.
         </Paragraph>
+        {(pdsPlan || selectedHostname || selectedUsername) && (
+          <Paragraph className="text-xs text-white/70">
+            Selected plan settings: plan={pdsPlan || "starter"}, disksize=
+            {planBasedDisksize}GiB
+            {selectedHostname ? `, hostname=${selectedHostname}` : ""}
+            {selectedUsername ? `, username=${selectedUsername}` : ""}
+          </Paragraph>
+        )}
         <Button
           onClick={handleSubscribe}
           disabled={loading}

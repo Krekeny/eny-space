@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
-const PDS_SERVICE_URL = "https://k8s-pds.frx.pub/api/v1/service/1";
+import { createClient } from "@/lib/supabase/server";
+
+const PDS_API_BASE_URL = "https://k8s-pds.frx.pub/api/v1";
 
 function getMockService() {
   const now = new Date();
@@ -104,7 +106,33 @@ export async function GET() {
       );
     }
 
-    const res = await fetch(PDS_SERVICE_URL, {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const { data: pdsServiceRow } = await supabase
+      .from("pds_services")
+      .select("pds_service_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    const pdsServiceId = pdsServiceRow?.pds_service_id;
+
+    if (!pdsServiceId) {
+      return NextResponse.json(
+        { message: "No provisioned PDS found for this user yet" },
+        { status: 404 },
+      );
+    }
+
+    const pdsServiceUrl = `${PDS_API_BASE_URL}/service/${pdsServiceId}`;
+
+    const res = await fetch(pdsServiceUrl, {
       // Ensure this runs server-side only and is not cached aggressively
       cache: "no-store",
       headers: {

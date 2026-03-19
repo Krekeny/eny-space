@@ -6,6 +6,21 @@ import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import type { Stripe } from "stripe";
 
+function normalizeSlug(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "")
+    .slice(0, 63);
+}
+
+type PdsCheckoutOptions = {
+  username?: string;
+  hostname?: string;
+  disksizeGb?: number;
+};
+
 /**
  * Get user's Stripe customer ID from database (minimal storage)
  */
@@ -145,7 +160,10 @@ export async function verifyActiveSubscription(): Promise<{
 /**
  * Create checkout session for new subscription
  */
-export async function createSubscriptionCheckout(priceId: string) {
+export async function createSubscriptionCheckout(
+  priceId: string,
+  options?: PdsCheckoutOptions,
+) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -184,6 +202,31 @@ export async function createSubscriptionCheckout(priceId: string) {
     "http://localhost:3000";
 
   const checkoutSession = await stripe.checkout.sessions.create({
+    // Used later in the Stripe webhook to provision the user's PDS
+    // with user-selected settings.
+    metadata: (() => {
+      const fallbackUsername = normalizeSlug(user.email!.split("@")[0] || "pds");
+      const pdsUsername = normalizeSlug(options?.username || fallbackUsername);
+      const pdsDisksizeGb = Number(options?.disksizeGb);
+      const normalizedDisksize =
+        Number.isFinite(pdsDisksizeGb) && pdsDisksizeGb > 0
+          ? String(Math.floor(pdsDisksizeGb))
+          : "10";
+
+      const requestedHostname = (options?.hostname || "").trim();
+      const cleanedHostname = requestedHostname
+        .replace(/^https?:\/\//i, "")
+        .replace(/\/.*$/, "");
+      const pdsHostnameBase = cleanedHostname || `${pdsUsername}.eny.k8s.frx.pub`;
+
+      return {
+        user_id: user.id,
+        user_email: user.email!,
+        pds_username: pdsUsername,
+        pds_disksize_gb: normalizedDisksize,
+        pds_hostname_base: pdsHostnameBase,
+      };
+    })(),
     customer: customerId,
     mode: "subscription",
     payment_method_types: ["card"],
@@ -195,9 +238,6 @@ export async function createSubscriptionCheckout(priceId: string) {
     ],
     success_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/dashboard`,
-    metadata: {
-      user_id: user.id,
-    },
   });
 
   return { url: checkoutSession.url };

@@ -9,21 +9,25 @@ import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 
 type PricingPlan = {
+  key: string;
   name: string;
   price: string;
   period: string;
   badge?: string;
   description: string;
   highlight?: boolean;
+  pdsDiskSizeGb: number;
   features: string[];
 };
 
 const PLANS: PricingPlan[] = [
   {
+    key: "starter",
     name: "Starter plan",
     price: "$19",
     period: "per month",
     description: "Perfect for small projects.",
+    pdsDiskSizeGb: 10,
     features: [
       "1 GB storage",
       "5 app deployments",
@@ -32,12 +36,14 @@ const PLANS: PricingPlan[] = [
     ],
   },
   {
+    key: "growth",
     name: "Growth plan",
     price: "$49",
     period: "per month",
     badge: "Popular",
     description: "Scale without limits.",
     highlight: true,
+    pdsDiskSizeGb: 50,
     features: [
       "10 GB storage",
       "Unlimited app deployments",
@@ -46,10 +52,12 @@ const PLANS: PricingPlan[] = [
     ],
   },
   {
+    key: "pro",
     name: "Pro plan",
     price: "$99",
     period: "per month",
     description: "Enterprise‑level performance.",
+    pdsDiskSizeGb: 200,
     features: [
       "Unlimited storage",
       "Custom domain support",
@@ -81,6 +89,15 @@ export function PricingSection() {
 
       <div className="mx-auto mt-12 grid max-w-6xl gap-6 md:grid-cols-3">
         {PLANS.map((plan) => (
+          (() => {
+            const params = new URLSearchParams({
+              auto_checkout: "1",
+              pds_plan: plan.key,
+              pds_disksize_gb: String(plan.pdsDiskSizeGb),
+            });
+            const signupHref = `/signup?${params.toString()}`;
+
+            return (
           <Card
             key={plan.name}
             className={[
@@ -118,7 +135,7 @@ export function PricingSection() {
 
             <CardContent className="mt-6 flex flex-1 flex-col gap-6 px-0">
               <ButtonLink
-                href="/signup"
+                href={signupHref}
                 className={[
                   "w-full rounded-full px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide transition",
                   plan.highlight
@@ -155,6 +172,8 @@ export function PricingSection() {
               </div>
             </CardContent>
           </Card>
+            );
+          })()
         ))}
       </div>
     </section>

@@ -14,7 +14,17 @@ import { Paragraph } from "@/components/paragraph";
 import DashboardClient from "./dashboard-client";
 import { ServiceDetailsClient } from "./service-details-client";
 
-export default async function DashboardPage() {
+type DashboardPageProps = {
+  searchParams?: {
+    auto_checkout?: string;
+    pds_plan?: string;
+    pds_username?: string;
+    pds_hostname?: string;
+    pds_disksize_gb?: string;
+  };
+};
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -107,6 +117,11 @@ export default async function DashboardPage() {
               subscribed={subscribed}
               subscription={subscription}
               priceId={process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || ""}
+              autoCheckoutFromPlan={searchParams?.auto_checkout === "1"}
+              pdsPlan={searchParams?.pds_plan}
+              pdsUsername={searchParams?.pds_username}
+              pdsHostname={searchParams?.pds_hostname}
+              pdsDisksizeGb={searchParams?.pds_disksize_gb}
             />
           </section>
         </CardContent>
