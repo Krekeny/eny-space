@@ -25,6 +25,19 @@ function normalizeDeployHostname(raw: string) {
   return h.replace(/\/$/, "");
 }
 
+function isValidFqdn(host: string) {
+  if (!host || host.length > 253) return false;
+  if (host.endsWith(".")) return false;
+  const parts = host.split(".");
+  if (parts.length < 2) return false;
+  return parts.every((label) => {
+    if (!label || label.length > 63) return false;
+    if (!/^[a-z0-9-]+$/i.test(label)) return false;
+    if (label.startsWith("-") || label.endsWith("-")) return false;
+    return true;
+  });
+}
+
 async function provisionPdsForUser({
   userId,
   userEmail,
@@ -45,6 +58,11 @@ async function provisionPdsForUser({
 
   const password = randomBytes(16).toString("base64url");
   const hostname = normalizeDeployHostname(pdsHostnameBase);
+  if (!isValidFqdn(hostname)) {
+    throw new Error(
+      `Invalid hostname for deploy after normalization: "${hostname}" (raw="${pdsHostnameBase}")`,
+    );
+  }
 
   const disksizeParsed = Number(disksizeGb);
   if (!Number.isFinite(disksizeParsed) || disksizeParsed <= 0) {
@@ -107,7 +125,7 @@ async function provisionPdsForUser({
       status: "deploy_failed",
     });
     throw new Error(
-      `PDS deploy failed (${deployRes.status}): ${
+      `PDS deploy failed (${deployRes.status}) for hostname "${hostname}": ${
         typeof deployBody === "string" ? deployBody : JSON.stringify(deployBody)
       }`,
     );
