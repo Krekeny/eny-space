@@ -98,9 +98,11 @@ async function provisionPdsForUser({
   const maybeServiceId =
     (typeof deployBody === "object" && deployBody !== null
       ? ((deployBody as any).service_id ??
+        (deployBody as any).serviceId ??
         (deployBody as any).id ??
         (deployBody as any).service?.id ??
-        (deployBody as any).data?.id)
+        (deployBody as any).data?.id ??
+        (deployBody as any).data?.serviceId)
       : undefined) ?? null;
 
   const pds_service_id =
