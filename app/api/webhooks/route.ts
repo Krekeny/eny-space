@@ -37,7 +37,7 @@ async function provisionPdsForUser({
   }
 
   const password = randomBytes(16).toString("base64url");
-  const hostnameUrl = `https://${pdsHostnameBase}`;
+  const hostname = pdsHostnameBase.trim();
 
   const disksize = Number(disksizeGb);
 
@@ -56,7 +56,10 @@ async function provisionPdsForUser({
     }
     // Retry deploy for known retryable states where id may be missing.
     // Keep skipping for everything else to avoid duplicate provisioning.
-    const retryableStatuses = new Set(["deploy_failed", "deploy_succeeded_no_id"]);
+    const retryableStatuses = new Set([
+      "deploy_failed",
+      "deploy_succeeded_no_id",
+    ]);
     if (existing.status && !retryableStatuses.has(existing.status)) {
       return { skipped: true, pds_service_id: null };
     }
@@ -73,7 +76,7 @@ async function provisionPdsForUser({
       username: pdsUsername,
       password,
       email: userEmail,
-      hostname: hostnameUrl,
+      hostname,
       disksize,
     }),
   });
@@ -87,7 +90,7 @@ async function provisionPdsForUser({
     // Persist failure status for easier debugging
     await supabase.from("pds_services").upsert({
       user_id: userId,
-      hostname: hostnameUrl,
+      hostname,
       status: "deploy_failed",
     });
     throw new Error(
@@ -115,7 +118,7 @@ async function provisionPdsForUser({
   await supabase.from("pds_services").upsert({
     user_id: userId,
     pds_service_id,
-    hostname: hostnameUrl,
+    hostname,
     status: pds_service_id ? "provisioning" : "deploy_succeeded_no_id",
   });
 
@@ -171,7 +174,9 @@ export async function POST(req: Request) {
 
         // Next step: provision the user's PDS
         if (userEmail) {
-          const fallbackUsername = normalizeSlug(userEmail.split("@")[0] || "pds");
+          const fallbackUsername = normalizeSlug(
+            userEmail.split("@")[0] || "pds",
+          );
           const pdsUsername = normalizeSlug(
             session.metadata?.pds_username || fallbackUsername,
           );
