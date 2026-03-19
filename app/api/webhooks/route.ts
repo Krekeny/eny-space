@@ -54,8 +54,10 @@ async function provisionPdsForUser({
     if (existing.pds_service_id) {
       return { skipped: true, pds_service_id: existing.pds_service_id };
     }
-    // If we already deployed but couldn't capture an id, avoid hammering deploy
-    if (existing.status && existing.status !== "deploy_failed") {
+    // Retry deploy for known retryable states where id may be missing.
+    // Keep skipping for everything else to avoid duplicate provisioning.
+    const retryableStatuses = new Set(["deploy_failed", "deploy_succeeded_no_id"]);
+    if (existing.status && !retryableStatuses.has(existing.status)) {
       return { skipped: true, pds_service_id: null };
     }
   }
