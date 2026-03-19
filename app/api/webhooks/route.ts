@@ -18,6 +18,13 @@ function normalizeSlug(value: string) {
     .slice(0, 63);
 }
 
+function normalizeDeployHostname(raw: string) {
+  let h = raw.trim();
+  h = h.replace(/^https?:\/\//i, "");
+  h = h.replace(/\/.*$/, "");
+  return h.replace(/\/$/, "");
+}
+
 async function provisionPdsForUser({
   userId,
   userEmail,
@@ -37,9 +44,15 @@ async function provisionPdsForUser({
   }
 
   const password = randomBytes(16).toString("base64url");
-  const hostname = pdsHostnameBase.trim();
+  const hostname = normalizeDeployHostname(pdsHostnameBase);
 
-  const disksize = Number(disksizeGb);
+  const disksizeParsed = Number(disksizeGb);
+  if (!Number.isFinite(disksizeParsed) || disksizeParsed <= 0) {
+    throw new Error(
+      `Invalid pds_disksize_gb metadata value: "${disksizeGb}". Expected a positive number.`,
+    );
+  }
+  const disksize = Math.floor(disksizeParsed);
 
   const supabase = createAdminClient();
 
