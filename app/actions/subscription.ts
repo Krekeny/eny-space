@@ -186,10 +186,20 @@ export async function createSubscriptionCheckout(
     customerId = customer.id;
 
     // Store only customer ID in database (minimal)
-    await supabase.from("subscriptions").upsert({
-      user_id: user.id,
-      stripe_customer_id: customerId,
-    });
+    const { data: existingSub } = await supabase
+      .from("subscriptions")
+      .select("id")
+      .eq("user_id", user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (!existingSub) {
+      const { error } = await supabase.from("subscriptions").insert({
+        user_id: user.id,
+        stripe_customer_id: customerId,
+      });
+      if (error) throw error;
+    }
   }
 
   const headersList = await headers();

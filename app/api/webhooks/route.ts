@@ -191,16 +191,27 @@ export async function POST(req: Request) {
           : session.customer.id;
 
       if (userId && customerId) {
-        // Only store user_id -> stripe_customer_id mapping (minimal)
-        const { error } = await supabase.from("subscriptions").upsert({
-          user_id: userId,
-          stripe_customer_id: customerId,
-        });
+        // Store user_id -> stripe_customer_id mapping (minimal)
+        // Avoid creating duplicate rows if the webhook is delivered more than once.
+        const { data: existingSub } = await supabase
+          .from("subscriptions")
+          .select("id")
+          .eq("user_id", userId)
+          .limit(1)
+          .maybeSingle();
 
-        if (error) {
-          console.error("Error storing customer ID:", error);
+        if (!existingSub) {
+          const { error } = await supabase
+            .from("subscriptions")
+            .insert({ user_id: userId, stripe_customer_id: customerId });
+          if (error) console.error("Error inserting customer ID:", error);
+          else console.log(`✅ Customer ID stored for user ${userId}`);
         } else {
-          console.log(`✅ Customer ID stored for user ${userId}`);
+          const { error } = await supabase
+            .from("subscriptions")
+            .update({ stripe_customer_id: customerId })
+            .eq("id", existingSub.id);
+          if (error) console.error("Error updating customer ID:", error);
         }
 
         // Next step: provision the user's PDS
