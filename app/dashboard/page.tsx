@@ -13,6 +13,7 @@ import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import DashboardClient from "./dashboard-client";
 import { ServiceDetailsClient } from "./service-details-client";
+import { AtprotoTestClient } from "./atproto-test-client";
 
 type DashboardPageProps = {
   searchParams?: {
@@ -105,6 +106,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <hr className="my-6" />
 
           <ServiceDetailsClient mode="details" />
+
+          <AtprotoTestClient />
 
           <section className="space-y-2 text-white">
             <Heading

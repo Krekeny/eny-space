@@ -121,7 +121,14 @@ export async function GET() {
       .eq("user_id", user.id)
       .maybeSingle();
 
-    const pdsServiceId = pdsServiceRow?.pds_service_id;
+    const forcedServiceIdRaw = process.env.PDS_FORCE_SERVICE_ID === "true"
+      ? process.env.PDS_TEST_SERVICE_ID
+      : undefined;
+    const forcedServiceId = forcedServiceIdRaw ? Number(forcedServiceIdRaw) : null;
+
+    const pdsServiceId = (forcedServiceId !== null && Number.isFinite(forcedServiceId)
+      ? forcedServiceId
+      : pdsServiceRow?.pds_service_id) as number | null | undefined;
 
     if (!pdsServiceId) {
       return NextResponse.json(
@@ -166,6 +173,22 @@ export async function GET() {
           },
           { status: 502 },
         );
+      }
+
+      // Redact sensitive secrets before sending to the browser.
+      if (data && typeof data === "object") {
+        const d: any = data;
+        if (d.encrypted_config && typeof d.encrypted_config === "object") {
+          if ("adminPassword" in d.encrypted_config) {
+            d.encrypted_config.adminPassword = "redacted";
+          }
+          if ("jwtSecret" in d.encrypted_config) {
+            d.encrypted_config.jwtSecret = "redacted";
+          }
+          if ("plcRotationKey" in d.encrypted_config) {
+            d.encrypted_config.plcRotationKey = "redacted";
+          }
+        }
       }
 
       return NextResponse.json(data);
