@@ -22,10 +22,8 @@ const PLACEHOLDER_LINKS = [
 
 function LogoBarItem({
   item,
-  index,
 }: {
   item: (typeof PLACEHOLDER_LINKS)[number];
-  index: number;
 }) {
   const Icon = item.icon;
   return (
@@ -43,15 +41,7 @@ function LogoBarItem({
 
 function LogoBarScroll() {
   return (
-    <div className="relative w-full overflow-hidden py-8">
-      <div
-        className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-neutral-950 to-transparent z-10"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-neutral-950 to-transparent z-10"
-        aria-hidden="true"
-      />
+    <div className="relative w-full overflow-hidden py-8 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
       <div className="flex w-max animate-marquee items-center [transform:translateZ(0)]">
         {["a", "b"].map((blockId) => (
           <div
@@ -59,13 +49,12 @@ function LogoBarScroll() {
             className="flex shrink-0 items-center gap-16 whitespace-nowrap"
           >
             {PLACEHOLDER_LINKS.slice(0, 6).map((item, i) => (
-              <LogoBarItem key={`${blockId}-${i}`} item={item} index={i} />
+              <LogoBarItem key={`${blockId}-${i}`} item={item} />
             ))}
             <div className="flex shrink-0 items-center">
               <LogoBarItem
                 key={`${blockId}-6`}
                 item={PLACEHOLDER_LINKS[6]}
-                index={6}
               />
               <span className="w-16 shrink-0" aria-hidden />
             </div>

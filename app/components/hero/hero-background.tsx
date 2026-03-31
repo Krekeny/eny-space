@@ -4,7 +4,11 @@
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-export function HeroBackground({ showPlanets = true }: { showPlanets?: boolean }) {
+export function HeroBackground({
+  showPlanets = true,
+}: {
+  showPlanets?: boolean;
+}) {
   const { scrollYProgress } = useScroll();
 
   // Parallax ratios (approximate 10%, 30%, 80%)
@@ -99,7 +103,7 @@ export function HeroBackground({ showPlanets = true }: { showPlanets?: boolean }
         style={{ y: midOrbsY }}
         aria-hidden
       >
-        <div className="absolute inset-0">
+        <div className="pointer-events-none fixed inset-0 -z-5 [mask-image:linear-gradient(to_bottom,transparent,black_14%,black_86%,transparent)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_14%,black_86%,transparent)]">
           <div className="absolute left-[12%] top-[18%] h-40 w-40 rounded-full bg-sky-400/10 blur-3xl shadow-[0_0_120px_rgba(56,189,248,0.55)]" />
           <div className="absolute right-[10%] top-[35%] h-56 w-56 rounded-full bg-fuchsia-400/15 blur-3xl shadow-[0_0_160px_rgba(244,114,182,0.65)]" />
           <div className="absolute left-[30%] bottom-[20%] h-48 w-64 rounded-[999px] bg-indigo-400/10 blur-[80px] shadow-[0_0_180px_rgba(129,140,248,0.6)]" />

@@ -85,15 +85,7 @@ export function TestimonialsSection() {
       </div>
 
       <div className="mx-auto mt-12 max-w-6xl">
-        <div className="relative w-full overflow-hidden py-4">
-          <div
-            className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-slate-950/80 to-transparent z-10"
-            aria-hidden="true"
-          />
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-slate-950/80 to-transparent z-10"
-            aria-hidden="true"
-          />
+        <div className="relative w-full overflow-hidden pt-4 pb-8 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
           <div className="flex w-max animate-marquee items-stretch gap-6 [transform:translateZ(0)]">
             {["a", "b"].map((blockId) => (
               <div
