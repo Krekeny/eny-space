@@ -7,6 +7,7 @@ import {
 import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
+import { prelaunch } from "@/lib/prelaunch";
 
 type PricingPlan = {
   key: string;
@@ -18,6 +19,7 @@ type PricingPlan = {
   highlight?: boolean;
   pdsDiskSizeGb: number;
   features: string[];
+  launchOnly?: boolean;
 };
 
 const PLANS: PricingPlan[] = [
@@ -58,6 +60,7 @@ const PLANS: PricingPlan[] = [
     period: "per month",
     description: "Enterprise‑level performance.",
     pdsDiskSizeGb: 200,
+    launchOnly: true,
     features: [
       "Unlimited storage",
       "Custom domain support",
@@ -69,6 +72,10 @@ const PLANS: PricingPlan[] = [
 ];
 
 export function PricingSection() {
+  // Hide the pricing block entirely during prelaunch mode.
+  // This keeps the "prelaunch vs launch" behavior controlled by one global flag.
+  if (prelaunch) return null;
+
   return (
     <section
       id="pricing"
