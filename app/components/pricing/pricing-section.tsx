@@ -8,6 +8,7 @@ import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import { prelaunch } from "@/lib/prelaunch";
+import { getStripePlanAmounts, type PlanKey } from "@/lib/stripe-plans";
 
 type PricingPlan = {
   key: string;
@@ -24,8 +25,8 @@ type PricingPlan = {
 
 const PLANS: PricingPlan[] = [
   {
-    key: "starter",
-    name: "Starter plan",
+    key: "personal",
+    name: "Personal",
     price: "$19",
     period: "per month",
     description: "Perfect for small projects.",
@@ -38,8 +39,8 @@ const PLANS: PricingPlan[] = [
     ],
   },
   {
-    key: "growth",
-    name: "Growth plan",
+    key: "community",
+    name: "Community",
     price: "$49",
     period: "per month",
     badge: "Popular",
@@ -54,8 +55,8 @@ const PLANS: PricingPlan[] = [
     ],
   },
   {
-    key: "pro",
-    name: "Pro plan",
+    key: "business",
+    name: "Business",
     price: "$99",
     period: "per month",
     description: "Enterprise‑level performance.",
@@ -71,10 +72,39 @@ const PLANS: PricingPlan[] = [
   },
 ];
 
-export function PricingSection() {
+function formatStripePrice(unitAmount: number | null, currency: string | null) {
+  if (!unitAmount || !currency) return null;
+
+  const normalized = currency.toLowerCase();
+  const zeroDecimalCurrencies = new Set([
+    "jpy",
+    "krw",
+    "clp",
+    "vnd",
+    "idr",
+    "huf",
+    "pyg",
+  ]);
+  const decimals = zeroDecimalCurrencies.has(normalized) ? 0 : 2;
+  const major = unitAmount / 10 ** decimals;
+
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: normalized.toUpperCase(),
+      maximumFractionDigits: decimals,
+    }).format(major);
+  } catch {
+    return null;
+  }
+}
+
+export async function PricingSection() {
   // Hide the pricing block entirely during prelaunch mode.
   // This keeps the "prelaunch vs launch" behavior controlled by one global flag.
   if (prelaunch) return null;
+
+  const stripeAmounts = await getStripePlanAmounts();
 
   return (
     <section
@@ -129,7 +159,14 @@ export function PricingSection() {
                   </div>
                   <div className="mt-4 flex items-baseline gap-2">
                     <span className="text-4xl font-semibold sm:text-5xl text-white">
-                      {plan.price}
+                      {(() => {
+                        const key = plan.key as PlanKey;
+                        const fromStripe = formatStripePrice(
+                          stripeAmounts[key]?.unitAmount ?? null,
+                          stripeAmounts[key]?.currency ?? null,
+                        );
+                        return fromStripe ?? plan.price;
+                      })()}
                     </span>
                     <span className="text-sm font-medium opacity-80 text-white">
                       {plan.period}

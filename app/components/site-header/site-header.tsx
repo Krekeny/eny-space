@@ -109,30 +109,6 @@ export function SiteHeader({ user }: SiteHeaderProps) {
           </div>
         </Link>
 
-        {/* ... (rest of your nav and buttons) ... */}
-        <nav className="hidden flex-1 justify-center gap-1 md:flex">
-          <Link
-            href="/"
-            className="inline-flex h-9 items-center justify-center rounded-full bg-transparent px-4 py-2 text-xs font-medium uppercase tracking-wide text-white/90 transition-colors hover:bg-white/5"
-          >
-            Home
-          </Link>
-          {user && (
-            <Link
-              href="/dashboard"
-              className="inline-flex h-9 items-center justify-center rounded-full bg-transparent px-4 py-2 text-xs font-medium uppercase tracking-wide text-white/90 transition-colors hover:bg-white/5"
-            >
-              Dashboard
-            </Link>
-          )}
-          <Link
-            href="/#about"
-            className="inline-flex h-9 items-center justify-center rounded-full bg-transparent px-4 py-2 text-xs font-medium uppercase tracking-wide text-white/90 transition-colors hover:bg-white/5"
-          >
-            About
-          </Link>
-        </nav>
-
         <div className="hidden items-center gap-2 md:flex">
           {!user ? (
             <Button

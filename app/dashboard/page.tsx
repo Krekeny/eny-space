@@ -14,6 +14,8 @@ import { Paragraph } from "@/components/paragraph";
 import DashboardClient from "./dashboard-client";
 import { ServiceDetailsClient } from "./service-details-client";
 import { AtprotoTestClient } from "./atproto-test-client";
+import { prelaunch } from "@/lib/prelaunch";
+import { getPriceIdForPlan } from "@/lib/stripe-plans";
 
 type DashboardPageProps = {
   searchParams?: {
@@ -36,6 +38,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   }
 
   const { subscribed, subscription } = await getSubscriptionStatus();
+
+  // During prelaunch we only collect signups and notify them on launch.
+  // Prevent non-subscribed users from reaching the dashboard subscribe UI.
+  if (prelaunch && !subscribed) {
+    redirect("/welcome");
+  }
 
   // Simple stubbed PDS status derived from subscription state
   const pdsStatus = subscribed ? "active" : "provisioning";
@@ -90,12 +98,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
           <div className="mt-4 flex flex-wrap gap-3">
             <ButtonLink
-              href="/dashboard/manage"
-              className="border border-white/80 bg-transparent uppercase tracking-wide text-white hover:bg-white/10 hover:border-white focus-visible:ring-white/50"
-            >
-              Manage
-            </ButtonLink>
-            <ButtonLink
               href={pdsDashboardUrl}
               className="border border-white/80 bg-transparent uppercase tracking-wide text-white hover:bg-white/10 hover:border-white focus-visible:ring-white/50"
             >
@@ -119,7 +121,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             <DashboardClient
               subscribed={subscribed}
               subscription={subscription}
-              priceId={process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || ""}
+              priceId={getPriceIdForPlan(searchParams?.pds_plan)}
               autoCheckoutFromPlan={searchParams?.auto_checkout === "1"}
               pdsPlan={searchParams?.pds_plan}
               pdsUsername={searchParams?.pds_username}

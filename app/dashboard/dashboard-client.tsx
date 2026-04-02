@@ -41,8 +41,9 @@ export default function DashboardClient({
       return Number(pdsDisksizeGb);
     }
 
-    if (pdsPlan === "growth") return 50;
-    if (pdsPlan === "pro") return 200;
+    const p = (pdsPlan || "").toLowerCase();
+    if (p === "community" || p === "growth") return 50;
+    if (p === "business" || p === "pro") return 200;
     return 10;
   }, [pdsDisksizeGb, pdsPlan]);
 
@@ -52,7 +53,7 @@ export default function DashboardClient({
   const handleSubscribe = async () => {
     if (!priceId) {
       alert(
-        "Stripe price ID not configured. Please set NEXT_PUBLIC_STRIPE_PRICE_ID in your environment variables.",
+        "Stripe price ID not configured. Set NEXT_PUBLIC_STRIPE_PRICE_PERSONAL_ID (and COMMUNITY/BUSINESS) or NEXT_PUBLIC_STRIPE_PRICE_ID as fallback.",
       );
       return;
     }
@@ -123,7 +124,7 @@ export default function DashboardClient({
         </Paragraph>
         {(pdsPlan || selectedHostname || selectedUsername) && (
           <Paragraph className="text-xs text-white/70">
-            Selected plan settings: plan={pdsPlan || "starter"}, disksize=
+            Selected plan settings: plan={pdsPlan || "personal"}, disksize=
             {planBasedDisksize}GiB
             {selectedHostname ? `, hostname=${selectedHostname}` : ""}
             {selectedUsername ? `, username=${selectedUsername}` : ""}
