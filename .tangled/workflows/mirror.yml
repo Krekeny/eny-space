@@ -17,5 +17,5 @@ steps:
     command: |
       git fetch --unshallow || true
       git remote add github https://x-access-token:$ACCESS_TOKEN@$GIT_REPOSITORY
-      BRANCH=$(git rev-parse --abbrev-ref HEAD)
+      BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || git log -1 --format='%D' | tr ',' '\n' | grep 'origin/' | sed 's|.*origin/||' | tr -d ' ' | head -1)
       git push github HEAD:refs/heads/mirror/${BRANCH} --force
