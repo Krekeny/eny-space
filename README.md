@@ -107,6 +107,7 @@ stripe listen --forward-to localhost:3000/api/webhooks
 1. Deploy your application and copy the webhook URL (e.g., `https://your-domain.com/api/webhooks`).
 
 2. In your Stripe dashboard, go to Developers → Webhooks and add an endpoint:
+
    - URL: `https://your-domain.com/api/webhooks`
    - Events to listen to:
      - `checkout.session.completed`
@@ -154,7 +155,9 @@ Make sure to set all required environment variables in your deployment platform.
 
 ## Multi-Remote Git Setup
 
-This repo syncs to two servers (tangled.sh primary, GitHub mirror) using a custom `all` remote. Running `git push all` updates both simultaneously.
+This repo syncs to two servers (tangled.sh primary, GitHub mirror) using a CI mirror script `.tangled/workflows/mirror.yml`.
+
+DEPRECATED: using a custom `all` remote. Running `git push all` updates both simultaneously.
 
 ### Current Config
 
