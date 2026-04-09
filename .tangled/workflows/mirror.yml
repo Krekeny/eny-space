@@ -1,0 +1,20 @@
+# .tangled/workflows/mirror.yml
+when:
+  - event: ["push"]
+    branch: ["main", "feature/*"]
+
+engine: "nixery"
+
+clone:
+  depth: 0
+
+dependencies:
+  nixpkgs:
+    - git
+
+steps:
+  - name: "Mirror to a different CI Repository"
+    command: |
+      git fetch --unshallow || true
+      git remote add github https://x-access-token:$ACCESS_TOKEN@$GIT_REPOSITORY
+      git push github HEAD:refs/heads/mirror/${BRANCH} --force
