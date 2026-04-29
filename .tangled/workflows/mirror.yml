@@ -1,7 +1,7 @@
 # .tangled/workflows/mirror.yml
 when:
   - event: ["push"]
-    branch: ["main", "develop", "feature/*"]
+    branch: ["main", "develop", "feature/*", "docs/*"]
   - event: ["pull_request"]
 
 engine: "nixery"
