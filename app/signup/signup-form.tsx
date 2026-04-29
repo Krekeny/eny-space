@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { signUp } from "@/actions/auth";
 import { Button } from "@/actions/components/ui/button";
@@ -21,7 +21,17 @@ interface SignUpFormProps {
 }
 
 export function SignUpForm({ next, loginHref }: SignUpFormProps) {
-  const [state, action, pending] = useActionState(signUp, null);
+  const [state, setState] = useState<{ error?: string; success?: boolean } | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    startTransition(async () => {
+      const result = await signUp(null, formData);
+      setState(result);
+    });
+  }
 
   if (state?.success) {
     return (
@@ -49,7 +59,7 @@ export function SignUpForm({ next, loginHref }: SignUpFormProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={action} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <input type="hidden" name="next" value={next} />
             {state?.error && (
               <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -77,8 +87,8 @@ export function SignUpForm({ next, loginHref }: SignUpFormProps) {
                 required
               />
             </div>
-            <Button type="submit" className="w-full" disabled={pending}>
-              {pending ? "Creating account…" : "Sign Up"}
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? "Creating account…" : "Sign Up"}
             </Button>
           </form>
         </CardContent>
