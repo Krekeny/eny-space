@@ -116,11 +116,14 @@ export async function PricingSection() {
           as="h2"
           className="text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-4xl"
         >
-          Flexible Pricing for Every Stage of Growth.
+          Simple Pricing for Individuals, Developers and Communities.
         </Heading>
         <Paragraph className="mt-4 text-sm text-white/70 sm:text-base">
-          From startups to enterprises, choose a plan that fits your needs. Pay
-          only for what you use and scale effortlessly.
+          Whether you're an indie developer, a power user, or running a
+          community.
+          <br />
+          Pick a plan that fits and own your data without managing
+          infrastructure.
         </Paragraph>
       </div>
 
@@ -159,14 +162,7 @@ export async function PricingSection() {
                   </div>
                   <div className="mt-4 flex items-baseline gap-2">
                     <span className="text-4xl font-semibold sm:text-5xl text-white">
-                      {(() => {
-                        const key = plan.key as PlanKey;
-                        const fromStripe = formatStripePrice(
-                          stripeAmounts[key]?.unitAmount ?? null,
-                          stripeAmounts[key]?.currency ?? null,
-                        );
-                        return fromStripe ?? plan.price;
-                      })()}
+                      ?€
                     </span>
                     <span className="text-sm font-medium opacity-80 text-white">
                       {plan.period}
@@ -219,7 +215,7 @@ export async function PricingSection() {
                 </CardContent>
               </Card>
             );
-          })(),
+          })()
         )}
       </div>
     </section>

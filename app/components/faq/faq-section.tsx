@@ -63,9 +63,9 @@ export function FAQSection() {
           Answers to the most common questions about managed PDS hosting and the
           eny.space PDS browser. If you can't find what you're looking for, feel
           free to{" "}
-          <span className="font-semibold text-white">
+          <a href="mailto:hello@krekeny.com" className="font-semibold text-white underline underline-offset-2 hover:text-white/80">
             reach out to our friendly team
-          </span>
+          </a>
           .
         </Paragraph>
       </div>

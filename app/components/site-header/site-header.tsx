@@ -76,14 +76,14 @@ export function SiteHeader({ user }: SiteHeaderProps) {
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+          className="flex items-center gap-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
           onClick={() => setMobileOpen(false)}
         >
           <Image
             src="/logo.svg"
             alt=""
-            width={40}
-            height={40}
+            width={32}
+            height={32}
             className="shrink-0"
           />
 
