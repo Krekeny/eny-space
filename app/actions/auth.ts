@@ -4,17 +4,18 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export async function signUp(formData: FormData) {
+export async function signUp(
+  _prevState: { error?: string; success?: boolean } | null,
+  formData: FormData
+): Promise<{ error?: string; success?: boolean }> {
   const supabase = await createClient();
 
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
   const { error } = await supabase.auth.signUp({
-    email: data.email,
-    password: data.password,
+    email,
+    password,
     options: {
       emailRedirectTo: `${
         process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
@@ -26,9 +27,7 @@ export async function signUp(formData: FormData) {
     return { error: error.message };
   }
 
-  const next = (formData.get("next") as string) || "/dashboard";
-  revalidatePath("/", "layout");
-  redirect(next);
+  return { success: true };
 }
 
 export async function signIn(formData: FormData) {
