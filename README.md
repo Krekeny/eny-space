@@ -64,13 +64,19 @@ STRIPE_SECRET_KEY=your_secret_key
 STRIPE_WEBHOOK_SECRET=your_webhook_secret
 NEXT_PUBLIC_STRIPE_PRICE_ID=your_stripe_price_id
 
+# Optional (recommended): plan-specific Price IDs for checkout + pricing display.
+# If set, the UI will show the real Stripe amounts for each plan.
+NEXT_PUBLIC_STRIPE_PRICE_PERSONAL_ID=your_stripe_price_id_personal
+NEXT_PUBLIC_STRIPE_PRICE_COMMUNITY_ID=your_stripe_price_id_community
+NEXT_PUBLIC_STRIPE_PRICE_BUSINESS_ID=your_stripe_price_id_business
+
 # App URL (for redirects)
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 Get your Supabase keys from your project settings → API.
 Get your Stripe keys from your Stripe dashboard.
-Create a subscription product and price in Stripe, then use the price ID for `NEXT_PUBLIC_STRIPE_PRICE_ID`.
+Create 3 subscription prices in Stripe (Personal / Community / Business). Set the resulting Price IDs in `NEXT_PUBLIC_STRIPE_PRICE_PERSONAL_ID`, `NEXT_PUBLIC_STRIPE_PRICE_COMMUNITY_ID`, and `NEXT_PUBLIC_STRIPE_PRICE_BUSINESS_ID`.
 
 3. Start the development server:
 

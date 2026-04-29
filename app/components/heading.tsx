@@ -9,5 +9,5 @@ interface HeadingProps {
 }
 
 export function Heading({ as: Tag = "h1", children, className }: HeadingProps) {
-  return <Tag className={cn(className)}>{children}</Tag>;
+  return <Tag className={cn("font-heading", className)}>{children}</Tag>;
 }

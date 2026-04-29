@@ -26,8 +26,9 @@ export async function signUp(formData: FormData) {
     return { error: error.message };
   }
 
+  const next = (formData.get("next") as string) || "/dashboard";
   revalidatePath("/", "layout");
-  redirect("/dashboard");
+  redirect(next);
 }
 
 export async function signIn(formData: FormData) {
@@ -47,8 +48,9 @@ export async function signIn(formData: FormData) {
     return { error: error.message };
   }
 
+  const next = (formData.get("next") as string) || "/dashboard";
   revalidatePath("/", "layout");
-  redirect("/dashboard");
+  redirect(next);
 }
 
 export async function signOut() {

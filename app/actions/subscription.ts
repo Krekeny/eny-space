@@ -6,6 +6,21 @@ import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import type { Stripe } from "stripe";
 
+function normalizeSlug(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "")
+    .slice(0, 63);
+}
+
+type PdsCheckoutOptions = {
+  username?: string;
+  hostname?: string;
+  disksizeGb?: number;
+};
+
 /**
  * Get user's Stripe customer ID from database (minimal storage)
  */
@@ -46,11 +61,10 @@ export async function getActiveSubscription(): Promise<Stripe.Subscription | nul
       limit: 10,
     });
 
-    // Find active or trialing subscription
+    // Find active or trialing subscription (still counts as subscribed even if cancel_at_period_end)
     const activeSubscription = subscriptions.data.find(
       (sub) =>
-        (sub.status === "active" || sub.status === "trialing") &&
-        !sub.cancel_at_period_end
+        sub.status === "active" || sub.status === "trialing"
     );
 
     return activeSubscription || null;
@@ -61,26 +75,71 @@ export async function getActiveSubscription(): Promise<Stripe.Subscription | nul
 }
 
 /**
- * Get subscription status for UI (always from Stripe)
+ * Get latest subscription for UI (shows canceled history too)
  */
 export async function getSubscriptionStatus() {
-  const subscription = await getActiveSubscription();
+  const customerId = await getStripeCustomerId();
+  if (!customerId) {
+    return {
+      subscribed: false,
+      subscription: null,
+    };
+  }
 
-  return {
-    subscribed: !!subscription,
-    subscription: subscription
-      ? {
-          status: subscription.status,
-          cancel_at_period_end: subscription.cancel_at_period_end,
-          current_period_end: new Date(
-            subscription.current_period_end * 1000
-          ).toISOString(),
-          current_period_start: new Date(
-            subscription.current_period_start * 1000
-          ).toISOString(),
-        }
-      : null,
-  };
+  try {
+    const subscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "all",
+      limit: 10,
+    });
+
+    if (!subscriptions.data.length) {
+      return {
+        subscribed: false,
+        subscription: null,
+      };
+    }
+
+    // Pick the most recently created subscription
+    const latest = subscriptions.data.reduce<Stripe.Subscription | null>(
+      (acc, sub) => {
+        if (!acc) return sub;
+        return sub.created > acc.created ? sub : acc;
+      },
+      null
+    );
+
+    if (!latest) {
+      return {
+        subscribed: false,
+        subscription: null,
+      };
+    }
+
+    const isCurrentlySubscribed =
+      (latest.status === "active" || latest.status === "trialing") &&
+      latest.cancel_at_period_end === false;
+
+    return {
+      subscribed: isCurrentlySubscribed,
+      subscription: {
+        status: latest.status,
+        cancel_at_period_end: latest.cancel_at_period_end,
+        current_period_end: new Date(
+          latest.current_period_end * 1000
+        ).toISOString(),
+        current_period_start: new Date(
+          latest.current_period_start * 1000
+        ).toISOString(),
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching subscription status from Stripe:", error);
+    return {
+      subscribed: false,
+      subscription: null,
+    };
+  }
 }
 
 /**
@@ -101,7 +160,10 @@ export async function verifyActiveSubscription(): Promise<{
 /**
  * Create checkout session for new subscription
  */
-export async function createSubscriptionCheckout(priceId: string) {
+export async function createSubscriptionCheckout(
+  priceId: string,
+  options?: PdsCheckoutOptions,
+) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -124,10 +186,20 @@ export async function createSubscriptionCheckout(priceId: string) {
     customerId = customer.id;
 
     // Store only customer ID in database (minimal)
-    await supabase.from("subscriptions").upsert({
-      user_id: user.id,
-      stripe_customer_id: customerId,
-    });
+    const { data: existingSub } = await supabase
+      .from("subscriptions")
+      .select("id")
+      .eq("user_id", user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (!existingSub) {
+      const { error } = await supabase.from("subscriptions").insert({
+        user_id: user.id,
+        stripe_customer_id: customerId,
+      });
+      if (error) throw error;
+    }
   }
 
   const headersList = await headers();
@@ -140,6 +212,31 @@ export async function createSubscriptionCheckout(priceId: string) {
     "http://localhost:3000";
 
   const checkoutSession = await stripe.checkout.sessions.create({
+    // Used later in the Stripe webhook to provision the user's PDS
+    // with user-selected settings.
+    metadata: (() => {
+      const fallbackUsername = normalizeSlug(user.email!.split("@")[0] || "pds");
+      const pdsUsername = normalizeSlug(options?.username || fallbackUsername);
+      const pdsDisksizeGb = Number(options?.disksizeGb);
+      const normalizedDisksize =
+        Number.isFinite(pdsDisksizeGb) && pdsDisksizeGb > 0
+          ? String(Math.floor(pdsDisksizeGb))
+          : "10";
+
+      const requestedHostname = (options?.hostname || "").trim();
+      const cleanedHostname = requestedHostname
+        .replace(/^https?:\/\//i, "")
+        .replace(/\/.*$/, "");
+      const pdsHostnameBase = cleanedHostname || `${pdsUsername}.eny.k8s.frx.pub`;
+
+      return {
+        user_id: user.id,
+        user_email: user.email!,
+        pds_username: pdsUsername,
+        pds_disksize_gb: normalizedDisksize,
+        pds_hostname_base: pdsHostnameBase,
+      };
+    })(),
     customer: customerId,
     mode: "subscription",
     payment_method_types: ["card"],
@@ -151,9 +248,6 @@ export async function createSubscriptionCheckout(priceId: string) {
     ],
     success_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/dashboard`,
-    metadata: {
-      user_id: user.id,
-    },
   });
 
   return { url: checkoutSession.url };

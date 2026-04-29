@@ -12,7 +12,37 @@ import {
 import { Input } from "@/actions/components/ui/input";
 import { Label } from "@/actions/components/ui/label";
 
-export default function LoginPage() {
+type LoginPageProps = {
+  searchParams?: {
+    auto_checkout?: string;
+    pds_plan?: string;
+    pds_username?: string;
+    pds_hostname?: string;
+    pds_disksize_gb?: string;
+  };
+};
+
+export default function LoginPage({ searchParams }: LoginPageProps) {
+  const nextParams = new URLSearchParams();
+  if (searchParams?.auto_checkout) {
+    nextParams.set("auto_checkout", searchParams.auto_checkout);
+  }
+  if (searchParams?.pds_plan) {
+    nextParams.set("pds_plan", searchParams.pds_plan);
+  }
+  if (searchParams?.pds_username) {
+    nextParams.set("pds_username", searchParams.pds_username);
+  }
+  if (searchParams?.pds_hostname) {
+    nextParams.set("pds_hostname", searchParams.pds_hostname);
+  }
+  if (searchParams?.pds_disksize_gb) {
+    nextParams.set("pds_disksize_gb", searchParams.pds_disksize_gb);
+  }
+
+  const next = `/dashboard${nextParams.toString() ? `?${nextParams.toString()}` : ""}`;
+  const signupHref = `/signup${nextParams.toString() ? `?${nextParams.toString()}` : ""}`;
+
   return (
     <main className="flex min-h-[60vh] items-center justify-center px-4">
       <Card className="w-full max-w-sm">
@@ -24,6 +54,7 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           <form action={signIn} className="space-y-4">
+            <input type="hidden" name="next" value={next} />
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -52,7 +83,7 @@ export default function LoginPage() {
         <CardFooter className="flex justify-center text-sm text-muted-foreground">
           <span>
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="underline underline-offset-4">
+            <Link href={signupHref} className="underline underline-offset-4">
               Sign up
             </Link>
           </span>

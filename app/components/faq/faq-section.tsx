@@ -13,34 +13,34 @@ type FaqItem = {
 
 const FAQ_ITEMS: FaqItem[] = [
   {
-    id: "web3-vs-traditional",
-    question: "Why is your Web3 hosting better than traditional hosting?",
+    id: "what-is-pds",
+    question: "What is a Personal Data Server (PDS)?",
     answer:
-      "Unlike traditional hosting, eny.space offers decentralized infrastructure designed for uptime, security, and scalability. Your projects are backed by blockchain-based guarantees, reducing single points of failure and giving you the resilience you need to grow.",
+      "A PDS is the place where your data and identity for the AT Protocol live. Instead of being locked into one platform, your posts, media and profile are stored on a server you control - and eny.space makes running that server manageable through a simple dashboard.",
   },
   {
-    id: "choose-plan",
-    question: "How do I know which pricing plan is right for me?",
+    id: "do-i-need-own-server",
+    question: "Do I need to understand Kubernetes, Docker or cloud hosting?",
     answer:
-      "Start with the plan that matches your expected storage and traffic. You can upgrade at any time without downtime, and our team can help you right-size based on your current and projected usage.",
+      "No. The whole point of eny.space is managed PDS hosting: you click to create a PDS and we take care of the underlying infrastructure. You can still bring your own domain and adjust settings, but you never have to touch kubectl or obscure cloud dashboards.",
   },
   {
-    id: "secure-platform",
-    question: "What makes your platform secure for hosting my Web3 project?",
+    id: "pds-browser-free",
+    question: "Is the PDS browser UI free to use?",
     answer:
-      "We combine audited smart contract infrastructure with strong network isolation, encryption in transit and at rest, and continuous monitoring. This layered approach helps protect your data and on-chain assets from common attack vectors.",
+      "The PDS explorer UI is designed to be freely accessible for browsing public data on your PDS - similar to how you might explore content on Bluesky today. Managed hosting, dedicated resources and custom domains sit on top as paid features when you want your own isolated space.",
   },
   {
-    id: "switch-plans",
-    question: "Can I switch plans later if my needs change?",
+    id: "billing-and-payments",
+    question: "How do billing and payments work for eny.space?",
     answer:
-      "Yes. You can move between plans at any time. Billing is prorated, and your deployments stay online during the switch so you can scale up or down without interruptions.",
+      "We integrate with modern payment providers so you can subscribe in a few clicks. Behind the scenes, we handle invoices, taxes and payouts for you, so you only see a clear monthly charge for your plan instead of having to reconcile every PDS user manually.",
   },
   {
-    id: "time-to-deploy",
-    question: "How soon can I deploy my Web3 project on eny.space?",
+    id: "who-is-it-for",
+    question: "Who is eny.space built for?",
     answer:
-      "Most teams deploy in minutes. Connect your wallet or Git repository, choose a plan, and follow the guided setup. Our onboarding flow is optimized so you can go from zero to live as quickly as possible.",
+      "eny.space is aimed at AT Protocol and Bluesky power users, indie developers and communities who want their own PDS without becoming infrastructure engineers. If you care about owning your data and having a clear UI to manage it, you are our target audience.",
   },
 ];
 
@@ -50,7 +50,7 @@ export function FAQSection() {
   return (
     <section
       id="faq"
-      className="relative w-full bg-neutral-950 px-4 py-20 sm:px-6 sm:py-24"
+      className="relative w-full px-4 py-20 sm:px-6 sm:py-24"
     >
       <div className="mx-auto max-w-4xl text-center">
         <Heading
@@ -60,8 +60,9 @@ export function FAQSection() {
           Frequently Asked Questions
         </Heading>
         <Paragraph className="mt-4 text-sm text-white/70 sm:text-base">
-          All the details you need about the product and billing. If you can't
-          find what you're looking for, feel free to{" "}
+          Answers to the most common questions about managed PDS hosting and the
+          eny.space PDS browser. If you can't find what you're looking for, feel
+          free to{" "}
           <span className="font-semibold text-white">
             reach out to our friendly team
           </span>
