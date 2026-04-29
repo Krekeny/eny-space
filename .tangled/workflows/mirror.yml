@@ -2,6 +2,7 @@
 when:
   - event: ["push"]
     branch: ["main", "develop", "feature/*"]
+  - event: ["pull_request"]
 
 engine: "nixery"
 
@@ -17,4 +18,5 @@ steps:
     command: |
       git fetch --unshallow || true
       git remote add github https://x-access-token:$ACCESS_TOKEN@$GIT_REPOSITORY
-      git push github HEAD:refs/heads/mirror/$TANGLED_REF_NAME --force
+      REF_NAME=${TANGLED_REF_NAME:-$TANGLED_PR_TARGET_BRANCH}
+      git push github HEAD:refs/heads/mirror/$REF_NAME --force
