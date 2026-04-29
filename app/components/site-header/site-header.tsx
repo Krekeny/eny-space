@@ -122,16 +122,24 @@ export function SiteHeader({ user }: SiteHeaderProps) {
               </Link>
             </Button>
           ) : (
-            <form action={signOut}>
-              <Button
-                type="submit"
-                size="default"
-                className={headerCtaClass}
-              >
-                Sign out
-                <ArrowUpRightIcon className="ml-0.5 size-3.5" />
+            <>
+              <Button size="default" className={headerCtaClass} asChild>
+                <Link href="/dashboard">
+                  Dashboard
+                  <ArrowUpRightIcon className="ml-1 size-3.5" />
+                </Link>
               </Button>
-            </form>
+              <form action={signOut}>
+                <Button
+                  type="submit"
+                  size="default"
+                  className={headerCtaClass}
+                >
+                  Sign out
+                  <ArrowUpRightIcon className="ml-0.5 size-3.5" />
+                </Button>
+              </form>
+            </>
           )}
         </div>
 

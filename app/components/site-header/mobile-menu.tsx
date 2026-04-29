@@ -23,11 +23,16 @@ export function MobileMenu({ user, open, onClose }: MobileMenuProps) {
 
       <div className="mt-3 flex flex-col gap-2">
         {user ? (
-          <form action={signOut}>
-            <button type="submit" className={mobileLinkClass}>
-              Sign out
-            </button>
-          </form>
+          <>
+            <Link href="/dashboard" onClick={onClose} className={mobileLinkClass}>
+              Dashboard
+            </Link>
+            <form action={signOut}>
+              <button type="submit" className={mobileLinkClass}>
+                Sign out
+              </button>
+            </form>
+          </>
         ) : (
           <>
             <Link href="/login" onClick={onClose} className={mobileLinkClass}>
