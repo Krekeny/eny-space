@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo } from "react";
 import Link from "next/link";
 import { Paragraph } from "@/components/paragraph";
 
@@ -141,6 +144,11 @@ function LogoBarItem({ item }: { item: (typeof ATMOSPHERE_APPS)[number] }) {
 }
 
 function LogoBarScroll() {
+  const shuffled = useMemo(
+    () => [...ATMOSPHERE_APPS].sort(() => Math.random() - 0.5),
+    [],
+  );
+
   return (
     <div className="relative w-full overflow-hidden py-8 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
       <div className="flex w-max animate-marquee items-center [transform:translateZ(0)]">
@@ -149,7 +157,7 @@ function LogoBarScroll() {
             key={blockId}
             className="flex shrink-0 items-center gap-16 whitespace-nowrap"
           >
-            {ATMOSPHERE_APPS.map((item, i) => (
+            {shuffled.map((item, i) => (
               <LogoBarItem key={`${blockId}-${i}`} item={item} />
             ))}
             <span className="w-16 shrink-0" aria-hidden />
