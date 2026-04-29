@@ -159,50 +159,13 @@ Make sure to set all required environment variables in your deployment platform.
 4. **Access Control**: Dashboard shows subscription status and protected API buttons
 5. **Protected Routes**: `/api/server/[endpoint]` routes check for active subscription before allowing access
 
-## Multi-Remote Git Setup
+## Mirroring
 
-This repo syncs to two servers (tangled.sh primary, GitHub mirror) using a CI mirror script `.tangled/workflows/mirror.yml`.
+Tangled is the primary git host. All pushes to `main`, `develop`, and `feature/*` branches are automatically mirrored to GitHub under `mirror/<branch-name>` via the Tangled CI pipeline at `.tangled/workflows/mirror.yml`. No manual multi-remote setup is needed.
 
-DEPRECATED: using a custom `all` remote. Running `git push all` updates both simultaneously.
+## How to Contribute
 
-### Current Config
-
-```bash
-all     git@tangled.sh:samsour.de/eny-space (fetch)
-all     git@github.com:Krekeny/eny-space.git (push)
-all     git@tangled.sh:samsour.de/eny-space (push)
-origin  git@tangled.sh:samsour.de/eny-space (fetch)
-origin  git@tangled.sh:samsour.de/eny-space (push)
-```
-
-Note: I previously had `all` with `git@tangled.sh:samsour.de/eny-space` as **fetch only**, so pushes were only going to GitHub and the tangled.sh repo wasn’t in sync. The config above fixes that by adding tangled.sh as a push URL on `all`.
-
-### Setup (New Clones)
-
-```bash
-# Clone primary
-git clone git@tangled.sh:samsour.de/eny-space
-
-# Add GitHub mirror + tangled push
-cd eny-space
-git remote rename origin tangled
-git remote add all git@tangled.sh:samsour.de/eny-space
-git remote set-url --add --push all git@github.com:Krekeny/eny-space.git
-git remote set-url --add --push all git@tangled.sh:samsour.de/eny-space
-
-# Push everything
-git push all --all
-git push all --tags
-```
-
-### How to Contribute
-
-1. Clone: `git clone git@tangled.sh:samsour.de/eny-space`
-2. Branch: `git checkout -b your-feature`
-3. Work: edit → `git add . && git commit -m "Your message"`
-4. Push: `git push all` (syncs both servers!)
-5. Update: `git fetch --all && git checkout main && git pull tangled main`
-
-Pro tip: add an alias `pushall="git push all"` in your shell config (e.g. `~/.bashrc` or `~/.zshrc`) for speed.
-
-# This is a test for commit
+1. Clone: `git clone git@tangled.org:samsour.de/eny-space`
+2. Branch: `git checkout -b feature/your-feature`
+3. Work: edit → `git add . && git commit -m "your message"`
+4. Push: `git push origin feature/your-feature`
