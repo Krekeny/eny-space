@@ -1,41 +1,142 @@
 import Link from "next/link";
-import {
-  BoxIcon,
-  CircleIcon,
-  HexagonIcon,
-  LayersIcon,
-  SparklesIcon,
-  SquareIcon,
-  CircleDotIcon,
-} from "lucide-react";
 import { Paragraph } from "@/components/paragraph";
 
-const PLACEHOLDER_LINKS = [
-  { label: "Short", href: "#", icon: BoxIcon },
-  { label: "Medium Label", href: "#", icon: SparklesIcon },
-  { label: "Descriptive Text", href: "#", icon: CircleIcon },
-  { label: "Another Link", href: "#", icon: LayersIcon },
-  { label: "Quick Label", href: "#", icon: CircleDotIcon },
-  { label: "Label Name Text", href: "#", icon: SquareIcon },
-  { label: "Final Example", href: "#", icon: HexagonIcon },
+const ATMOSPHERE_APPS: { label: string; href?: string; icon: string }[] = [
+  {
+    label: "Anisota",
+    href: "https://anisota.net",
+    icon: "/atmosphere-icons/logo-anisota.svg",
+  },
+  {
+    label: "Blacksky",
+    href: "https://blackskyweb.xyz",
+    icon: "/atmosphere-icons/logo-blacksky.svg",
+  },
+  {
+    label: "Blento",
+    href: "https://blento.app",
+    icon: "/atmosphere-icons/logo-blento.svg",
+  },
+  {
+    label: "Bluesky",
+    href: "https://bsky.app",
+    icon: "/atmosphere-icons/logo-bluesky.svg",
+  },
+  {
+    label: "Bookhive",
+    href: "https://bookhive.buzz",
+    icon: "/atmosphere-icons/logo-bookhive.svg",
+  },
+  {
+    label: "Grain",
+    href: "https://grain.social",
+    icon: "/atmosphere-icons/logo-grain.svg",
+  },
+  {
+    label: "Graze",
+    href: "https://graze.social",
+    icon: "/atmosphere-icons/logo-graze.svg",
+  },
+  {
+    label: "Leaflet",
+    href: "https://leaflet.pub",
+    icon: "/atmosphere-icons/logo-leaflet.svg",
+  },
+  {
+    label: "Margin",
+    href: "https://margin.at/",
+    icon: "/atmosphere-icons/logo-margin.svg",
+  },
+  {
+    label: "Offprint",
+    href: "https://offprint.app",
+    icon: "/atmosphere-icons/logo-offprint.svg",
+  },
+  {
+    label: "Pckt",
+    href: "https://pckt.blog",
+    icon: "/atmosphere-icons/logo-pckt.svg",
+  },
+  {
+    label: "PDSls",
+    href: "https://pdsls.dev",
+    icon: "/atmosphere-icons/logo-pdsls.svg",
+  },
+  {
+    label: "Plyr.fm",
+    href: "https://plyr.fm",
+    icon: "/atmosphere-icons/logo-plyr.fm.svg",
+  },
+  {
+    label: "Popfeed",
+    href: "https://popfeed.social",
+    icon: "/atmosphere-icons/logo-popfeed.svg",
+  },
+  {
+    label: "Roomy",
+    href: "https://a.roomy.space/",
+    icon: "/atmosphere-icons/logo-roomy.svg",
+  },
+  {
+    label: "Semble",
+    href: "https://semble.so/",
+    icon: "/atmosphere-icons/logo-semble.svg",
+  },
+  {
+    label: "Sifa.id",
+    href: "https://sifa.id",
+    icon: "/atmosphere-icons/logo-sifa%20id.svg",
+  },
+  {
+    label: "Sill",
+    href: "https://sill.social",
+    icon: "/atmosphere-icons/logo-sill.svg",
+  },
+  {
+    label: "Spark",
+    href: "https://sprk.so/",
+    icon: "/atmosphere-icons/logo-spark.svg",
+  },
+  {
+    label: "Surf",
+    href: "https://surf.social",
+    icon: "/atmosphere-icons/logo-surf.svg",
+  },
+  {
+    label: "Tangled",
+    href: "https://tangled.org",
+    icon: "/atmosphere-icons/logo-tangled.svg",
+  },
 ];
 
-function LogoBarItem({
-  item,
-}: {
-  item: (typeof PLACEHOLDER_LINKS)[number];
-}) {
-  const Icon = item.icon;
-  return (
-    <Link
-      href={item.href}
-      className="flex shrink-0 items-center gap-3 text-base font-medium text-white/90 transition-colors hover:text-white"
-    >
+function LogoBarItem({ item }: { item: (typeof ATMOSPHERE_APPS)[number] }) {
+  const inner = (
+    <>
       <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white/5">
-        <Icon className="size-5 text-white/90" aria-hidden />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={item.icon} alt="" className="size-6" aria-hidden />
       </span>
       {item.label}
-    </Link>
+    </>
+  );
+
+  if (item.href) {
+    return (
+      <Link
+        href={item.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex shrink-0 items-center gap-3 text-base font-medium text-white/90 transition-colors hover:text-white"
+      >
+        {inner}
+      </Link>
+    );
+  }
+
+  return (
+    <span className="flex shrink-0 items-center gap-3 text-base font-medium text-white/50 cursor-default">
+      {inner}
+    </span>
   );
 }
 
@@ -48,16 +149,10 @@ function LogoBarScroll() {
             key={blockId}
             className="flex shrink-0 items-center gap-16 whitespace-nowrap"
           >
-            {PLACEHOLDER_LINKS.slice(0, 6).map((item, i) => (
+            {ATMOSPHERE_APPS.map((item, i) => (
               <LogoBarItem key={`${blockId}-${i}`} item={item} />
             ))}
-            <div className="flex shrink-0 items-center">
-              <LogoBarItem
-                key={`${blockId}-6`}
-                item={PLACEHOLDER_LINKS[6]}
-              />
-              <span className="w-16 shrink-0" aria-hidden />
-            </div>
+            <span className="w-16 shrink-0" aria-hidden />
           </div>
         ))}
       </div>
