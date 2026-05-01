@@ -3,8 +3,9 @@ import { ChevronDownIcon } from "lucide-react";
 
 const navItems = [
   { label: "Key features", href: "/#features" },
-  { label: "Build with eny.space", href: "/#build" },
-  { label: "Latest news", href: "/#news" },
+  { label: "FAQs", href: "/#faq" },
+  // { label: "Build with eny.space", href: "/#build" },
+  // { label: "Latest news", href: "/#news" },
 ];
 
 export function HeroRight() {
