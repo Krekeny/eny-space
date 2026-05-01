@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { ChevronDownIcon } from "lucide-react";
+import { prelaunch } from "@/lib/prelaunch";
 
 const navItems = [
   { label: "Key features", href: "/#features" },
+  ...(!prelaunch ? [{ label: "Pricing", href: "/#pricing" }] : []),
   { label: "FAQs", href: "/#faq" },
-  // { label: "Build with eny.space", href: "/#build" },
-  // { label: "Latest news", href: "/#news" },
 ];
 
 export function HeroRight() {
