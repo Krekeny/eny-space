@@ -115,7 +115,7 @@ const ATMOSPHERE_APPS: { label: string; href?: string; icon: string }[] = [
 function LogoBarItem({ item }: { item: (typeof ATMOSPHERE_APPS)[number] }) {
   const inner = (
     <>
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white/5">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white/15">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={item.icon} alt="" className="size-6" aria-hidden />
       </span>
