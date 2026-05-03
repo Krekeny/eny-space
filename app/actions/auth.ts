@@ -13,18 +13,30 @@ export async function signUp(
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${
-        process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-      }/auth/callback`,
-    },
-  });
+  try {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${
+          process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+        }/auth/callback`,
+      },
+    });
 
-  if (error) {
-    return { error: error.message };
+    if (error) {
+      return { error: error.message };
+    }
+  } catch (err) {
+    const cause = (err as any)?.cause;
+    const isTimeout =
+      cause?.code === "UND_ERR_CONNECT_TIMEOUT" ||
+      (err as Error)?.message === "fetch failed";
+    return {
+      error: isTimeout
+        ? "Could not reach the server. Please check your connection and try again."
+        : "An unexpected error occurred. Please try again.",
+    };
   }
 
   return { success: true };

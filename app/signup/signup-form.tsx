@@ -28,8 +28,12 @@ export function SignUpForm({ next, loginHref }: SignUpFormProps) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     startTransition(async () => {
-      const result = await signUp(null, formData);
-      setState(result);
+      try {
+        const result = await signUp(null, formData);
+        setState(result);
+      } catch {
+        setState({ error: "An unexpected error occurred. Please try again." });
+      }
     });
   }
 

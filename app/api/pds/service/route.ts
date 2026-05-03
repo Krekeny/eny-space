@@ -37,7 +37,7 @@ function getMockService() {
   const failedRequestsLast24h = 42;
   const successfulRequestsLast24h = requestsPerHourLast24h.reduce(
     (sum, p) => sum + p.count,
-    0,
+    0
   );
 
   return {
@@ -102,7 +102,7 @@ export async function GET() {
           error:
             "Missing PDS_API_TOKEN env variable for authenticating with PDS API",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -121,19 +121,24 @@ export async function GET() {
       .eq("user_id", user.id)
       .maybeSingle();
 
-    const forcedServiceIdRaw = process.env.PDS_FORCE_SERVICE_ID === "true"
-      ? process.env.PDS_TEST_SERVICE_ID
-      : undefined;
-    const forcedServiceId = forcedServiceIdRaw ? Number(forcedServiceIdRaw) : null;
+    const forcedServiceIdRaw =
+      process.env.PDS_FORCE_SERVICE_ID === "true"
+        ? process.env.PDS_TEST_SERVICE_ID
+        : undefined;
+    const forcedServiceId = forcedServiceIdRaw
+      ? Number(forcedServiceIdRaw)
+      : null;
 
-    const pdsServiceId = (forcedServiceId !== null && Number.isFinite(forcedServiceId)
-      ? forcedServiceId
-      : pdsServiceRow?.pds_service_id) as number | null | undefined;
+    const pdsServiceId = (
+      forcedServiceId !== null && Number.isFinite(forcedServiceId)
+        ? forcedServiceId
+        : pdsServiceRow?.pds_service_id
+    ) as number | null | undefined;
 
     if (!pdsServiceId) {
       return NextResponse.json(
         { message: "No provisioned PDS found for this user yet" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -171,7 +176,7 @@ export async function GET() {
             status: res.status,
             body: data,
           },
-          { status: 502 },
+          { status: 502 }
         );
       }
 
@@ -204,7 +209,7 @@ export async function GET() {
         contentType,
         bodyPreview: bodyText.slice(0, 500),
       },
-      { status: 502 },
+      { status: 502 }
     );
   } catch (error) {
     console.error("Error proxying PDS service request", error);
@@ -213,7 +218,7 @@ export async function GET() {
         error: "Failed to reach PDS service endpoint",
         detail: error instanceof Error ? error.message : String(error),
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
