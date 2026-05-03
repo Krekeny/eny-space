@@ -42,6 +42,12 @@ const FAQ_ITEMS: FaqItem[] = [
     answer:
       "eny.space is aimed at AT Protocol and Bluesky power users, indie developers and communities who want their own PDS without becoming infrastructure engineers. If you care about owning your data and having a clear UI to manage it, you are our target audience.",
   },
+  {
+    id: "why-no-atmosphere-login",
+    question: 'Why can\'t I log in with my "@" handle or Atmosphere account?',
+    answer:
+      "eny.space provisions Personal Data Servers — your account here is separate from your AT Protocol identity on purpose. Allowing Atmosphere login before your PDS is fully set up could lock you out of your own server. We are working on Atmosphere login as an option, but an email address will always be required as a secure fallback.",
+  },
 ];
 
 export function FAQSection() {
