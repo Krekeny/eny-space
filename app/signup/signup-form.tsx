@@ -21,7 +21,10 @@ interface SignUpFormProps {
 }
 
 export function SignUpForm({ next, loginHref }: SignUpFormProps) {
-  const [state, setState] = useState<{ error?: string; success?: boolean } | null>(null);
+  const [state, setState] = useState<{
+    error?: string;
+    success?: boolean;
+  } | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
