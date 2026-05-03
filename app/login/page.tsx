@@ -80,13 +80,17 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center text-sm text-muted-foreground">
+        <CardFooter className="flex flex-col gap-3 text-sm text-muted-foreground">
           <span>
             Don&apos;t have an account?{" "}
             <Link href={signupHref} className="underline underline-offset-4">
               Sign up
             </Link>
           </span>
+          <p className="text-center text-xs text-muted-foreground/70">
+            Login with your eny.space email — not your Atmosphere handle.
+            Atmosphere login is coming soon.
+          </p>
         </CardFooter>
       </Card>
     </main>

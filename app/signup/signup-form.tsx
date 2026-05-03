@@ -99,13 +99,17 @@ export function SignUpForm({ next, loginHref }: SignUpFormProps) {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center text-sm text-muted-foreground">
+        <CardFooter className="flex flex-col gap-3 text-sm text-muted-foreground">
           <span>
             Already have an account?{" "}
             <Link href={loginHref} className="underline underline-offset-4">
               Login
             </Link>
           </span>
+          <p className="text-center text-xs text-muted-foreground/70">
+            We use email login to keep your account secure during PDS setup.
+            Atmosphere login is coming soon.
+          </p>
         </CardFooter>
       </Card>
     </main>
