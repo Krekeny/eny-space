@@ -60,7 +60,7 @@ function getMockService() {
       "helm repo update\n" +
       "helm install bluesky-pds nerkho/bluesky-pds --namespace {namespace} -f {values}\n" +
       'export KUBECONFIG=""',
-    state: 0,
+    state: 3,
     kubeconfig_id: 1,
     created_at: "2026-03-17T15:05:40.000000Z",
     updated_at: "2026-03-17T15:05:40.000000Z",

@@ -29,7 +29,7 @@ export function AtprotoTestClient() {
   const [inviteCode, setInviteCode] = useState<string>("");
 
   const [email, setEmail] = useState<string>("");
-  const [handle, setHandle] = useState<string>("");
+  const [handlePrefix, setHandlePrefix] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
 
   const [sessionIdentifier, setSessionIdentifier] = useState<string>("");
@@ -40,6 +40,10 @@ export function AtprotoTestClient() {
   const [error, setError] = useState<string | null>(null);
 
   const pdsBareHost = useMemo(() => stripScheme(pdsHost), [pdsHost]);
+  const fullHandle = useMemo(
+    () => (handlePrefix && pdsBareHost ? `${handlePrefix}.${pdsBareHost}` : ""),
+    [handlePrefix, pdsBareHost],
+  );
   const pdsStateNum = useMemo(() => {
     if (pdsState === null) return null;
     const n = typeof pdsState === "number" ? pdsState : Number(pdsState);
@@ -47,9 +51,9 @@ export function AtprotoTestClient() {
   }, [pdsState]);
   const isPdsReady = pdsStateNum !== null && pdsStateNum >= 3;
   const createAccountDisabled =
-    loading || !inviteCode || !handle || !newPassword || !isPdsReady;
+    loading || !inviteCode || !handlePrefix || !newPassword || !isPdsReady;
   const createSessionDisabled =
-    loading || !handle || !newPassword || !isPdsReady;
+    loading || !handlePrefix || !newPassword || !isPdsReady;
 
   useEffect(() => {
     const load = async () => {
@@ -61,9 +65,9 @@ export function AtprotoTestClient() {
         setPdsHost(host);
         setPdsState(data?.state ?? null);
 
-        if (!handle && host) {
+        if (!handlePrefix && host) {
           const bare = stripScheme(host);
-          setHandle(`user1.${bare}`);
+          setHandlePrefix("user1");
           setSessionIdentifier(`user1.${bare}`);
         }
       } catch (e) {
@@ -94,7 +98,6 @@ export function AtprotoTestClient() {
           throw new Error(payload);
         }
 
-        // Prefer the nested upstream error if present.
         const upstreamMessage =
           payload?.payload?.message ||
           payload?.payload?.error ||
@@ -117,30 +120,42 @@ export function AtprotoTestClient() {
   };
 
   const createInvite = async () => {
-    const payload = await call("/api/pds/atproto/invite", { useCount: 1 });
-    const code = payload?.code || payload?.inviteCode || "";
-    setInviteCode(code);
-    setOutput(payload);
+    try {
+      const payload = await call("/api/pds/atproto/invite", { useCount: 1 });
+      const code = payload?.code || payload?.inviteCode || "";
+      setInviteCode(code);
+      setOutput(payload);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
   };
 
   const createAccount = async () => {
-    const payload = await call("/api/pds/atproto/create-account", {
-      email,
-      handle,
-      password: newPassword,
-      inviteCode,
-    });
-    setOutput(payload);
-    setSessionIdentifier(handle);
-    setSessionPassword(newPassword);
+    try {
+      const payload = await call("/api/pds/atproto/create-account", {
+        email,
+        handle: fullHandle,
+        password: newPassword,
+        inviteCode,
+      });
+      setOutput(payload);
+      setSessionIdentifier(fullHandle);
+      setSessionPassword(newPassword);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
   };
 
   const createSession = async () => {
-    const payload = await call("/api/pds/atproto/create-session", {
-      identifier: sessionIdentifier || handle,
-      password: sessionPassword || newPassword,
-    });
-    setOutput(payload);
+    try {
+      const payload = await call("/api/pds/atproto/create-session", {
+        identifier: sessionIdentifier || fullHandle,
+        password: sessionPassword || newPassword,
+      });
+      setOutput(payload);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
   };
 
   return (
@@ -155,7 +170,14 @@ export function AtprotoTestClient() {
       {pdsHost ? (
         <Paragraph className="text-sm text-white/70">
           PDS endpoint:{" "}
-          <span className="font-mono text-white">{pdsHost}</span>
+          <a
+            href={pdsHost}
+            target="_blank"
+            rel="noreferrer"
+            className="font-mono text-white underline underline-offset-2 hover:text-white/80"
+          >
+            {pdsHost}
+          </a>
         </Paragraph>
       ) : (
         <Paragraph className="text-sm text-white/70">Loading PDS endpoint…</Paragraph>
@@ -163,8 +185,7 @@ export function AtprotoTestClient() {
 
       {pdsStateNum !== null && !isPdsReady && (
         <Paragraph className="text-sm text-amber-100/90">
-          PDS not ready yet (state={pdsStateNum}). Waiting for provisioning to
-          finish.
+          PDS not ready yet (state={pdsStateNum}). Waiting for provisioning to finish.
         </Paragraph>
       )}
 
@@ -206,12 +227,17 @@ export function AtprotoTestClient() {
 
         <label className="space-y-1">
           <Paragraph className="text-xs font-medium text-white/60">Handle</Paragraph>
-          <input
-            value={handle}
-            onChange={(e) => setHandle(e.target.value)}
-            className="w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/50"
-            placeholder={`user1.${pdsBareHost || "eny.k8s.frx.pub"}`}
-          />
+          <div className="flex items-center rounded-md border border-white/20 bg-transparent text-sm text-white focus-within:border-white/50">
+            <input
+              value={handlePrefix}
+              onChange={(e) => setHandlePrefix(e.target.value)}
+              className="min-w-0 flex-1 bg-transparent px-3 py-2 placeholder:text-white/50 focus:outline-none"
+              placeholder="user1"
+            />
+            {pdsBareHost && (
+              <span className="shrink-0 pr-3 text-white/40">.{pdsBareHost}</span>
+            )}
+          </div>
         </label>
 
         <label className="space-y-1 md:col-span-2">
@@ -234,8 +260,8 @@ export function AtprotoTestClient() {
           disabled={createAccountDisabled}
           className={
             createAccountDisabled
-              ? "rounded-full bg-emerald-400/10 border border-emerald-200/10 opacity-60 cursor-not-allowed"
-              : "rounded-full bg-emerald-400/20 hover:bg-emerald-400/35 border border-emerald-200/25"
+              ? "rounded-full bg-emerald-400/10 border border-emerald-200/10 opacity-40 cursor-not-allowed"
+              : "rounded-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-medium"
           }
         >
           Create user
@@ -245,8 +271,8 @@ export function AtprotoTestClient() {
           disabled={createSessionDisabled}
           className={
             createSessionDisabled
-              ? "rounded-full bg-sky-400/10 border border-sky-200/10 opacity-60 cursor-not-allowed"
-              : "rounded-full bg-sky-400/20 hover:bg-sky-400/35 border border-sky-200/25"
+              ? "rounded-full bg-sky-400/10 border border-sky-200/10 opacity-40 cursor-not-allowed"
+              : "rounded-full bg-sky-500 hover:bg-sky-400 text-neutral-950 font-medium"
           }
         >
           Login (create session)
@@ -286,4 +312,3 @@ export function AtprotoTestClient() {
     </section>
   );
 }
-
