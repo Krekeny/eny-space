@@ -48,10 +48,7 @@ export function FAQSection() {
   const [openId, setOpenId] = useState<string | null>(FAQ_ITEMS[0]?.id ?? null);
 
   return (
-    <section
-      id="faq"
-      className="relative w-full px-4 py-20 sm:px-6 sm:py-24"
-    >
+    <section id="faq" className="relative w-full px-4 py-20 sm:px-6 sm:py-24">
       <div className="mx-auto max-w-4xl text-center">
         <Heading
           as="h2"
@@ -60,10 +57,13 @@ export function FAQSection() {
           Frequently Asked Questions
         </Heading>
         <Paragraph className="mt-4 text-sm text-white/70 sm:text-base">
-          Answers to the most common questions about managed PDS hosting and the
+          answers to the most common questions about managed PDS hosting and the
           eny.space PDS browser. If you can't find what you're looking for, feel
           free to{" "}
-          <a href="mailto:hello@krekeny.com" className="font-semibold text-white underline underline-offset-2 hover:text-white/80">
+          <a
+            href="mailto:hello@krekeny.com"
+            className="font-semibold text-white underline underline-offset-2 hover:text-white/80"
+          >
             reach out to our friendly team
           </a>
           .

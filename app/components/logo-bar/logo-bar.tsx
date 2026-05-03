@@ -146,7 +146,7 @@ function LogoBarItem({ item }: { item: (typeof ATMOSPHERE_APPS)[number] }) {
 function LogoBarScroll() {
   const shuffled = useMemo(
     () => [...ATMOSPHERE_APPS].sort(() => Math.random() - 0.5),
-    [],
+    []
   );
 
   return (
