@@ -5,8 +5,6 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
-  CardDescription,
 } from "@/actions/components/ui/card";
 import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
@@ -14,20 +12,22 @@ import { Paragraph } from "@/components/paragraph";
 import DashboardClient from "./dashboard-client";
 import { ServiceDetailsClient } from "./service-details-client";
 import { AtprotoTestClient } from "./atproto-test-client";
+import { CollapsibleSection } from "./collapsible-section";
 import { prelaunch } from "@/lib/prelaunch";
 import { getPriceIdForPlan } from "@/lib/stripe-plans";
 
 type DashboardPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     auto_checkout?: string;
     pds_plan?: string;
     pds_username?: string;
     pds_hostname?: string;
     pds_disksize_gb?: string;
-  };
+  }>;
 };
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  const params = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -39,13 +39,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const { subscribed, subscription } = await getSubscriptionStatus();
 
-  // During prelaunch we only collect signups and notify them on launch.
-  // Prevent non-subscribed users from reaching the dashboard subscribe UI.
   if (prelaunch && !subscribed) {
     redirect("/welcome");
   }
 
-  // Simple stubbed PDS status derived from subscription state
   const pdsStatus = subscribed ? "active" : "provisioning";
   const pdsHostname =
     user.email?.split("@")[0]?.toLowerCase().replace(/[^a-z0-9-]/g, "-") +
@@ -53,31 +50,25 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const pdsDashboardUrl = `https://${pdsHostname}`;
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6">
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6">
+      {/* Overview — always visible */}
       <Card>
         <CardHeader>
           <Heading as="h1" className="text-xl font-semibold text-white">
             My PDS
           </Heading>
           <Paragraph className="text-sm text-white/80">
-            Authenticated as {user.email}. This is your Personal Data Server
-            overview.
+            Authenticated as {user.email}.
           </Paragraph>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 text-white">
-            <div className="space-y-2">
-              <Paragraph className="text-sm font-medium text-white/80">
-                Status
-              </Paragraph>
-              <Paragraph className="text-base font-semibold capitalize">
-                {pdsStatus}
-              </Paragraph>
+            <div className="space-y-1">
+              <Paragraph className="text-sm font-medium text-white/60">Status</Paragraph>
+              <Paragraph className="text-base font-semibold capitalize">{pdsStatus}</Paragraph>
             </div>
-            <div className="space-y-2">
-              <Paragraph className="text-sm font-medium text-white/80">
-                URL / Hostname
-              </Paragraph>
+            <div className="space-y-1">
+              <Paragraph className="text-sm font-medium text-white/60">Hostname</Paragraph>
               <a
                 href={pdsDashboardUrl}
                 target="_blank"
@@ -88,15 +79,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               </a>
             </div>
           </div>
-
-          <div className="mt-4 space-y-2 rounded-md border border-white/10 bg-white/5 p-4 text-white backdrop-blur-xl">
-            <Paragraph className="text-sm font-medium text-white/80">
-              Usage summary
-            </Paragraph>
-            <ServiceDetailsClient mode="stats" />
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 pt-1">
             <ButtonLink
               href={pdsDashboardUrl}
               className="border border-white/80 bg-transparent uppercase tracking-wide text-white hover:bg-white/10 hover:border-white focus-visible:ring-white/50"
@@ -104,33 +87,37 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               Open dashboard
             </ButtonLink>
           </div>
-
-          <hr className="my-6" />
-
-          <ServiceDetailsClient mode="details" />
-
-          <AtprotoTestClient />
-
-          <section className="space-y-2 text-white">
-            <Heading
-              as="h2"
-              className="text-sm font-semibold uppercase tracking-wide text-white/80"
-            >
-              Billing & Subscription
-            </Heading>
-            <DashboardClient
-              subscribed={subscribed}
-              subscription={subscription}
-              priceId={getPriceIdForPlan(searchParams?.pds_plan)}
-              autoCheckoutFromPlan={searchParams?.auto_checkout === "1"}
-              pdsPlan={searchParams?.pds_plan}
-              pdsUsername={searchParams?.pds_username}
-              pdsHostname={searchParams?.pds_hostname}
-              pdsDisksizeGb={searchParams?.pds_disksize_gb}
-            />
-          </section>
         </CardContent>
       </Card>
+
+      {/* Usage & Stats */}
+      <CollapsibleSection title="Usage & Stats">
+        <ServiceDetailsClient mode="stats" />
+      </CollapsibleSection>
+
+      {/* Service Details */}
+      <CollapsibleSection title="Service Details">
+        <ServiceDetailsClient mode="details" />
+      </CollapsibleSection>
+
+      {/* AT Protocol */}
+      <CollapsibleSection title="AT Protocol">
+        <AtprotoTestClient />
+      </CollapsibleSection>
+
+      {/* Billing & Subscription */}
+      <CollapsibleSection title="Billing & Subscription" defaultOpen>
+        <DashboardClient
+          subscribed={subscribed}
+          subscription={subscription}
+          priceId={getPriceIdForPlan(params?.pds_plan)}
+          autoCheckoutFromPlan={params?.auto_checkout === "1"}
+          pdsPlan={params?.pds_plan}
+          pdsUsername={params?.pds_username}
+          pdsHostname={params?.pds_hostname}
+          pdsDisksizeGb={params?.pds_disksize_gb}
+        />
+      </CollapsibleSection>
     </main>
   );
 }

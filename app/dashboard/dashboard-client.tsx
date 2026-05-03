@@ -88,27 +88,6 @@ export default function DashboardClient({
     }
   }, [autoCheckoutFromPlan, subscribed, loading]);
 
-  const handleServerCall = async (endpoint: string) => {
-    try {
-      const response = await fetch(`/api/server/${endpoint}`, {
-        method: "POST",
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to make server call");
-      }
-
-      const data = await response.json();
-      alert(`Success: ${JSON.stringify(data, null, 2)}`);
-    } catch (error) {
-      console.error("Error making server call:", error);
-      alert(
-        `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-      );
-    }
-  };
-
   const hasSubscription = !!subscription;
   const isCanceled =
     subscription?.status === "canceled" || subscription?.status === "past_due";
@@ -294,32 +273,6 @@ export default function DashboardClient({
         </div>
       </div>
 
-      <hr className="my-4 border-white/10" />
-
-      <div className="space-y-2">
-        <Heading as="h3" className="text-sm font-semibold text-white">
-          Server Actions
-        </Heading>
-        <Paragraph className="text-sm text-white/80">
-          You have access to the following server endpoints:
-        </Paragraph>
-        <div className="flex flex-wrap gap-2 pt-1">
-          <Button
-            variant="outline"
-            className="rounded-full border-white/60 bg-transparent px-4 text-xs font-medium uppercase tracking-wide text-white hover:bg-white/10"
-            onClick={() => handleServerCall("action1")}
-          >
-            Call Server Action 1
-          </Button>
-          <Button
-            variant="outline"
-            className="rounded-full border-white/60 bg-transparent px-4 text-xs font-medium uppercase tracking-wide text-white hover:bg-white/10"
-            onClick={() => handleServerCall("action2")}
-          >
-            Call Server Action 2
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }
