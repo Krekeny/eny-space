@@ -99,7 +99,7 @@ export async function getPdsServiceForCurrentUser(): Promise<{
 }
 
 export function getPdsBaseUrlFromService(service: any): string {
-  const raw = service?.encrypted_config?.hostname as string | undefined;
+  const raw = (service?.hostname || service?.encrypted_config?.hostname) as string | undefined;
   if (!raw) {
     throw new Error("Missing PDS host");
   }

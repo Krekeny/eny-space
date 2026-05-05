@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
+import { pdsStateLabel } from "@/lib/pds-state";
 
 type ServiceStats = {
   cpuUsagePercent?: number;
@@ -86,6 +87,8 @@ export function ServiceDetailsClient({
         }
 
         const data = (await res.json()) as ServiceResponse;
+        console.log("[ServiceDetailsClient] response:", data);
+        console.log("[ServiceDetailsClient] stats:", data.stats ?? "MISSING — stats section will not render");
         setService(data);
       } catch (err) {
         console.error("Failed to load service details", err);
@@ -216,7 +219,7 @@ export function ServiceDetailsClient({
                   State
                 </Paragraph>
                 <Paragraph className="text-sm font-mono text-white">
-                  {String(service.state)}
+                  {pdsStateLabel(service.state)}
                 </Paragraph>
               </div>
             )}

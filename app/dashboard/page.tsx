@@ -15,6 +15,8 @@ import { AtprotoTestClient } from "./atproto-test-client";
 import { CollapsibleSection } from "./collapsible-section";
 import { prelaunch } from "@/lib/prelaunch";
 import { getPriceIdForPlan } from "@/lib/stripe-plans";
+import { getPdsServiceForCurrentUser } from "../api/pds/atproto/helpers";
+import { pdsStateLabel } from "@/lib/pds-state";
 
 type DashboardPageProps = {
   searchParams?: Promise<{
@@ -43,11 +45,20 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     redirect("/welcome");
   }
 
-  const pdsStatus = subscribed ? "active" : "provisioning";
-  const pdsHostname =
-    user.email?.split("@")[0]?.toLowerCase().replace(/[^a-z0-9-]/g, "-") +
-      ".eny.space" || "pending.eny.space";
-  const pdsDashboardUrl = `https://${pdsHostname}`;
+  let pdsHostname: string | null = null;
+  let pdsStatus = subscribed ? "active" : "provisioning";
+
+  try {
+    const { service } = await getPdsServiceForCurrentUser();
+    pdsHostname = service?.hostname || service?.encrypted_config?.hostname || null;
+    if (service?.state !== undefined && service.state !== null) {
+      pdsStatus = pdsStateLabel(service.state);
+    }
+  } catch {
+    // Service not provisioned yet or API unavailable — fall back to subscription-derived status
+  }
+
+  const pdsDashboardUrl = pdsHostname ? `https://pdsls.dev/${pdsHostname}` : null;
 
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6">
@@ -69,23 +80,29 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             </div>
             <div className="space-y-1">
               <Paragraph className="text-sm font-medium text-white/60">Hostname</Paragraph>
-              <a
-                href={pdsDashboardUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-base font-semibold text-primary underline underline-offset-2"
-              >
-                {pdsHostname}
-              </a>
+              {pdsDashboardUrl ? (
+                <a
+                  href={pdsDashboardUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-base font-semibold text-primary underline underline-offset-2"
+                >
+                  {pdsHostname}
+                </a>
+              ) : (
+                <Paragraph className="text-base font-semibold text-white/50">Pending</Paragraph>
+              )}
             </div>
           </div>
           <div className="flex flex-wrap gap-3 pt-1">
-            <ButtonLink
-              href={pdsDashboardUrl}
-              className="border border-white/80 bg-transparent uppercase tracking-wide text-white hover:bg-white/10 hover:border-white focus-visible:ring-white/50"
-            >
-              Open dashboard
-            </ButtonLink>
+            {pdsDashboardUrl && (
+              <ButtonLink
+                href={pdsDashboardUrl}
+                className="border border-white/80 bg-transparent uppercase tracking-wide text-white hover:bg-white/10 hover:border-white focus-visible:ring-white/50"
+              >
+                Open dashboard
+              </ButtonLink>
+            )}
           </div>
         </CardContent>
       </Card>
