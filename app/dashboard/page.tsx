@@ -17,6 +17,7 @@ import { prelaunch } from "@/lib/prelaunch";
 import { getPriceIdForPlan } from "@/lib/stripe-plans";
 import { getPdsServiceForCurrentUser } from "../api/pds/atproto/helpers";
 import { pdsStateLabel } from "@/lib/pds-state";
+import { PdsHealthClient } from "./pds-health-client";
 
 type DashboardPageProps = {
   searchParams?: Promise<{
@@ -104,6 +105,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               </ButtonLink>
             )}
           </div>
+          {pdsHostname && (
+            <PdsHealthClient pdsHost={`https://${pdsHostname}`} />
+          )}
         </CardContent>
       </Card>
 
