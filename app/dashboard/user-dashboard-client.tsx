@@ -196,7 +196,114 @@ type PdsAccount = {
   handle: string;
   email?: string;
   indexedAt?: string;
+  deactivatedAt?: string;
 };
+
+function AccountRow({ account, onRefresh }: { account: PdsAccount; onRefresh: () => void }) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [rowError, setRowError] = useState<string | null>(null);
+  const isDeactivated = Boolean(account.deactivatedAt);
+
+  const deactivate = async () => {
+    setBusy(true);
+    setRowError(null);
+    try {
+      const res = await fetch("/api/pds/atproto/accounts", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ did: account.did, active: isDeactivated }),
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(payload?.message || "Failed to update account");
+      onRefresh();
+    } catch (e) {
+      setRowError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const deleteAccount = async () => {
+    setBusy(true);
+    setRowError(null);
+    try {
+      const res = await fetch("/api/pds/atproto/accounts", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ did: account.did }),
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(payload?.message || "Failed to delete account");
+      onRefresh();
+    } catch (e) {
+      setRowError(e instanceof Error ? e.message : String(e));
+      setConfirmDelete(false);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="py-3 text-sm space-y-1">
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-0.5 min-w-0">
+          <div className="flex items-center gap-2">
+            <Paragraph className="font-medium text-white truncate">{account.handle}</Paragraph>
+            {isDeactivated && (
+              <span className="text-xs text-amber-400/80 border border-amber-400/30 rounded px-1">deactivated</span>
+            )}
+          </div>
+          {account.email && (
+            <Paragraph className="text-xs text-white/50 truncate">{account.email}</Paragraph>
+          )}
+          <Paragraph className="font-mono text-xs text-white/30 truncate">{account.did}</Paragraph>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {account.indexedAt && (
+            <Paragraph className="text-xs text-white/40 whitespace-nowrap">
+              {new Date(account.indexedAt).toLocaleDateString()}
+            </Paragraph>
+          )}
+          <button
+            onClick={deactivate}
+            disabled={busy}
+            className="text-xs text-white/40 hover:text-amber-300 transition-colors disabled:opacity-40"
+          >
+            {busy ? "…" : isDeactivated ? "Reactivate" : "Deactivate"}
+          </button>
+          {confirmDelete ? (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={deleteAccount}
+                disabled={busy}
+                className="text-xs text-rose-400 hover:text-rose-300 transition-colors disabled:opacity-40"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="text-xs text-white/30 hover:text-white/60 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="text-xs text-white/40 hover:text-rose-400 transition-colors"
+            >
+              Delete
+            </button>
+          )}
+        </div>
+      </div>
+      {rowError && (
+        <Paragraph className="text-xs text-rose-300 break-all">{rowError}</Paragraph>
+      )}
+    </div>
+  );
+}
 
 function UsersSection() {
   const [accounts, setAccounts] = useState<PdsAccount[]>([]);
@@ -244,22 +351,7 @@ function UsersSection() {
       {accounts.length > 0 && (
         <div className="divide-y divide-white/5">
           {accounts.map((account) => (
-            <div key={account.did} className="flex items-start justify-between gap-4 py-3 text-sm">
-              <div className="space-y-0.5 min-w-0">
-                <Paragraph className="font-medium text-white truncate">
-                  {account.handle}
-                </Paragraph>
-                {account.email && (
-                  <Paragraph className="text-xs text-white/50 truncate">{account.email}</Paragraph>
-                )}
-                <Paragraph className="font-mono text-xs text-white/30 truncate">{account.did}</Paragraph>
-              </div>
-              {account.indexedAt && (
-                <Paragraph className="text-xs text-white/40 whitespace-nowrap shrink-0">
-                  {new Date(account.indexedAt).toLocaleDateString()}
-                </Paragraph>
-              )}
-            </div>
+            <AccountRow key={account.did} account={account} onRefresh={load} />
           ))}
         </div>
       )}
