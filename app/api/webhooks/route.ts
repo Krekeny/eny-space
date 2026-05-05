@@ -7,7 +7,7 @@ import { randomBytes } from "crypto";
 import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-const PDS_API_BASE_URL = "https://k8s-pds.frx.pub/api/v1";
+const PDS_API_BASE_URL = process.env.PDS_API_BASE_URL;
 
 function normalizeSlug(value: string) {
   return value
@@ -51,6 +51,10 @@ async function provisionPdsForUser({
   pdsHostnameBase: string;
   disksizeGb: string;
 }) {
+  if (!PDS_API_BASE_URL) {
+    throw new Error("Missing PDS_API_BASE_URL env var");
+  }
+
   const apiToken = process.env.PDS_API_TOKEN;
   if (!apiToken) {
     throw new Error("Missing PDS_API_TOKEN env var");
