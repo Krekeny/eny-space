@@ -196,33 +196,64 @@ type PdsAccount = {
   handle: string;
   email?: string;
   indexedAt?: string;
-  deactivatedAt?: string;
 };
 
+function DeleteDialog({
+  handle,
+  onConfirm,
+  onCancel,
+  busy,
+}: {
+  handle: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  busy: boolean;
+}) {
+  const [input, setInput] = useState("");
+  const matches = input === handle;
+
+  return (
+    <div className="mt-2 space-y-3 rounded-md border border-rose-500/30 bg-rose-950/20 p-3 text-sm">
+      <div className="space-y-1">
+        <Paragraph className="font-medium text-rose-300">Delete {handle}?</Paragraph>
+        <Paragraph className="text-xs text-white/50">
+          All data is permanently and immediately deleted. This cannot be undone.
+        </Paragraph>
+      </div>
+      <div className="space-y-1">
+        <Paragraph className="text-xs text-white/50">Type the handle to confirm:</Paragraph>
+        <Input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={handle}
+          className="h-7 text-xs"
+          autoFocus
+        />
+      </div>
+      <div className="flex gap-2">
+        <Button
+          onClick={onConfirm}
+          disabled={!matches || busy}
+          className="h-7 rounded-full px-3 text-xs bg-rose-600 hover:bg-rose-500 border-0 flex-1"
+        >
+          {busy ? "Deleting…" : "Delete permanently"}
+        </Button>
+        <Button
+          onClick={onCancel}
+          disabled={busy}
+          className="h-7 rounded-full px-3 text-xs bg-transparent border border-white/20 hover:bg-white/5"
+        >
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function AccountRow({ account, onRefresh }: { account: PdsAccount; onRefresh: () => void }) {
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [busy, setBusy] = useState(false);
   const [rowError, setRowError] = useState<string | null>(null);
-  const isDeactivated = Boolean(account.deactivatedAt);
-
-  const deactivate = async () => {
-    setBusy(true);
-    setRowError(null);
-    try {
-      const res = await fetch("/api/pds/atproto/accounts", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ did: account.did, active: isDeactivated }),
-      });
-      const payload = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(payload?.message || "Failed to update account");
-      onRefresh();
-    } catch (e) {
-      setRowError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
-  };
 
   const deleteAccount = async () => {
     setBusy(true);
@@ -238,7 +269,7 @@ function AccountRow({ account, onRefresh }: { account: PdsAccount; onRefresh: ()
       onRefresh();
     } catch (e) {
       setRowError(e instanceof Error ? e.message : String(e));
-      setConfirmDelete(false);
+      setShowDeleteDialog(false);
     } finally {
       setBusy(false);
     }
@@ -248,12 +279,7 @@ function AccountRow({ account, onRefresh }: { account: PdsAccount; onRefresh: ()
     <div className="py-3 text-sm space-y-1">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-0.5 min-w-0">
-          <div className="flex items-center gap-2">
-            <Paragraph className="font-medium text-white truncate">{account.handle}</Paragraph>
-            {isDeactivated && (
-              <span className="text-xs text-amber-400/80 border border-amber-400/30 rounded px-1">deactivated</span>
-            )}
-          </div>
+          <Paragraph className="font-medium text-white truncate">{account.handle}</Paragraph>
           {account.email && (
             <Paragraph className="text-xs text-white/50 truncate">{account.email}</Paragraph>
           )}
@@ -266,38 +292,22 @@ function AccountRow({ account, onRefresh }: { account: PdsAccount; onRefresh: ()
             </Paragraph>
           )}
           <button
-            onClick={deactivate}
-            disabled={busy}
-            className="text-xs text-white/40 hover:text-amber-300 transition-colors disabled:opacity-40"
+            onClick={() => setShowDeleteDialog(true)}
+            disabled={busy || showDeleteDialog}
+            className="text-xs text-white/40 hover:text-rose-400 transition-colors disabled:opacity-40"
           >
-            {busy ? "…" : isDeactivated ? "Reactivate" : "Deactivate"}
+            Delete
           </button>
-          {confirmDelete ? (
-            <div className="flex items-center gap-1">
-              <button
-                onClick={deleteAccount}
-                disabled={busy}
-                className="text-xs text-rose-400 hover:text-rose-300 transition-colors disabled:opacity-40"
-              >
-                Confirm
-              </button>
-              <button
-                onClick={() => setConfirmDelete(false)}
-                className="text-xs text-white/30 hover:text-white/60 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setConfirmDelete(true)}
-              className="text-xs text-white/40 hover:text-rose-400 transition-colors"
-            >
-              Delete
-            </button>
-          )}
         </div>
       </div>
+      {showDeleteDialog && (
+        <DeleteDialog
+          handle={account.handle}
+          onConfirm={deleteAccount}
+          onCancel={() => setShowDeleteDialog(false)}
+          busy={busy}
+        />
+      )}
       {rowError && (
         <Paragraph className="text-xs text-rose-300 break-all">{rowError}</Paragraph>
       )}
