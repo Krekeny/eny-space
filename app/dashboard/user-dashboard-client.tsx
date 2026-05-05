@@ -48,9 +48,12 @@ export function UserDashboardClient() {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <CreateUserSection pdsBareHost={pdsBareHost} />
-      <InviteSection />
+    <div className="space-y-6">
+      <div className="grid gap-6 md:grid-cols-2">
+        <CreateUserSection pdsBareHost={pdsBareHost} />
+        <InviteSection />
+      </div>
+      <UsersSection />
     </div>
   );
 }
@@ -184,6 +187,82 @@ function InviteSection() {
         </div>
       )}
       {error && <Paragraph className="text-sm text-rose-300 break-all">{error}</Paragraph>}
+    </section>
+  );
+}
+
+type PdsAccount = {
+  did: string;
+  handle: string;
+  email?: string;
+  indexedAt?: string;
+};
+
+function UsersSection() {
+  const [accounts, setAccounts] = useState<PdsAccount[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/pds/atproto/accounts");
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(`${payload?.message || "Failed to load accounts"} — ${JSON.stringify(payload?.upstream ?? {})}`);
+      setAccounts(payload?.accounts ?? []);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  return (
+    <section className="space-y-3 rounded-md border border-white/10 bg-white/5 p-4">
+      <div className="flex items-center justify-between">
+        <Paragraph className="text-sm font-semibold text-white">Users</Paragraph>
+        <button
+          onClick={load}
+          disabled={loading}
+          className="text-xs text-white/40 hover:text-white/80 transition-colors disabled:opacity-40"
+        >
+          {loading ? "Loading…" : "Refresh"}
+        </button>
+      </div>
+
+      {error && (
+        <Paragraph className="text-sm text-rose-300">{error}</Paragraph>
+      )}
+
+      {!loading && !error && accounts.length === 0 && (
+        <Paragraph className="text-sm text-white/40">No accounts found.</Paragraph>
+      )}
+
+      {accounts.length > 0 && (
+        <div className="divide-y divide-white/5">
+          {accounts.map((account) => (
+            <div key={account.did} className="flex items-start justify-between gap-4 py-3 text-sm">
+              <div className="space-y-0.5 min-w-0">
+                <Paragraph className="font-medium text-white truncate">
+                  {account.handle}
+                </Paragraph>
+                {account.email && (
+                  <Paragraph className="text-xs text-white/50 truncate">{account.email}</Paragraph>
+                )}
+                <Paragraph className="font-mono text-xs text-white/30 truncate">{account.did}</Paragraph>
+              </div>
+              {account.indexedAt && (
+                <Paragraph className="text-xs text-white/40 whitespace-nowrap shrink-0">
+                  {new Date(account.indexedAt).toLocaleDateString()}
+                </Paragraph>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
