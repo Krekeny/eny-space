@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 
-import { createHash } from "crypto";
-
 import { getPdsBaseUrlFromService, getPdsServiceForCurrentUser } from "../helpers";
 
 function toBasicAuth(user: string, pass: string) {
@@ -13,7 +11,7 @@ export async function POST(req: Request) {
     const { useCount } = (await req.json()) as { useCount?: number };
 
     const { service, pdsServiceId } = await getPdsServiceForCurrentUser();
-    const requiredServiceIdRaw = process.env.NEXT_PUBLIC_PDS_TEST_SERVICE_ID;
+    const requiredServiceIdRaw = process.env.PDS_TEST_SERVICE_ID;
     if (requiredServiceIdRaw) {
       const requiredServiceId = Number(requiredServiceIdRaw);
       if (pdsServiceId !== requiredServiceId) {
@@ -38,10 +36,6 @@ export async function POST(req: Request) {
     }
 
     const trimmedAdminPassword = String(adminPassword).trim();
-    const adminPasswordHashPrefix = createHash("sha256")
-      .update(trimmedAdminPassword)
-      .digest("hex")
-      .slice(0, 10);
 
     // PDS scripts use `admin:${PDS_ADMIN_PASSWORD}`
     const authHeader = toBasicAuth("admin", trimmedAdminPassword);

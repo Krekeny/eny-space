@@ -19,13 +19,13 @@ export async function POST(req: Request) {
     if (!body?.handle || !body?.password || !body?.inviteCode) {
       return NextResponse.json(
         { message: "Missing required fields: handle, password, inviteCode" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     const { service, pdsServiceId } = await getPdsServiceForCurrentUser();
 
-    const requiredServiceIdRaw = process.env.NEXT_PUBLIC_PDS_TEST_SERVICE_ID;
+    const requiredServiceIdRaw = process.env.PDS_TEST_SERVICE_ID;
     if (requiredServiceIdRaw) {
       const requiredServiceId = Number(requiredServiceIdRaw);
       if (pdsServiceId !== requiredServiceId) {
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
           {
             message: `PDS service id mismatch: expected ${requiredServiceId}, got ${pdsServiceId}`,
           },
-          { status: 409 },
+          { status: 409 }
         );
       }
     }
@@ -52,8 +52,11 @@ export async function POST(req: Request) {
 
       if (!user?.email) {
         return NextResponse.json(
-          { message: "Missing email (neither request body nor Supabase user email found)" },
-          { status: 400 },
+          {
+            message:
+              "Missing email (neither request body nor Supabase user email found)",
+          },
+          { status: 400 }
         );
       }
 
@@ -66,17 +69,17 @@ export async function POST(req: Request) {
     const res = await fetch(
       `${pdsBaseUrl}/xrpc/com.atproto.server.createAccount`,
       {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: emailToUse,
-        handle: body.handle,
-        password: body.password,
-        inviteCode: body.inviteCode,
-      }),
-      },
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: emailToUse,
+          handle: body.handle,
+          password: body.password,
+          inviteCode: body.inviteCode,
+        }),
+      }
     );
 
     const contentType = res.headers.get("content-type") || "";
@@ -87,7 +90,7 @@ export async function POST(req: Request) {
     if (!res.ok) {
       return NextResponse.json(
         { message: "Failed to create account", status: res.status, payload },
-        { status: 502 },
+        { status: 502 }
       );
     }
 
@@ -103,4 +106,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ message }, { status });
   }
 }
-

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
 
-const PDS_API_BASE_URL = "https://k8s-pds.frx.pub/api/v1";
+const PDS_API_BASE_URL = process.env.PDS_API_BASE_URL;
 
 function getMockService() {
   const now = new Date();
@@ -92,6 +92,13 @@ export async function GET() {
     const useMock = process.env.PDS_USE_MOCK === "true";
     if (useMock) {
       return NextResponse.json(getMockService());
+    }
+
+    if (!PDS_API_BASE_URL) {
+      return NextResponse.json(
+        { error: "Missing PDS_API_BASE_URL env variable" },
+        { status: 500 }
+      );
     }
 
     const apiToken = process.env.PDS_API_TOKEN;
