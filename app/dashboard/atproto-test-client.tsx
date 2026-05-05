@@ -188,11 +188,6 @@ export function AtprotoTestClient() {
           PDS not ready yet ({pdsStateLabel(pdsState)}). Waiting for provisioning to finish.
         </Paragraph>
       )}
-      {pdsReady && pdsState !== null && Number(pdsState) === 2 && (
-        <Paragraph className="text-sm text-sky-200/90">
-          PDS is awaiting its first user — create an invite code and account below to complete setup.
-        </Paragraph>
-      )}
 
       <div className="space-y-2 text-sm">
         <div className="flex flex-wrap gap-2">

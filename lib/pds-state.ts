@@ -1,7 +1,7 @@
 const PDS_STATE_LABELS: Record<number, string> = {
   0: "Pending",
   1: "Deploying",
-  2: "Awaiting first user",
+  2: "Creating user",
   3: "Running",
   4: "Error",
 };
