@@ -2,8 +2,7 @@ const PDS_STATE_LABELS: Record<number, string> = {
   0: "Pending",
   1: "Deploying",
   2: "Creating user",
-  3: "Running",
-  4: "Error",
+  3: "Done",
 };
 
 export function pdsStateLabel(state: number | string | null | undefined): string {
