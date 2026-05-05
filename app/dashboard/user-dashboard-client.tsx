@@ -9,7 +9,6 @@ import { Label } from "@/actions/components/ui/label";
 type ServiceResponse = {
   hostname?: string;
   encrypted_config?: { hostname?: string };
-  state?: number | string;
 };
 
 function stripScheme(hostname?: string) {
@@ -17,159 +16,174 @@ function stripScheme(hostname?: string) {
   return hostname.replace(/^https?:\/\//i, "").replace(/\/.*$/, "");
 }
 
-export function UserDashboardClient() {
-  const [pdsHost, setPdsHost] = useState<string>("");
-  const [inviteCode, setInviteCode] = useState<string>("");
-  const [handle, setHandle] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [loading, setLoading] = useState(false);
-  const [fetchError, setFetchError] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
-  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+async function apiCall(path: string, body: unknown) {
+  const res = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const payload = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(payload?.message || payload?.payload?.message || "Request failed");
+  }
+  return payload;
+}
 
-  const pdsBareHost = useMemo(() => stripScheme(pdsHost), [pdsHost]);
-  const fullHandle = useMemo(
-    () => (handle && pdsBareHost ? `${handle}.${pdsBareHost}` : ""),
-    [handle, pdsBareHost],
-  );
+export function UserDashboardClient() {
+  const [pdsBareHost, setPdsBareHost] = useState<string>("");
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/pds/service")
       .then((r) => r.json())
       .then((data: ServiceResponse) => {
         const host = data?.hostname || data?.encrypted_config?.hostname || "";
-        setPdsHost(host ? `https://${stripScheme(host)}` : "");
+        setPdsBareHost(stripScheme(host));
       })
       .catch((e) => setFetchError(e instanceof Error ? e.message : "Failed to load PDS info"));
   }, []);
 
-  const call = async (path: string, body: unknown) => {
+  if (fetchError) {
+    return <Paragraph className="text-sm text-rose-300">{fetchError}</Paragraph>;
+  }
+
+  return (
+    <div className="grid gap-6 md:grid-cols-2">
+      <CreateUserSection pdsBareHost={pdsBareHost} />
+      <InviteSection />
+    </div>
+  );
+}
+
+function CreateUserSection({ pdsBareHost }: { pdsBareHost: string }) {
+  const [handle, setHandle] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const fullHandle = useMemo(
+    () => (handle && pdsBareHost ? `${handle}.${pdsBareHost}` : ""),
+    [handle, pdsBareHost],
+  );
+
+  const submit = async () => {
+    if (!handle || !password) return;
     setLoading(true);
-    setActionError(null);
-    setActionSuccess(null);
+    setError(null);
+    setSuccess(null);
     try {
-      const res = await fetch(path, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+      await apiCall("/api/pds/atproto/create-account", {
+        handle: fullHandle,
+        password,
       });
-      const payload = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(payload?.message || payload?.payload?.message || "Request failed");
-      }
-      return payload;
+      setSuccess(`Account created: ${fullHandle}`);
+      setHandle("");
+      setPassword("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(false);
     }
   };
 
-  const createInvite = async () => {
+  return (
+    <section className="space-y-4 rounded-md border border-white/10 bg-white/5 p-4">
+      <div>
+        <Paragraph className="text-sm font-semibold text-white">Create user</Paragraph>
+        <Paragraph className="text-xs text-white/50 mt-1">
+          Directly create an account on your PDS.
+        </Paragraph>
+      </div>
+      <div className="space-y-3">
+        <div className="space-y-1">
+          <Label htmlFor="handle">Handle</Label>
+          <div className="flex items-center gap-1">
+            <Input
+              id="handle"
+              value={handle}
+              onChange={(e) => setHandle(e.target.value)}
+              placeholder="username"
+              className="flex-1"
+            />
+            {pdsBareHost && (
+              <Paragraph className="text-xs text-white/40 whitespace-nowrap">.{pdsBareHost}</Paragraph>
+            )}
+          </div>
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="new-password">Password</Label>
+          <Input
+            id="new-password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+          />
+        </div>
+      </div>
+      <Button
+        onClick={submit}
+        disabled={loading || !handle || !password || !pdsBareHost}
+        className="rounded-full w-full"
+      >
+        {loading ? "Creating…" : "Create account"}
+      </Button>
+      {success && <Paragraph className="text-sm text-emerald-300">{success}</Paragraph>}
+      {error && <Paragraph className="text-sm text-rose-300 break-all">{error}</Paragraph>}
+    </section>
+  );
+}
+
+function InviteSection() {
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const generate = async () => {
+    setLoading(true);
+    setError(null);
+    setInviteCode(null);
     try {
-      const payload = await call("/api/pds/atproto/invite", { useCount: 1 });
-      const code = payload?.code || payload?.inviteCode || "";
-      setInviteCode(code);
+      const payload = await apiCall("/api/pds/atproto/invite", { useCount: 1 });
+      setInviteCode(payload?.code || payload?.inviteCode || "");
     } catch (e) {
-      setActionError(e instanceof Error ? e.message : String(e));
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setLoading(false);
     }
   };
 
-  const createAccount = async () => {
-    if (!handle || !password || !inviteCode) return;
-    try {
-      await call("/api/pds/atproto/create-account", {
-        handle: fullHandle,
-        password,
-        inviteCode,
-      });
-      setActionSuccess(`Account created: ${fullHandle}`);
-      setHandle("");
-      setPassword("");
-      setInviteCode("");
-    } catch (e) {
-      setActionError(e instanceof Error ? e.message : String(e));
-    }
+  const copy = () => {
+    if (!inviteCode) return;
+    navigator.clipboard.writeText(inviteCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
-
-  if (fetchError) {
-    return (
-      <Paragraph className="text-sm text-rose-300">{fetchError}</Paragraph>
-    );
-  }
 
   return (
-    <div className="space-y-8">
-      {/* Invite code */}
-      <section className="space-y-3">
-        <Paragraph className="text-sm font-semibold text-white/80 uppercase tracking-wide">
-          Invitation code
+    <section className="space-y-4 rounded-md border border-white/10 bg-white/5 p-4">
+      <div>
+        <Paragraph className="text-sm font-semibold text-white">Invite someone</Paragraph>
+        <Paragraph className="text-xs text-white/50 mt-1">
+          Generate a one-time code for an external person to create their own account.
         </Paragraph>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button onClick={createInvite} disabled={loading || !pdsHost} className="rounded-full">
-            {loading ? "Working…" : "Generate invite"}
+      </div>
+      <Button onClick={generate} disabled={loading} className="rounded-full w-full">
+        {loading ? "Generating…" : "Generate invite code"}
+      </Button>
+      {inviteCode && (
+        <div className="space-y-2">
+          <Paragraph className="font-mono text-sm text-white break-all rounded bg-black/20 p-2">
+            {inviteCode}
+          </Paragraph>
+          <Button onClick={copy} className="rounded-full w-full">
+            {copied ? "Copied!" : "Copy code"}
           </Button>
-          {inviteCode && (
-            <Paragraph className="font-mono text-sm text-white break-all">{inviteCode}</Paragraph>
-          )}
         </div>
-      </section>
-
-      {/* Create user */}
-      <section className="space-y-4">
-        <Paragraph className="text-sm font-semibold text-white/80 uppercase tracking-wide">
-          Create user
-        </Paragraph>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="space-y-1">
-            <Label htmlFor="handle">Handle</Label>
-            <div className="flex items-center gap-1">
-              <Input
-                id="handle"
-                value={handle}
-                onChange={(e) => setHandle(e.target.value)}
-                placeholder="username"
-                className="flex-1"
-              />
-              {pdsBareHost && (
-                <Paragraph className="text-xs text-white/40 whitespace-nowrap">.{pdsBareHost}</Paragraph>
-              )}
-            </div>
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-            />
-          </div>
-          <div className="space-y-1 sm:col-span-2">
-            <Label htmlFor="invite">Invite code</Label>
-            <Input
-              id="invite"
-              value={inviteCode}
-              onChange={(e) => setInviteCode(e.target.value)}
-              placeholder="Paste invite code or generate one above"
-              className="font-mono"
-            />
-          </div>
-        </div>
-        <Button
-          onClick={createAccount}
-          disabled={loading || !handle || !password || !inviteCode || !pdsHost}
-          className="rounded-full"
-        >
-          {loading ? "Working…" : "Create account"}
-        </Button>
-      </section>
-
-      {actionSuccess && (
-        <Paragraph className="text-sm text-emerald-300">{actionSuccess}</Paragraph>
       )}
-      {actionError && (
-        <Paragraph className="text-sm text-rose-300 break-all">{actionError}</Paragraph>
-      )}
-    </div>
+      {error && <Paragraph className="text-sm text-rose-300 break-all">{error}</Paragraph>}
+    </section>
   );
 }
