@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import { Button } from "@/actions/components/ui/button";
+import { isPdsReady as checkPdsReady, pdsStateLabel } from "@/lib/pds-state";
 
 type ServiceResponse = {
+  hostname?: string;
   encrypted_config?: {
     hostname?: string;
   };
@@ -44,16 +46,11 @@ export function AtprotoTestClient() {
     () => (handlePrefix && pdsBareHost ? `${handlePrefix}.${pdsBareHost}` : ""),
     [handlePrefix, pdsBareHost],
   );
-  const pdsStateNum = useMemo(() => {
-    if (pdsState === null) return null;
-    const n = typeof pdsState === "number" ? pdsState : Number(pdsState);
-    return Number.isFinite(n) ? n : null;
-  }, [pdsState]);
-  const isPdsReady = pdsStateNum !== null && pdsStateNum >= 3;
+  const pdsReady = checkPdsReady(pdsState);
   const createAccountDisabled =
-    loading || !inviteCode || !handlePrefix || !newPassword || !isPdsReady;
+    loading || !inviteCode || !handlePrefix || !newPassword || !pdsReady;
   const createSessionDisabled =
-    loading || !handlePrefix || !newPassword || !isPdsReady;
+    loading || !handlePrefix || !newPassword || !pdsReady;
 
   useEffect(() => {
     const load = async () => {
@@ -61,7 +58,9 @@ export function AtprotoTestClient() {
         const res = await fetch("/api/pds/service", { method: "GET" });
         if (!res.ok) throw new Error(`Failed to load service (${res.status})`);
         const data = (await res.json()) as ServiceResponse;
-        const host = data?.encrypted_config?.hostname || "";
+        console.log("[AtprotoTestClient] service response:", data);
+        const host = data?.hostname || data?.encrypted_config?.hostname || "";
+        if (!host) console.warn("[AtprotoTestClient] hostname is empty — buttons will be disabled");
         setPdsHost(host);
         setPdsState(data?.state ?? null);
 
@@ -71,6 +70,7 @@ export function AtprotoTestClient() {
           setSessionIdentifier(`user1.${bare}`);
         }
       } catch (e) {
+        console.error("[AtprotoTestClient] fetch failed:", e);
         setError(e instanceof Error ? e.message : "Unknown error");
       }
     };
@@ -171,7 +171,7 @@ export function AtprotoTestClient() {
         <Paragraph className="text-sm text-white/70">
           PDS endpoint:{" "}
           <a
-            href={pdsHost}
+            href={`https://pdsls.dev/${pdsBareHost}`}
             target="_blank"
             rel="noreferrer"
             className="font-mono text-white underline underline-offset-2 hover:text-white/80"
@@ -183,9 +183,9 @@ export function AtprotoTestClient() {
         <Paragraph className="text-sm text-white/70">Loading PDS endpoint…</Paragraph>
       )}
 
-      {pdsStateNum !== null && !isPdsReady && (
+      {pdsState !== null && !pdsReady && (
         <Paragraph className="text-sm text-amber-100/90">
-          PDS not ready yet (state={pdsStateNum}). Waiting for provisioning to finish.
+          PDS not ready yet ({pdsStateLabel(pdsState)}). Waiting for provisioning to finish.
         </Paragraph>
       )}
 
@@ -193,7 +193,7 @@ export function AtprotoTestClient() {
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={createInvite}
-            disabled={loading || !pdsBareHost || !isPdsReady}
+            disabled={loading || !pdsBareHost || !pdsReady}
             className="rounded-full"
           >
             {loading ? "Working..." : "Create invite"}

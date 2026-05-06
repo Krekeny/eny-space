@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 
-const PDS_API_BASE_URL = "https://k8s-pds.frx.pub/api/v1";
+const PDS_API_BASE_URL = process.env.PDS_API_BASE_URL;
 
 function parseMaybeDoubleEncodedJson(input: unknown) {
   if (typeof input === "string") {
@@ -45,6 +45,12 @@ export async function getPdsServiceForCurrentUser(): Promise<{
   if (!pdsServiceId) {
     return Promise.reject(
       Object.assign(new Error("No provisioned PDS found for this user"), { status: 404 }),
+    );
+  }
+
+  if (!PDS_API_BASE_URL) {
+    return Promise.reject(
+      Object.assign(new Error("Missing PDS_API_BASE_URL env var"), { status: 500 }),
     );
   }
 
@@ -93,7 +99,7 @@ export async function getPdsServiceForCurrentUser(): Promise<{
 }
 
 export function getPdsBaseUrlFromService(service: any): string {
-  const raw = service?.encrypted_config?.hostname as string | undefined;
+  const raw = (service?.hostname || service?.encrypted_config?.hostname) as string | undefined;
   if (!raw) {
     throw new Error("Missing PDS host");
   }

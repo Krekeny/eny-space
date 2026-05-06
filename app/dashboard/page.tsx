@@ -1,33 +1,17 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSubscriptionStatus } from "@/actions/subscription";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from "@/actions/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/actions/components/ui/card";
 import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
-import DashboardClient from "./dashboard-client";
-import { ServiceDetailsClient } from "./service-details-client";
-import { AtprotoTestClient } from "./atproto-test-client";
-import { CollapsibleSection } from "./collapsible-section";
 import { prelaunch } from "@/lib/prelaunch";
-import { getPriceIdForPlan } from "@/lib/stripe-plans";
+import { getPdsServiceForCurrentUser } from "../api/pds/atproto/helpers";
+import { isPdsReady, pdsStateLabel } from "@/lib/pds-state";
+import { PdsHealthClient } from "./pds-health-client";
+import { UserDashboardClient } from "./user-dashboard-client";
 
-type DashboardPageProps = {
-  searchParams?: Promise<{
-    auto_checkout?: string;
-    pds_plan?: string;
-    pds_username?: string;
-    pds_hostname?: string;
-    pds_disksize_gb?: string;
-  }>;
-};
-
-export default async function DashboardPage({ searchParams }: DashboardPageProps) {
-  const params = await searchParams;
+export default async function DashboardPage() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -37,87 +21,80 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     redirect("/login");
   }
 
-  const { subscribed, subscription } = await getSubscriptionStatus();
+  const { subscribed } = await getSubscriptionStatus();
 
   if (prelaunch && !subscribed) {
     redirect("/welcome");
   }
 
-  const pdsStatus = subscribed ? "active" : "provisioning";
-  const pdsHostname =
-    user.email?.split("@")[0]?.toLowerCase().replace(/[^a-z0-9-]/g, "-") +
-      ".eny.space" || "pending.eny.space";
-  const pdsDashboardUrl = `https://${pdsHostname}`;
+  let pdsHostname: string | null = null;
+  let pdsState: number | string | null = null;
+
+  try {
+    const { service } = await getPdsServiceForCurrentUser();
+    pdsHostname = service?.hostname || service?.encrypted_config?.hostname || null;
+    pdsState = service?.state ?? null;
+  } catch {
+    // Not provisioned yet or API unavailable
+  }
+
+  const ready = isPdsReady(pdsState);
+  const statusLabel = pdsState !== null ? pdsStateLabel(pdsState) : subscribed ? "Provisioning" : "No subscription";
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6">
-      {/* Overview — always visible */}
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6">
+      <div className="flex items-center justify-between">
+        <Heading as="h1" className="text-xl font-semibold text-white">
+          My PDS
+        </Heading>
+        <ButtonLink
+          href="/dashboard/developer"
+          className="text-sm text-white/40 hover:text-white/80"
+        >
+          Developer Settings →
+        </ButtonLink>
+      </div>
+
+      {/* Status card */}
       <Card>
         <CardHeader>
-          <Heading as="h1" className="text-xl font-semibold text-white">
-            My PDS
-          </Heading>
-          <Paragraph className="text-sm text-white/80">
-            Authenticated as {user.email}.
-          </Paragraph>
+          <div className="flex items-center gap-2">
+            <span
+              className={`inline-block h-2.5 w-2.5 rounded-full ${
+                ready ? "bg-emerald-400" : "bg-amber-400 animate-pulse"
+              }`}
+            />
+            <Heading as="h2" className="text-base font-semibold text-white">
+              {statusLabel}
+            </Heading>
+          </div>
+          {pdsHostname && (
+            <Paragraph className="text-sm text-white/60 font-mono">{pdsHostname}</Paragraph>
+          )}
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 text-white">
-            <div className="space-y-1">
-              <Paragraph className="text-sm font-medium text-white/60">Status</Paragraph>
-              <Paragraph className="text-base font-semibold capitalize">{pdsStatus}</Paragraph>
-            </div>
-            <div className="space-y-1">
-              <Paragraph className="text-sm font-medium text-white/60">Hostname</Paragraph>
-              <a
-                href={pdsDashboardUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-base font-semibold text-primary underline underline-offset-2"
-              >
-                {pdsHostname}
-              </a>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-3 pt-1">
-            <ButtonLink
-              href={pdsDashboardUrl}
-              className="border border-white/80 bg-transparent uppercase tracking-wide text-white hover:bg-white/10 hover:border-white focus-visible:ring-white/50"
-            >
-              Open dashboard
-            </ButtonLink>
-          </div>
-        </CardContent>
+        {pdsHostname && (
+          <CardContent>
+            <PdsHealthClient pdsHost={`https://${pdsHostname}`} />
+          </CardContent>
+        )}
       </Card>
 
-      {/* Usage & Stats */}
-      <CollapsibleSection title="Usage & Stats">
-        <ServiceDetailsClient mode="stats" />
-      </CollapsibleSection>
-
-      {/* Service Details */}
-      <CollapsibleSection title="Service Details">
-        <ServiceDetailsClient mode="details" />
-      </CollapsibleSection>
-
-      {/* AT Protocol */}
-      <CollapsibleSection title="AT Protocol">
-        <AtprotoTestClient />
-      </CollapsibleSection>
-
-      {/* Billing & Subscription */}
-      <CollapsibleSection title="Billing & Subscription" defaultOpen>
-        <DashboardClient
-          subscribed={subscribed}
-          subscription={subscription}
-          priceId={getPriceIdForPlan(params?.pds_plan)}
-          autoCheckoutFromPlan={params?.auto_checkout === "1"}
-          pdsPlan={params?.pds_plan}
-          pdsUsername={params?.pds_username}
-          pdsHostname={params?.pds_hostname}
-          pdsDisksizeGb={params?.pds_disksize_gb}
-        />
-      </CollapsibleSection>
+      {/* Forms — only shown when PDS is reachable */}
+      {ready ? (
+        <Card>
+          <CardContent className="pt-6">
+            <UserDashboardClient />
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="py-8 text-center">
+            <Paragraph className="text-sm text-white/50">
+              The PDS is not ready yet. Forms will appear once it is running.
+            </Paragraph>
+          </CardContent>
+        </Card>
+      )}
     </main>
   );
 }

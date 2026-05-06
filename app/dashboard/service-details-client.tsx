@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
+import { pdsStateLabel } from "@/lib/pds-state";
+import { CollapsibleSection } from "./collapsible-section";
 
 type ServiceStats = {
   cpuUsagePercent?: number;
@@ -86,6 +88,8 @@ export function ServiceDetailsClient({
         }
 
         const data = (await res.json()) as ServiceResponse;
+        console.log("[ServiceDetailsClient] response:", data);
+        console.log("[ServiceDetailsClient] stats:", data.stats ?? "MISSING — stats section will not render");
         setService(data);
       } catch (err) {
         console.error("Failed to load service details", err);
@@ -122,6 +126,10 @@ export function ServiceDetailsClient({
 
   const cfg = service.encrypted_config || {};
   const stats = service.stats;
+
+  if (mode === "stats" && !stats) {
+    return null;
+  }
   const maskedAdminPassword =
     cfg.adminPassword && cfg.adminPassword.length > 0 ? "••••••••" : undefined;
 
@@ -159,7 +167,7 @@ export function ServiceDetailsClient({
   const showDetails = mode === "all" || mode === "details";
   const showStats = mode === "all" || mode === "stats";
 
-  return (
+  const content = (
     <section
       className={
         mode === "stats"
@@ -216,7 +224,7 @@ export function ServiceDetailsClient({
                   State
                 </Paragraph>
                 <Paragraph className="text-sm font-mono text-white">
-                  {String(service.state)}
+                  {pdsStateLabel(service.state)}
                 </Paragraph>
               </div>
             )}
@@ -488,4 +496,14 @@ export function ServiceDetailsClient({
       )}
     </section>
   );
+
+  if (mode === "stats") {
+    return (
+      <CollapsibleSection title="Usage & Stats">
+        {content}
+      </CollapsibleSection>
+    );
+  }
+
+  return content;
 }

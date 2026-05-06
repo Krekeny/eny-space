@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
     const { service, pdsServiceId } = await getPdsServiceForCurrentUser();
 
-    const requiredServiceIdRaw = process.env.NEXT_PUBLIC_PDS_TEST_SERVICE_ID;
+    const requiredServiceIdRaw = process.env.PDS_TEST_SERVICE_ID;
     if (requiredServiceIdRaw) {
       const requiredServiceId = Number(requiredServiceIdRaw);
       if (pdsServiceId !== requiredServiceId) {

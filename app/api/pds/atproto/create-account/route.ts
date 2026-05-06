@@ -7,77 +7,90 @@ import {
   getPdsServiceForCurrentUser,
 } from "../helpers";
 
+function toBasicAuth(user: string, pass: string) {
+  return `Basic ${Buffer.from(`${user}:${pass}`).toString("base64")}`;
+}
+
+async function generateInviteCode(pdsBaseUrl: string, authHeader: string): Promise<string> {
+  const res = await fetch(`${pdsBaseUrl}/xrpc/com.atproto.server.createInviteCode`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: authHeader },
+    body: JSON.stringify({ useCount: 1 }),
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to generate invite code (${res.status})`);
+  }
+  const data = await res.json();
+  const code = data?.code || data?.inviteCode;
+  if (!code) throw new Error("Invite code missing from response");
+  return code;
+}
+
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as {
       email?: string;
       handle: string;
       password: string;
-      inviteCode: string;
     };
 
-    if (!body?.handle || !body?.password || !body?.inviteCode) {
+    if (!body?.handle || !body?.password) {
       return NextResponse.json(
-        { message: "Missing required fields: handle, password, inviteCode" },
+        { message: "Missing required fields: handle, password" },
         { status: 400 },
       );
     }
 
     const { service, pdsServiceId } = await getPdsServiceForCurrentUser();
 
-    const requiredServiceIdRaw = process.env.NEXT_PUBLIC_PDS_TEST_SERVICE_ID;
+    const requiredServiceIdRaw = process.env.PDS_TEST_SERVICE_ID;
     if (requiredServiceIdRaw) {
       const requiredServiceId = Number(requiredServiceIdRaw);
       if (pdsServiceId !== requiredServiceId) {
         return NextResponse.json(
-          {
-            message: `PDS service id mismatch: expected ${requiredServiceId}, got ${pdsServiceId}`,
-          },
+          { message: `PDS service id mismatch: expected ${requiredServiceId}, got ${pdsServiceId}` },
           { status: 409 },
         );
       }
     }
 
-    // Ensure we always have `https://...` for fetch
+    const adminPassword = service?.encrypted_config?.adminPassword as string | undefined;
+    if (!adminPassword) {
+      return NextResponse.json(
+        { message: "Missing PDS admin credentials" },
+        { status: 500 },
+      );
+    }
+
     const pdsBaseUrl = getPdsBaseUrlFromService(service);
+    const authHeader = toBasicAuth("admin", String(adminPassword).trim());
 
     let emailToUse = body.email;
     if (!emailToUse) {
-      // Reuse the user's own Supabase email for testing, but add a +alias suffix
-      // to avoid collisions if the backend enforces uniqueness.
       const supabase = await createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user?.email) {
         return NextResponse.json(
-          { message: "Missing email (neither request body nor Supabase user email found)" },
+          { message: "Missing email: provide one in the request or ensure a Supabase user is logged in" },
           { status: 400 },
         );
       }
-
-      const baseEmail = user.email;
-      const [local, domain] = baseEmail.split("@");
-      const alias = `${local}+atproto-test-${Date.now()}`;
-      emailToUse = `${alias}@${domain}`;
+      const [local, domain] = user.email.split("@");
+      emailToUse = `${local}+pds-${Date.now()}@${domain}`;
     }
 
-    const res = await fetch(
-      `${pdsBaseUrl}/xrpc/com.atproto.server.createAccount`,
-      {
+    const inviteCode = await generateInviteCode(pdsBaseUrl, authHeader);
+
+    const res = await fetch(`${pdsBaseUrl}/xrpc/com.atproto.server.createAccount`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: emailToUse,
         handle: body.handle,
         password: body.password,
-        inviteCode: body.inviteCode,
+        inviteCode,
       }),
-      },
-    );
+    });
 
     const contentType = res.headers.get("content-type") || "";
     const payload = contentType.includes("application/json")
@@ -91,7 +104,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Return the email that we used, so the UI mirrors the real admin workflow.
     if (payload && typeof payload === "object") {
       return NextResponse.json({ ...(payload as any), emailUsed: emailToUse });
     }
@@ -103,4 +115,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ message }, { status });
   }
 }
-
