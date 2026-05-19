@@ -74,6 +74,14 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
                 autoComplete="current-password"
                 required
               />
+              <p className="text-right">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-muted-foreground underline underline-offset-4"
+                >
+                  Forgot password?
+                </Link>
+              </p>
             </div>
             <Button type="submit" className="w-full">
               Login

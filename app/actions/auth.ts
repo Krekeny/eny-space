@@ -70,3 +70,51 @@ export async function signOut() {
   revalidatePath("/", "layout");
   redirect("/");
 }
+
+export async function requestPasswordReset(
+  _prevState: { error?: string; success?: boolean } | null,
+  formData: FormData
+): Promise<{ error?: string; success?: boolean }> {
+  const supabase = await createClient();
+  const email = formData.get("email") as string;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${appUrl}/auth/callback?next=/reset-password`,
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+  } catch (err) {
+    const cause = (err as { cause?: { code?: string } })?.cause;
+    const isTimeout =
+      cause?.code === "UND_ERR_CONNECT_TIMEOUT" ||
+      (err as Error)?.message === "fetch failed";
+    return {
+      error: isTimeout
+        ? "Could not reach the server. Please check your connection and try again."
+        : "An unexpected error occurred. Please try again.",
+    };
+  }
+
+  return { success: true };
+}
+
+export async function updatePassword(
+  _prevState: { error?: string } | null,
+  formData: FormData
+): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const password = formData.get("password") as string;
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/dashboard");
+}
