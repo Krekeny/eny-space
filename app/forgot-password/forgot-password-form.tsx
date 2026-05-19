@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { requestPasswordReset } from "@/actions/auth";
 import { Button } from "@/actions/components/ui/button";
 import {
@@ -15,7 +16,12 @@ import {
 import { Input } from "@/actions/components/ui/input";
 import { Label } from "@/actions/components/ui/label";
 
+const EXPIRED_LINK_MESSAGE =
+  "This reset link is invalid or has expired. Request a new one below.";
+
 export function ForgotPasswordForm() {
+  const searchParams = useSearchParams();
+  const linkExpired = searchParams.get("error") === "expired";
   const [state, setState] = useState<{
     error?: string;
     success?: boolean;
@@ -68,6 +74,11 @@ export function ForgotPasswordForm() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {linkExpired && !state?.error && (
+              <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {EXPIRED_LINK_MESSAGE}
+              </p>
+            )}
             {state?.error && (
               <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
                 {state.error}

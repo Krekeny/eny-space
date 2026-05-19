@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { SignUpForm } from "./signup-form";
 
 type SignUpPageProps = {
@@ -24,5 +25,9 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
   const next = `/dashboard${qs ? `?${qs}` : ""}`;
   const loginHref = `/login${qs ? `?${qs}` : ""}`;
 
-  return <SignUpForm next={next} loginHref={loginHref} />;
+  return (
+    <Suspense>
+      <SignUpForm next={next} loginHref={loginHref} />
+    </Suspense>
+  );
 }

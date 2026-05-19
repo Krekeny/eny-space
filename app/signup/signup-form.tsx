@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { signUp } from "@/actions/auth";
 import { Button } from "@/actions/components/ui/button";
 import {
@@ -20,7 +21,12 @@ interface SignUpFormProps {
   loginHref: string;
 }
 
+const EXPIRED_LINK_MESSAGE =
+  "This confirmation link is invalid or has expired. Sign up again to receive a new email.";
+
 export function SignUpForm({ next, loginHref }: SignUpFormProps) {
+  const searchParams = useSearchParams();
+  const linkExpired = searchParams.get("error") === "expired";
   const [state, setState] = useState<{
     error?: string;
     success?: boolean;
@@ -47,8 +53,8 @@ export function SignUpForm({ next, loginHref }: SignUpFormProps) {
           <CardHeader>
             <CardTitle>Check your email</CardTitle>
             <CardDescription>
-              We sent you a confirmation link. Click it to activate your account
-              and you&apos;ll be taken to your dashboard.
+              We sent you a confirmation link. Click it to confirm your email and
+              activate your account.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -68,6 +74,11 @@ export function SignUpForm({ next, loginHref }: SignUpFormProps) {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <input type="hidden" name="next" value={next} />
+            {linkExpired && !state?.error && (
+              <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {EXPIRED_LINK_MESSAGE}
+              </p>
+            )}
             {state?.error && (
               <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
                 {state.error}

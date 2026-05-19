@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+const appOrigin = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
 export async function signUp(
   _prevState: { error?: string; success?: boolean } | null,
   formData: FormData
@@ -18,9 +20,7 @@ export async function signUp(
       email,
       password,
       options: {
-        emailRedirectTo: `${
-          process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-        }/auth/callback`,
+        emailRedirectTo: `${appOrigin}/auth/confirm-callback`,
       },
     });
 
@@ -77,35 +77,42 @@ export async function requestPasswordReset(
 ): Promise<{ error?: string; success?: boolean }> {
   const supabase = await createClient();
   const email = formData.get("email") as string;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${appUrl}/auth/callback?next=/reset-password`,
+      redirectTo: `${appOrigin}/auth/reset-callback`,
     });
 
     if (error) {
-      return { error: error.message };
+      return {
+        error:
+          error.message === "fetch failed"
+            ? connectionErrorMessage(new Error("fetch failed"))
+            : error.message,
+      };
     }
   } catch (err) {
-    const cause = (err as { cause?: { code?: string } })?.cause;
-    const isTimeout =
-      cause?.code === "UND_ERR_CONNECT_TIMEOUT" ||
-      (err as Error)?.message === "fetch failed";
-    return {
-      error: isTimeout
-        ? "Could not reach the server. Please check your connection and try again."
-        : "An unexpected error occurred. Please try again.",
-    };
+    return { error: connectionErrorMessage(err) };
   }
 
   return { success: true };
 }
 
+function connectionErrorMessage(err: unknown): string {
+  const cause = (err as { cause?: { code?: string } })?.cause;
+  const message = (err as Error)?.message;
+  const isConnectionIssue =
+    cause?.code === "UND_ERR_CONNECT_TIMEOUT" ||
+    cause?.code === "ENOTFOUND" ||
+    message === "fetch failed";
+  return isConnectionIssue
+    ? "Could not reach the server. Please check your connection and try again."
+    : "An unexpected error occurred. Please try again.";
+}
+
 export async function updatePassword(
-  _prevState: { error?: string } | null,
+  _prevState: { error?: string; success?: boolean } | null,
   formData: FormData
-): Promise<{ error?: string }> {
+): Promise<{ error?: string; success?: boolean }> {
   const supabase = await createClient();
   const password = formData.get("password") as string;
 
@@ -116,5 +123,5 @@ export async function updatePassword(
   }
 
   revalidatePath("/", "layout");
-  redirect("/dashboard");
+  return { success: true };
 }
