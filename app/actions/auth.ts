@@ -124,5 +124,5 @@ export async function updatePassword(
 
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
-  redirect("/login");
+  redirect("/login?message=password-reset");
 }
