@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { createClient } from "@/lib/supabase/server";
+import { isRecoverySession } from "@/lib/auth";
 import { SiteHeader } from "@/components/site-header";
 import { Footer } from "@/components/footer";
 import { SiteBackground } from "@/components/site-background";
@@ -50,11 +51,17 @@ export default async function RootLayout({ children }: LayoutProps) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const isRecovery = session ? isRecoverySession(session.access_token) : false;
+
   return (
     <html lang="en" className={`${firaMono.variable} ${doto.variable}`}>
       <body className="min-h-screen flex flex-col">
         <SiteBackground />
-        <SiteHeader user={user} />
+        <SiteHeader user={user} isRecovery={isRecovery} />
         <main className="flex-1">{children}</main>
         <Footer />
         <SpeedInsights />

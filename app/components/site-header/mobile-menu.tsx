@@ -5,6 +5,7 @@ import { signOut } from "@/actions/auth";
 
 interface MobileMenuProps {
   user: User | null;
+  isRecovery?: boolean;
   open: boolean;
   onClose: () => void;
 }
@@ -12,7 +13,7 @@ interface MobileMenuProps {
 const mobileLinkClass =
   "block text-left text-base font-medium text-white/90 hover:text-white";
 
-export function MobileMenu({ user, open, onClose }: MobileMenuProps) {
+export function MobileMenu({ user, isRecovery = false, open, onClose }: MobileMenuProps) {
   if (!open) return null;
 
   return (
@@ -22,7 +23,7 @@ export function MobileMenu({ user, open, onClose }: MobileMenuProps) {
       </nav>
 
       <div className="mt-3 flex flex-col gap-2">
-        {user ? (
+        {user && !isRecovery ? (
           <>
             <Link href="/dashboard" onClick={onClose} className={mobileLinkClass}>
               Dashboard

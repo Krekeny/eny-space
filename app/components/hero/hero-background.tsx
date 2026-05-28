@@ -2,6 +2,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 export function HeroBackground({
@@ -36,6 +37,22 @@ export function HeroBackground({
     [0, 0.5, 1],
     ["-16deg", "0deg", "16deg"],
   );
+
+  const [stars, setStars] = useState<
+    { cx: number; cy: number; r: number; opacity: number; blur: number }[]
+  >([]);
+
+  useEffect(() => {
+    setStars(
+      Array.from({ length: 90 }, (_, i) => ({
+        cx: Math.random() * 1440,
+        cy: Math.random() * 900,
+        r: Math.random() * 1.3 + 0.4,
+        opacity: 0.5 + Math.random() * 0.4,
+        blur: i % 7 === 0 ? 1.5 : 0,
+      })),
+    );
+  }, []);
 
   return (
     <>
@@ -77,23 +94,17 @@ export function HeroBackground({
             </radialGradient>
           </defs>
 
-          {Array.from({ length: 90 }).map((_, i) => {
-            const radius = Math.random() * 1.3 + 0.4;
-            const blur = i % 7 === 0 ? 1.5 : 0;
-            return (
-              <circle
-                key={i}
-                cx={Math.random() * 1440}
-                cy={Math.random() * 900}
-                r={radius}
-                fill="url(#starGradient)"
-                opacity={0.5 + Math.random() * 0.4}
-                style={{
-                  filter: blur ? `blur(${blur}px)` : undefined,
-                }}
-              />
-            );
-          })}
+          {stars.map((s, i) => (
+            <circle
+              key={i}
+              cx={s.cx}
+              cy={s.cy}
+              r={s.r}
+              fill="url(#starGradient)"
+              opacity={s.opacity}
+              style={{ filter: s.blur ? `blur(${s.blur}px)` : undefined }}
+            />
+          ))}
         </svg>
       </motion.div>
 

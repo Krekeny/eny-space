@@ -13,31 +13,33 @@ import { Input } from "@/actions/components/ui/input";
 import { Label } from "@/actions/components/ui/label";
 
 type LoginPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     auto_checkout?: string;
     pds_plan?: string;
     pds_username?: string;
     pds_hostname?: string;
     pds_disksize_gb?: string;
-  };
+    message?: string;
+  }>;
 };
 
-export default function LoginPage({ searchParams }: LoginPageProps) {
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = await searchParams;
   const nextParams = new URLSearchParams();
-  if (searchParams?.auto_checkout) {
-    nextParams.set("auto_checkout", searchParams.auto_checkout);
+  if (params?.auto_checkout) {
+    nextParams.set("auto_checkout", params.auto_checkout);
   }
-  if (searchParams?.pds_plan) {
-    nextParams.set("pds_plan", searchParams.pds_plan);
+  if (params?.pds_plan) {
+    nextParams.set("pds_plan", params.pds_plan);
   }
-  if (searchParams?.pds_username) {
-    nextParams.set("pds_username", searchParams.pds_username);
+  if (params?.pds_username) {
+    nextParams.set("pds_username", params.pds_username);
   }
-  if (searchParams?.pds_hostname) {
-    nextParams.set("pds_hostname", searchParams.pds_hostname);
+  if (params?.pds_hostname) {
+    nextParams.set("pds_hostname", params.pds_hostname);
   }
-  if (searchParams?.pds_disksize_gb) {
-    nextParams.set("pds_disksize_gb", searchParams.pds_disksize_gb);
+  if (params?.pds_disksize_gb) {
+    nextParams.set("pds_disksize_gb", params.pds_disksize_gb);
   }
 
   const next = `/dashboard${nextParams.toString() ? `?${nextParams.toString()}` : ""}`;
@@ -52,6 +54,11 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
             Sign in to access your eny.space dashboard.
           </CardDescription>
         </CardHeader>
+        {params?.message === "password-reset" && (
+          <div className="mx-6 mb-2 rounded-md bg-green-500/10 px-3 py-2 text-sm text-green-600">
+            Password updated — please sign in with your new password.
+          </div>
+        )}
         <CardContent>
           <form action={signIn} className="space-y-4">
             <input type="hidden" name="next" value={next} />
@@ -74,6 +81,14 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
                 autoComplete="current-password"
                 required
               />
+              <p className="text-right">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-muted-foreground underline underline-offset-4"
+                >
+                  Forgot password?
+                </Link>
+              </p>
             </div>
             <Button type="submit" className="w-full">
               Login

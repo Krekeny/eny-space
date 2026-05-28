@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { signUp } from "@/actions/auth";
+import { requestPasswordReset } from "@/actions/auth";
 import { Button } from "@/actions/components/ui/button";
 import {
   Card,
@@ -16,15 +16,10 @@ import {
 import { Input } from "@/actions/components/ui/input";
 import { Label } from "@/actions/components/ui/label";
 
-interface SignUpFormProps {
-  next: string;
-  loginHref: string;
-}
-
 const EXPIRED_LINK_MESSAGE =
-  "This confirmation link is invalid or has expired. Sign up again to receive a new email.";
+  "This reset link is invalid or has expired. Request a new one below.";
 
-export function SignUpForm({ next, loginHref }: SignUpFormProps) {
+export function ForgotPasswordForm() {
   const searchParams = useSearchParams();
   const linkExpired = searchParams.get("error") === "expired";
   const [state, setState] = useState<{
@@ -38,7 +33,7 @@ export function SignUpForm({ next, loginHref }: SignUpFormProps) {
     const formData = new FormData(e.currentTarget);
     startTransition(async () => {
       try {
-        const result = await signUp(null, formData);
+        const result = await requestPasswordReset(null, formData);
         setState(result);
       } catch {
         setState({ error: "An unexpected error occurred. Please try again." });
@@ -53,10 +48,15 @@ export function SignUpForm({ next, loginHref }: SignUpFormProps) {
           <CardHeader>
             <CardTitle>Check your email</CardTitle>
             <CardDescription>
-              We sent you a confirmation link. Click it to confirm your email and
-              activate your account.
+              If an account exists for that address, we sent a link to reset
+              your password.
             </CardDescription>
           </CardHeader>
+          <CardFooter className="justify-center text-sm text-muted-foreground">
+            <Link href="/login" className="underline underline-offset-4">
+              Back to login
+            </Link>
+          </CardFooter>
         </Card>
       </main>
     );
@@ -66,14 +66,14 @@ export function SignUpForm({ next, loginHref }: SignUpFormProps) {
     <main className="flex min-h-[60vh] items-center justify-center px-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Create account</CardTitle>
+          <CardTitle>Reset password</CardTitle>
           <CardDescription>
-            Get started with eny.space in a few seconds.
+            Enter your email and we&apos;ll send you a link to choose a new
+            password.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <input type="hidden" name="next" value={next} />
             {linkExpired && !state?.error && (
               <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
                 {EXPIRED_LINK_MESSAGE}
@@ -94,33 +94,15 @@ export function SignUpForm({ next, loginHref }: SignUpFormProps) {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                minLength={6}
-                autoComplete="new-password"
-                required
-              />
-            </div>
             <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Creating account…" : "Sign Up"}
+              {isPending ? "Sending link…" : "Send reset link"}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col gap-3 text-sm text-muted-foreground">
-          <span>
-            Already have an account?{" "}
-            <Link href={loginHref} className="underline underline-offset-4">
-              Login
-            </Link>
-          </span>
-          <p className="text-center text-xs text-muted-foreground/70">
-            We use email login to keep your account secure during PDS setup.
-            Atmosphere login is coming soon.
-          </p>
+        <CardFooter className="text-sm text-muted-foreground">
+          <Link href="/login" className="underline underline-offset-4">
+            Back to login
+          </Link>
         </CardFooter>
       </Card>
     </main>
