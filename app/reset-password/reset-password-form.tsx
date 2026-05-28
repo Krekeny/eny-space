@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Link from "next/link";
 import { updatePassword, signOut } from "@/actions/auth";
-import { prelaunch } from "@/lib/prelaunch";
 import { Button } from "@/actions/components/ui/button";
 import {
   Card,
@@ -11,19 +9,14 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/actions/components/ui/card";
 import { Input } from "@/actions/components/ui/input";
 import { Label } from "@/actions/components/ui/label";
 
 export function ResetPasswordForm() {
-  const [state, setState] = useState<{
-    error?: string;
-    success?: boolean;
-  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isCancelling, startCancelTransition] = useTransition();
-  const continueHref = prelaunch ? "/welcome" : "/dashboard";
 
   function handleCancel() {
     startCancelTransition(async () => {
@@ -37,37 +30,11 @@ export function ResetPasswordForm() {
     startTransition(async () => {
       try {
         const result = await updatePassword(null, formData);
-        setState(result);
+        if (result?.error) setError(result.error);
       } catch {
-        setState({ error: "An unexpected error occurred. Please try again." });
+        setError("An unexpected error occurred. Please try again.");
       }
     });
-  }
-
-  if (state?.success) {
-    return (
-      <main className="flex min-h-[60vh] items-center justify-center px-4">
-        <Card className="w-full max-w-sm text-center">
-          <CardHeader>
-            <CardTitle>Password updated</CardTitle>
-            <CardDescription>
-              Your password has been changed successfully. You can continue to
-              your account.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild className="w-full">
-              <Link href={continueHref}>Continue</Link>
-            </Button>
-          </CardContent>
-          <CardFooter className="justify-center text-sm text-muted-foreground">
-            <Link href="/login" className="underline underline-offset-4">
-              Back to login
-            </Link>
-          </CardFooter>
-        </Card>
-      </main>
-    );
   }
 
   return (
@@ -81,9 +48,9 @@ export function ResetPasswordForm() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {state?.error && (
+            {error && (
               <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                {state.error}
+                {error}
               </p>
             )}
             <div className="space-y-2">

@@ -110,9 +110,9 @@ function connectionErrorMessage(err: unknown): string {
 }
 
 export async function updatePassword(
-  _prevState: { error?: string; success?: boolean } | null,
+  _prevState: { error?: string } | null,
   formData: FormData
-): Promise<{ error?: string; success?: boolean }> {
+): Promise<{ error?: string }> {
   const supabase = await createClient();
   const password = formData.get("password") as string;
 
@@ -122,6 +122,7 @@ export async function updatePassword(
     return { error: error.message };
   }
 
+  await supabase.auth.signOut();
   revalidatePath("/", "layout");
-  return { success: true };
+  redirect("/login");
 }
