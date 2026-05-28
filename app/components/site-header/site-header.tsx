@@ -11,12 +11,13 @@ import { MobileMenu } from "./mobile-menu";
 
 interface SiteHeaderProps {
   user: User | null;
+  isRecovery?: boolean;
 }
 
 const headerCtaClass =
   "inline-flex items-center gap-1.5 rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950 cursor-pointer hover:bg-primary/80";
 
-export function SiteHeader({ user }: SiteHeaderProps) {
+export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [displayText, setDisplayText] = useState(".");
   const [isTyping, setIsTyping] = useState(false);
@@ -110,18 +111,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
         </Link>
 
         <div className="hidden items-center gap-2 md:flex">
-          {!user ? (
-            <Button
-              size="default"
-              className={headerCtaClass}
-              asChild
-            >
-              <Link href="/signup">
-                Get started
-                <ArrowUpRightIcon className="ml-1 size-3.5" />
-              </Link>
-            </Button>
-          ) : (
+          {user && !isRecovery ? (
             <>
               <Button size="default" className={headerCtaClass} asChild>
                 <Link href="/dashboard">
@@ -140,6 +130,17 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 </Button>
               </form>
             </>
+          ) : (
+            <Button
+              size="default"
+              className={headerCtaClass}
+              asChild
+            >
+              <Link href="/signup">
+                Get started
+                <ArrowUpRightIcon className="ml-1 size-3.5" />
+              </Link>
+            </Button>
           )}
         </div>
 
@@ -159,6 +160,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
 
       <MobileMenu
         user={user}
+        isRecovery={isRecovery}
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
       />

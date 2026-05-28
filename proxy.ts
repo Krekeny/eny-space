@@ -1,19 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createMiddlewareClient } from "@/lib/supabase/middleware";
+import { isRecoverySession } from "@/lib/auth";
 
 const AUTH_ROUTES = ["/login", "/signup"];
 const RESET_PASSWORD_PATH = "/reset-password";
-
-function isRecoverySession(accessToken: string): boolean {
-  try {
-    const base64 = accessToken.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-    const payload = JSON.parse(atob(base64));
-    const amr: { method: string }[] = payload.amr ?? [];
-    return amr.length === 1 && amr[0].method === "recovery";
-  } catch {
-    return false;
-  }
-}
 
 export async function proxy(request: NextRequest) {
   const { supabase, response } = createMiddlewareClient(request);
