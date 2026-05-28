@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { updatePassword } from "@/actions/auth";
+import { updatePassword, signOut } from "@/actions/auth";
 import { prelaunch } from "@/lib/prelaunch";
 import { Button } from "@/actions/components/ui/button";
 import {
@@ -22,7 +22,14 @@ export function ResetPasswordForm() {
     success?: boolean;
   } | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isCancelling, startCancelTransition] = useTransition();
   const continueHref = prelaunch ? "/welcome" : "/dashboard";
+
+  function handleCancel() {
+    startCancelTransition(async () => {
+      await signOut({ redirectAllowed: true });
+    });
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -90,16 +97,20 @@ export function ResetPasswordForm() {
                 required
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isPending}>
+            <Button type="submit" className="w-full" disabled={isPending || isCancelling}>
               {isPending ? "Updating…" : "Update password"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full"
+              disabled={isPending || isCancelling}
+              onClick={handleCancel}
+            >
+              {isCancelling ? "Cancelling…" : "Cancel"}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="text-sm text-muted-foreground">
-          <Link href="/login" className="underline underline-offset-4">
-            Back to login
-          </Link>
-        </CardFooter>
       </Card>
     </main>
   );
