@@ -72,7 +72,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <Card>
           <CardContent className="py-8 text-center">
             <Paragraph className="text-sm text-white/50">
-              The PDS is not ready yet. Forms will appear once it is running.
+              Your PDS is being set up. Once it's running you'll be able to create accounts, generate invite codes, and manage users.
             </Paragraph>
           </CardContent>
         </Card>
