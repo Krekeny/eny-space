@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/actions/components/ui/card";
-import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import DashboardClient from "../dashboard/dashboard-client";
@@ -17,6 +16,8 @@ import { formatStripePrice } from "@/lib/format-stripe-price";
 import { getStripePlanAmounts } from "@/lib/stripe-plans";
 import type { OnboardingSearchParams } from "@/lib/onboarding";
 import { WelcomeCheckout } from "./welcome-checkout";
+import { PlanCards } from "@/components/pricing/plan-cards";
+import { OnboardingSteps } from "./onboarding-steps";
 
 type WelcomePageProps = {
   searchParams?: Promise<OnboardingSearchParams>;
@@ -53,40 +54,42 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
         )
       : null;
 
+  if (!selectedPlan) {
+    return (
+      <main className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
+        <div className="mb-8 text-center space-y-6">
+          <OnboardingSteps currentStep={1} />
+          <div>
+            <Heading as="h1" className="text-2xl font-semibold text-white">
+              Choose a plan
+            </Heading>
+            <Paragraph className="mt-2 text-sm text-white/60">
+              Pick a plan to activate your PDS.
+            </Paragraph>
+          </div>
+        </div>
+        <PlanCards isLoggedIn />
+      </main>
+    );
+  }
+
   return (
     <main className="flex min-h-[60vh] items-center justify-center px-4 py-8">
       <Card className="w-full max-w-2xl bg-white/5">
         <CardHeader>
+          <div className="mb-4">
+            <OnboardingSteps currentStep={1} />
+          </div>
           <CardTitle>Welcome</CardTitle>
           <CardDescription>
-            {selectedPlan
-              ? `Confirm your ${selectedPlan.name} plan and continue setup.`
-              : "Almost there — pick a plan to activate your access."}
+            Confirm your {selectedPlan.name} plan and continue setup.
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
           <div className="space-y-4 text-white">
-            <Heading as="h2" className="text-base font-semibold">
-              Subscribe to Access
-            </Heading>
-            {selectedPlan ? (
-              <WelcomeCheckout plan={selectedPlan} displayPrice={displayPrice} />
-            ) : (
-              <div className="space-y-3">
-                <Paragraph className="text-sm text-white/80">
-                  Choose a plan on our pricing page, then return here to finish
-                  setup.
-                </Paragraph>
-                <ButtonLink
-                  href="/#pricing"
-                  className="inline-flex rounded-full bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
-                >
-                  View pricing
-                </ButtonLink>
-              </div>
-            )}
-            {subscription && selectedPlan && (
+            <WelcomeCheckout plan={selectedPlan} displayPrice={displayPrice} />
+            {subscription && (
               <DashboardClient
                 subscribed={subscribed}
                 subscription={subscription}

@@ -26,7 +26,7 @@ export function MobileMenu({ user, isRecovery = false, open, onClose }: MobileMe
         {user && !isRecovery ? (
           <>
             <Link href="/dashboard" onClick={onClose} className={mobileLinkClass}>
-              Dashboard
+              Your PDS
             </Link>
             <form action={signOut}>
               <button type="submit" className={mobileLinkClass}>

@@ -14,6 +14,7 @@ import { formatStripePrice } from "@/lib/format-stripe-price";
 import { getStripePlanAmounts } from "@/lib/stripe-plans";
 import type { OnboardingSearchParams } from "@/lib/onboarding";
 import { PdsNameForm } from "../pds-name-form";
+import { OnboardingSteps } from "../onboarding-steps";
 
 type WelcomeNamePageProps = {
   searchParams?: Promise<OnboardingSearchParams>;
@@ -52,6 +53,9 @@ export default async function WelcomeNamePage({
     <main className="flex min-h-[60vh] items-center justify-center px-4 py-8">
       <Card className="w-full max-w-lg bg-white/5">
         <CardHeader>
+          <div className="mb-4">
+            <OnboardingSteps currentStep={2} />
+          </div>
           <CardTitle>Choose your PDS name</CardTitle>
           <CardDescription>
             Pick a unique name for your {plan.name} PDS before we provision it.

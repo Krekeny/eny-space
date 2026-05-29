@@ -8,6 +8,8 @@ export type PlanCatalogEntry = {
   pdsDiskSizeGb: number;
   badge?: string;
   highlight?: boolean;
+  /** When true the plan is shown on the pricing page but cannot be purchased yet. */
+  disabled?: boolean;
   features: string[];
 };
 
@@ -15,40 +17,43 @@ export const PLAN_CATALOG: Record<PlanKey, PlanCatalogEntry> = {
   personal: {
     key: "personal",
     name: "Personal",
-    description: "Perfect for small projects.",
+    description: "Your own AT Protocol PDS, ready in minutes.",
     pdsDiskSizeGb: 1,
     features: [
-      "1 GB storage",
-      "5 app deployments",
-      "Basic security protocols",
-      "24/7 support access",
+      "1 GB blob & repo storage",
+      "Personal AT Protocol PDS",
+      "Your handle: yourpds.eny.space",
+      "Invite code generation",
+      "Managed updates & backups",
     ],
   },
   community: {
     key: "community",
     name: "Community",
-    description: "Scale without limits.",
+    description: "Host your own corner of the Atmosphere.",
     pdsDiskSizeGb: 10,
     badge: "Popular",
     highlight: true,
     features: [
-      "10 GB storage",
-      "Unlimited app deployments",
-      "Advanced security and encryption",
-      "Priority support with dedicated manager",
+      "10 GB blob & repo storage",
+      "Host multiple accounts",
+      "Invite codes for your members",
+      "Custom domain support (coming soon)",
+      "Managed updates & backups",
     ],
   },
   business: {
     key: "business",
-    name: "Business",
-    description: "Enterprise-level performance.",
+    name: "Organization",
+    description: "Dedicated infrastructure for teams and companies.",
     pdsDiskSizeGb: 100,
+    disabled: true,
     features: [
-      "100 GB storage",
-      "Custom domain support",
-      "Dedicated node hosting",
-      "Real-time monitoring and analytics",
-      "Premium 24/7 support with SLA",
+      "100 GB blob & repo storage",
+      "Unlimited hosted accounts",
+      "Dedicated node",
+      "Custom domain & SLA",
+      "Priority support",
     ],
   },
 };

@@ -115,7 +115,7 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
             <>
               <Button size="default" className={headerCtaClass} asChild>
                 <Link href="/dashboard">
-                  Dashboard
+                  Your PDS
                   <ArrowUpRightIcon className="ml-1 size-3.5" />
                 </Link>
               </Button>
@@ -123,10 +123,9 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
                 <Button
                   type="submit"
                   size="default"
-                  className={headerCtaClass}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-transparent px-4 text-xs font-medium uppercase tracking-wide text-white/70 cursor-pointer hover:border-white/60 hover:text-white"
                 >
                   Sign out
-                  <ArrowUpRightIcon className="ml-0.5 size-3.5" />
                 </Button>
               </form>
             </>
