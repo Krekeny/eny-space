@@ -1,4 +1,4 @@
-const PDS_HOSTNAME_SUFFIX = ".eny.k8s.frx.pub";
+const PDS_HOSTNAME_SUFFIX = process.env.NEXT_PUBLIC_PDS_HOSTNAME_SUFFIX ?? ".eny.space";
 
 export function normalizePdsSlug(value: string): string {
   return value

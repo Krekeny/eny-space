@@ -6,7 +6,7 @@ import { randomBytes } from "crypto";
 
 import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { normalizePdsSlug } from "@/lib/pds-slug";
+import { normalizePdsSlug, pdsHostnameForSlug } from "@/lib/pds-slug";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 
 const PDS_API_BASE_URL = process.env.PDS_API_BASE_URL;
@@ -216,7 +216,7 @@ export async function POST(req: Request) {
           );
           const pdsHostnameBase =
             session.metadata?.pds_hostname_base ||
-            `${pdsUsername}.eny.k8s.frx.pub`;
+            pdsHostnameForSlug(pdsUsername);
           const planKey = session.metadata?.pds_plan || "personal";
 
           try {
