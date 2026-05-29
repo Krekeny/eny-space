@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSubscriptionStatus } from "@/actions/subscription";
-import { Card, CardContent, CardHeader } from "@/actions/components/ui/card";
+import { Card, CardContent } from "@/actions/components/ui/card";
 import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import { getPdsServiceForCurrentUser } from "../api/pds/atproto/helpers";
 import { welcomePath, type OnboardingSearchParams } from "@/lib/onboarding";
-import { isPdsReady, pdsStateLabel } from "@/lib/pds-state";
-import { PdsHealthClient } from "./pds-health-client";
+import { isPdsReady } from "@/lib/pds-state";
+import { PdsStatusCard } from "./pds-status-card";
 import { UserDashboardClient } from "./user-dashboard-client";
 
 type DashboardPageProps = {
@@ -44,7 +44,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   }
 
   const ready = isPdsReady(pdsState);
-  const statusLabel = pdsState !== null ? pdsStateLabel(pdsState) : subscribed ? "Provisioning" : "No subscription";
 
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6">
@@ -60,29 +59,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         </ButtonLink>
       </div>
 
-      {/* Status card */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <span
-              className={`inline-block h-2.5 w-2.5 rounded-full ${
-                ready ? "bg-emerald-400" : "bg-amber-400 animate-pulse"
-              }`}
-            />
-            <Heading as="h2" className="text-base font-semibold text-white">
-              {statusLabel}
-            </Heading>
-          </div>
-          {pdsHostname && (
-            <Paragraph className="text-sm text-white/60 font-mono">{pdsHostname}</Paragraph>
-          )}
-        </CardHeader>
-        {pdsHostname && (
-          <CardContent>
-            <PdsHealthClient pdsHost={`https://${pdsHostname}`} />
-          </CardContent>
-        )}
-      </Card>
+      <PdsStatusCard initialState={pdsState} initialHostname={pdsHostname} />
 
       {/* Forms — only shown when PDS is reachable */}
       {ready ? (
