@@ -130,16 +130,25 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
               </form>
             </>
           ) : (
-            <Button
-              size="default"
-              className={headerCtaClass}
-              asChild
-            >
-              <Link href="/signup">
-                Get started
-                <ArrowUpRightIcon className="ml-1 size-3.5" />
-              </Link>
-            </Button>
+            <>
+              <Button
+                size="default"
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-transparent px-4 text-xs font-medium uppercase tracking-wide text-white/70 cursor-pointer hover:border-white/60 hover:text-white"
+                asChild
+              >
+                <Link href="/login">Log in</Link>
+              </Button>
+              <Button
+                size="default"
+                className={headerCtaClass}
+                asChild
+              >
+                <Link href="/signup">
+                  Get started
+                  <ArrowUpRightIcon className="ml-1 size-3.5" />
+                </Link>
+              </Button>
+            </>
           )}
         </div>
 

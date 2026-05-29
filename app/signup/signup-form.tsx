@@ -15,6 +15,7 @@ import {
 } from "@/actions/components/ui/card";
 import { Input } from "@/actions/components/ui/input";
 import { Label } from "@/actions/components/ui/label";
+import { PasswordInput } from "@/components/password-input";
 
 interface SignUpFormProps {
   next: string;
@@ -65,8 +66,18 @@ export function SignUpForm({ next, loginHref }: SignUpFormProps) {
   return (
     <main className="flex min-h-[60vh] items-center justify-center px-4">
       <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Create account</CardTitle>
+        <CardHeader className="pb-2">
+          <div className="flex rounded-lg bg-white/5 p-1 mb-4">
+            <Link
+              href={loginHref}
+              className="flex-1 px-3 py-1.5 text-center text-sm font-medium text-white/40 hover:text-white/70 transition-colors"
+            >
+              Log in
+            </Link>
+            <span className="flex-1 rounded-md bg-white/15 px-3 py-1.5 text-center text-sm font-semibold text-white shadow-sm">
+              Create account
+            </span>
+          </div>
           <CardDescription>
             Get started with eny.space in a few seconds.
           </CardDescription>
@@ -96,28 +107,21 @@ export function SignUpForm({ next, loginHref }: SignUpFormProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
+              <PasswordInput
                 id="password"
                 name="password"
-                type="password"
                 minLength={6}
                 autoComplete="new-password"
                 required
               />
             </div>
             <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Creating account…" : "Sign Up"}
+              {isPending ? "Creating account…" : "Create account"}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col gap-3 text-sm text-muted-foreground">
-          <span>
-            Already have an account?{" "}
-            <Link href={loginHref} className="underline underline-offset-4">
-              Login
-            </Link>
-          </span>
-          <p className="text-center text-xs text-muted-foreground/70">
+        <CardFooter>
+          <p className="text-center w-full text-xs text-muted-foreground/70">
             We use email login to keep your account secure during PDS setup.
             Atmosphere login is coming soon.
           </p>
