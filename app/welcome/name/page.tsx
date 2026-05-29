@@ -12,7 +12,7 @@ import { PlanSummaryCard } from "@/components/plan/plan-summary-card";
 import { prelaunch } from "@/lib/prelaunch";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 import { formatStripePrice } from "@/lib/format-stripe-price";
-import { getPriceIdForPlan, getStripePlanAmounts } from "@/lib/stripe-plans";
+import { getStripePlanAmounts } from "@/lib/stripe-plans";
 import type { OnboardingSearchParams } from "@/lib/onboarding";
 import { PdsNameForm } from "../pds-name-form";
 
@@ -52,7 +52,6 @@ export default async function WelcomeNamePage({
     stripeAmounts[plan.key].unitAmount,
     stripeAmounts[plan.key].currency,
   );
-  const priceId = getPriceIdForPlan(plan.key);
 
   return (
     <main className="flex min-h-[60vh] items-center justify-center px-4 py-8">
@@ -67,11 +66,7 @@ export default async function WelcomeNamePage({
         <CardContent className="space-y-4 text-white">
           <PlanSummaryCard plan={plan} displayPrice={displayPrice} compact />
 
-          <PdsNameForm
-            priceId={priceId}
-            pdsPlan={plan.key}
-            pdsDisksizeGb={String(plan.pdsDiskSizeGb)}
-          />
+          <PdsNameForm pdsPlan={plan.key} />
         </CardContent>
       </Card>
     </main>

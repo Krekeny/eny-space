@@ -7,6 +7,7 @@ import { randomBytes } from "crypto";
 import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { normalizePdsSlug } from "@/lib/pds-slug";
+import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 
 const PDS_API_BASE_URL = process.env.PDS_API_BASE_URL;
 
@@ -35,13 +36,13 @@ async function provisionPdsForUser({
   userEmail,
   pdsUsername,
   pdsHostnameBase,
-  disksizeGb,
+  planKey,
 }: {
   userId: string;
   userEmail: string;
   pdsUsername: string;
   pdsHostnameBase: string;
-  disksizeGb: string;
+  planKey: string;
 }) {
   if (!PDS_API_BASE_URL) {
     throw new Error("Missing PDS_API_BASE_URL env var");
@@ -60,13 +61,8 @@ async function provisionPdsForUser({
     );
   }
 
-  const disksizeParsed = Number(disksizeGb);
-  if (!Number.isFinite(disksizeParsed) || disksizeParsed <= 0) {
-    throw new Error(
-      `Invalid pds_disksize_gb metadata value: "${disksizeGb}". Expected a positive number.`,
-    );
-  }
-  const disksize = Math.floor(disksizeParsed);
+  const plan = getPlanCatalogEntry(planKey);
+  const disksize = plan.pdsDiskSizeGb;
 
   const supabase = createAdminClient();
 
@@ -221,7 +217,7 @@ export async function POST(req: Request) {
           const pdsHostnameBase =
             session.metadata?.pds_hostname_base ||
             `${pdsUsername}.eny.k8s.frx.pub`;
-          const disksizeGb = session.metadata?.pds_disksize_gb || "1";
+          const planKey = session.metadata?.pds_plan || "personal";
 
           try {
             console.log(`✅ Provisioning PDS for user ${userId}...`);
@@ -230,7 +226,7 @@ export async function POST(req: Request) {
               userEmail,
               pdsUsername,
               pdsHostnameBase,
-              disksizeGb,
+              planKey,
             });
           } catch (e) {
             console.error(`❌ Provisioning PDS failed for ${userId}:`, e);

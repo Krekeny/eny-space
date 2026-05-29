@@ -8,16 +8,13 @@ import { Input } from "@/actions/components/ui/input";
 import { Label } from "@/actions/components/ui/label";
 import { Paragraph } from "@/components/paragraph";
 import { validatePdsSlugInput } from "@/lib/pds-slug";
-import { disksizeGbForPlan } from "@/lib/plan-catalog";
 import { welcomePath } from "@/lib/onboarding";
 
 type PdsNameFormProps = {
-  priceId: string;
-  pdsPlan?: string;
-  pdsDisksizeGb?: string;
+  pdsPlan: string;
 };
 
-export function PdsNameForm({ priceId, pdsPlan, pdsDisksizeGb }: PdsNameFormProps) {
+export function PdsNameForm({ pdsPlan }: PdsNameFormProps) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -32,13 +29,6 @@ export function PdsNameForm({ priceId, pdsPlan, pdsDisksizeGb }: PdsNameFormProp
     e.preventDefault();
     setError(null);
 
-    if (!priceId) {
-      setError(
-        "Stripe price is not configured. Contact support or try again later.",
-      );
-      return;
-    }
-
     const validation = validatePdsSlugInput(name);
     if (!validation.ok) {
       setError(validation.error);
@@ -47,11 +37,7 @@ export function PdsNameForm({ priceId, pdsPlan, pdsDisksizeGb }: PdsNameFormProp
 
     setLoading(true);
     try {
-      const { url } = await createSubscriptionCheckout(priceId, {
-        username: validation.slug,
-        disksizeGb: disksizeGbForPlan(pdsPlan, pdsDisksizeGb),
-        planKey: pdsPlan,
-      });
+      const { url } = await createSubscriptionCheckout(pdsPlan, validation.slug);
       if (url) {
         window.location.href = url;
         return;
@@ -120,14 +106,7 @@ export function PdsNameForm({ priceId, pdsPlan, pdsDisksizeGb }: PdsNameFormProp
           variant="ghost"
           disabled={loading}
           className="rounded-full border border-white/40 bg-transparent px-4 text-xs font-medium uppercase tracking-wide text-white hover:bg-white/10"
-          onClick={() =>
-            router.push(
-              welcomePath({
-                pds_plan: pdsPlan,
-                pds_disksize_gb: pdsDisksizeGb,
-              }),
-            )
-          }
+          onClick={() => router.push(welcomePath({ pds_plan: pdsPlan }))}
         >
           Back
         </Button>

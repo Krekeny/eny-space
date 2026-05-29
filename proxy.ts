@@ -28,12 +28,7 @@ export async function proxy(request: NextRequest) {
 
     if (AUTH_ROUTES.includes(pathname)) {
       const pdsPlan = request.nextUrl.searchParams.get("pds_plan") ?? undefined;
-      const pdsDisksizeGb =
-        request.nextUrl.searchParams.get("pds_disksize_gb") ?? undefined;
-      const destination = welcomePath({
-        pds_plan: pdsPlan,
-        pds_disksize_gb: pdsDisksizeGb,
-      });
+      const destination = welcomePath({ pds_plan: pdsPlan });
       return NextResponse.redirect(new URL(destination, request.url));
     }
   }

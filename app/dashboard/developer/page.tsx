@@ -21,7 +21,6 @@ import { PdsHealthClient } from "../pds-health-client";
 type DashboardPageProps = {
   searchParams?: Promise<{
     pds_plan?: string;
-    pds_disksize_gb?: string;
   }>;
 };
 
@@ -39,12 +38,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const { subscribed, subscription } = await getSubscriptionStatus();
 
   if (!subscribed) {
-    redirect(
-      welcomePath({
-        pds_plan: params?.pds_plan,
-        pds_disksize_gb: params?.pds_disksize_gb,
-      }),
-    );
+    redirect(welcomePath({ pds_plan: params?.pds_plan }));
   }
 
   let pdsHostname: string | null = null;
@@ -139,9 +133,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <DashboardClient
           subscribed={subscribed}
           subscription={subscription}
-          priceId=""
           pdsPlan={params?.pds_plan}
-          pdsDisksizeGb={params?.pds_disksize_gb}
         />
       </CollapsibleSection>
     </main>

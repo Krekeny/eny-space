@@ -15,16 +15,13 @@ import { welcomeNamePath } from "@/lib/onboarding";
 interface DashboardClientProps {
   subscribed: boolean;
   subscription: any;
-  priceId: string;
   pdsPlan?: string;
-  pdsDisksizeGb?: string;
 }
 
 export default function DashboardClient({
   subscribed,
   subscription,
   pdsPlan,
-  pdsDisksizeGb,
 }: DashboardClientProps) {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -47,10 +44,7 @@ export default function DashboardClient({
           again to regain access.
         </Paragraph>
         <ButtonLink
-          href={welcomeNamePath({
-            pds_plan: pdsPlan,
-            pds_disksize_gb: pdsDisksizeGb,
-          })}
+          href={welcomeNamePath({ pds_plan: pdsPlan })}
           className="mt-1 inline-flex rounded-full bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
         >
           Subscribe again

@@ -116,9 +116,7 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
                 <DashboardClient
                   subscribed={subscribed}
                   subscription={subscription}
-                  priceId=""
                   pdsPlan={selectedPlan.key}
-                  pdsDisksizeGb={String(selectedPlan.pdsDiskSizeGb)}
                 />
               )}
             </div>

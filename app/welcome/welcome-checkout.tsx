@@ -14,10 +14,7 @@ export function WelcomeCheckout({ plan, displayPrice }: WelcomeCheckoutProps) {
       <PlanSummaryCard plan={plan} displayPrice={displayPrice} />
 
       <ButtonLink
-        href={welcomeNamePath({
-          pds_plan: plan.key,
-          pds_disksize_gb: String(plan.pdsDiskSizeGb),
-        })}
+        href={welcomeNamePath({ pds_plan: plan.key })}
         className="inline-flex rounded-full bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
       >
         Choose PDS name

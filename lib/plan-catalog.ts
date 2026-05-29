@@ -63,14 +63,3 @@ export function getPlanCatalogEntry(
   return PLAN_CATALOG[normalizePlanKey(planKey)];
 }
 
-export function disksizeGbForPlan(
-  pdsPlan?: string,
-  pdsDisksizeGb?: string,
-): number {
-  const override = Number(pdsDisksizeGb);
-  if (Number.isFinite(override) && override > 0) {
-    return Math.floor(override);
-  }
-
-  return getPlanCatalogEntry(pdsPlan).pdsDiskSizeGb;
-}

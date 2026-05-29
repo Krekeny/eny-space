@@ -10,10 +10,7 @@ type SignUpPageProps = {
 
 export default async function SignUpPage({ searchParams }: SignUpPageProps) {
   const params = await searchParams;
-  const onboarding = {
-    pds_plan: params?.pds_plan,
-    pds_disksize_gb: params?.pds_disksize_gb,
-  };
+  const onboarding = { pds_plan: params?.pds_plan };
   const next = welcomePath(onboarding);
 
   const supabase = await createClient();
@@ -25,9 +22,6 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
   }
   const loginQs = new URLSearchParams();
   if (params?.pds_plan) loginQs.set("pds_plan", params.pds_plan);
-  if (params?.pds_disksize_gb) {
-    loginQs.set("pds_disksize_gb", params.pds_disksize_gb);
-  }
   const loginHref = `/login${loginQs.toString() ? `?${loginQs}` : ""}`;
 
   return (

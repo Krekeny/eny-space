@@ -7,13 +7,8 @@ import { headers } from "next/headers";
 import type { Stripe } from "stripe";
 import { pdsHostnameForSlug, validatePdsSlugInput } from "@/lib/pds-slug";
 import { welcomeNamePath } from "@/lib/onboarding";
-
-type PdsCheckoutOptions = {
-  username?: string;
-  hostname?: string;
-  disksizeGb?: number;
-  planKey?: string;
-};
+import { getPlanCatalogEntry } from "@/lib/plan-catalog";
+import { getPriceIdForPlan } from "@/lib/stripe-plans";
 
 /**
  * Get user's Stripe customer ID from database (minimal storage)
@@ -152,11 +147,13 @@ export async function verifyActiveSubscription(): Promise<{
 }
 
 /**
- * Create checkout session for new subscription
+ * Create checkout session for new subscription.
+ * planKey and username come from the client; all pricing and config is
+ * derived server-side from the plan catalog so the client cannot influence specs.
  */
 export async function createSubscriptionCheckout(
-  priceId: string,
-  options?: PdsCheckoutOptions,
+  planKey: string,
+  username: string,
 ) {
   const supabase = await createClient();
   const {
@@ -166,6 +163,27 @@ export async function createSubscriptionCheckout(
   if (!user) {
     throw new Error("User must be authenticated");
   }
+
+  const rawUsername = username.trim();
+  if (!rawUsername) {
+    throw new Error("PDS name is required before checkout.");
+  }
+
+  const validation = validatePdsSlugInput(rawUsername);
+  if (!validation.ok) {
+    throw new Error(validation.error);
+  }
+
+  const pdsUsername = validation.slug;
+
+  // All plan config (price, disk size) comes from the server-side catalog
+  const plan = getPlanCatalogEntry(planKey);
+  const priceId = getPriceIdForPlan(plan.key);
+  if (!priceId) {
+    throw new Error("Plan price is not configured. Contact support.");
+  }
+  const normalizedDisksize = String(plan.pdsDiskSizeGb);
+  const pdsHostnameBase = pdsHostnameForSlug(pdsUsername);
 
   // Get or create Stripe customer
   let customerId = await getStripeCustomerId();
@@ -179,7 +197,6 @@ export async function createSubscriptionCheckout(
     });
     customerId = customer.id;
 
-    // Store only customer ID in database (minimal)
     const { data: existingSub } = await supabase
       .from("subscriptions")
       .select("id")
@@ -205,34 +222,12 @@ export async function createSubscriptionCheckout(
     process.env.NEXT_PUBLIC_APP_URL ||
     "http://localhost:3000";
 
-  const rawUsername = (options?.username || "").trim();
-  if (!rawUsername) {
-    throw new Error("PDS name is required before checkout.");
-  }
-
-  const validation = validatePdsSlugInput(rawUsername);
-  if (!validation.ok) {
-    throw new Error(validation.error);
-  }
-
-  const pdsUsername = validation.slug;
-  const pdsDisksizeGb = Number(options?.disksizeGb);
-  const normalizedDisksize =
-    Number.isFinite(pdsDisksizeGb) && pdsDisksizeGb > 0
-      ? String(Math.floor(pdsDisksizeGb))
-      : "1";
-
-  const requestedHostname = (options?.hostname || "").trim();
-  const cleanedHostname = requestedHostname
-    .replace(/^https?:\/\//i, "")
-    .replace(/\/.*$/, "");
-  const pdsHostnameBase = cleanedHostname || pdsHostnameForSlug(pdsUsername);
-
   const checkoutSession = await stripe.checkout.sessions.create({
     metadata: {
       user_id: user.id,
       user_email: user.email!,
       pds_username: pdsUsername,
+      pds_plan: plan.key,
       pds_disksize_gb: normalizedDisksize,
       pds_hostname_base: pdsHostnameBase,
     },
@@ -246,10 +241,7 @@ export async function createSubscriptionCheckout(
       },
     ],
     success_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}${welcomeNamePath({
-      pds_plan: options?.planKey,
-      pds_disksize_gb: normalizedDisksize,
-    })}`,
+    cancel_url: `${origin}${welcomeNamePath({ pds_plan: plan.key })}`,
   });
 
   return { url: checkoutSession.url };

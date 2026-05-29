@@ -53,10 +53,7 @@ export async function PricingSection() {
           const { unitAmount, currency } = stripeAmounts[planKey];
           const displayPrice = formatStripePrice(unitAmount, currency);
 
-          const onboarding = {
-            pds_plan: plan.key,
-            pds_disksize_gb: String(plan.pdsDiskSizeGb),
-          };
+          const onboarding = { pds_plan: plan.key };
           const ctaHref = user
             ? welcomePath(onboarding)
             : `/signup?${new URLSearchParams(onboarding).toString()}`;

@@ -29,12 +29,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const { subscribed } = await getSubscriptionStatus();
 
   if (!subscribed) {
-    redirect(
-      welcomePath({
-        pds_plan: params?.pds_plan,
-        pds_disksize_gb: params?.pds_disksize_gb,
-      }),
-    );
+    redirect(welcomePath({ pds_plan: params?.pds_plan }));
   }
 
   let pdsHostname: string | null = null;
