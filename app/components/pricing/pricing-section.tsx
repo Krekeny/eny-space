@@ -130,6 +130,11 @@ export async function PricingSection() {
       <div className="mx-auto mt-12 grid max-w-6xl gap-6 md:grid-cols-3">
         {PLANS.map((plan) =>
           (() => {
+            const planKey = plan.key as PlanKey;
+            const { unitAmount, currency } = stripeAmounts[planKey];
+            const displayPrice =
+              formatStripePrice(unitAmount, currency) ?? plan.price;
+
             const params = new URLSearchParams({
               auto_checkout: "1",
               pds_plan: plan.key,
@@ -162,7 +167,7 @@ export async function PricingSection() {
                   </div>
                   <div className="mt-4 flex items-baseline gap-2">
                     <span className="text-4xl font-semibold sm:text-5xl text-white">
-                      ?€
+                      {displayPrice}
                     </span>
                     <span className="text-sm font-medium opacity-80 text-white">
                       {plan.period}
