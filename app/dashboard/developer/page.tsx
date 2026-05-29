@@ -15,7 +15,7 @@ import { AtprotoTestClient } from "../atproto-test-client";
 import { CollapsibleSection } from "../collapsible-section";
 import { getPdsServiceForCurrentUser } from "../../api/pds/atproto/helpers";
 import { welcomePath } from "@/lib/onboarding";
-import { pdsStateLabel } from "@/lib/pds-state";
+import { pdsStateLabel, isPdsReady } from "@/lib/pds-state";
 import { PdsHealthClient } from "../pds-health-client";
 
 type DashboardPageProps = {
@@ -43,12 +43,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   let pdsHostname: string | null = null;
   let pdsStatus = subscribed ? "active" : "provisioning";
+  let pdsReady = false;
 
   try {
     const { service } = await getPdsServiceForCurrentUser();
     pdsHostname = service?.hostname || service?.encrypted_config?.hostname || null;
     if (service?.state !== undefined && service.state !== null) {
       pdsStatus = pdsStateLabel(service.state);
+      pdsReady = isPdsReady(service.state);
     }
   } catch {
     // Service not provisioned yet or API unavailable — fall back to subscription-derived status
@@ -109,7 +111,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               </ButtonLink>
             )}
           </div>
-          {pdsHostname && (
+          {pdsHostname && pdsReady && (
             <PdsHealthClient pdsHost={`https://${pdsHostname}`} />
           )}
         </CardContent>

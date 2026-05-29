@@ -70,7 +70,7 @@ export function PdsStatusCard({ initialState, initialHostname }: Props) {
           </Paragraph>
         )}
       </CardHeader>
-      {hostname && (
+      {hostname && stateType === "ready" && (
         <CardContent>
           <PdsHealthClient pdsHost={`https://${hostname}`} />
         </CardContent>

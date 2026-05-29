@@ -1,3 +1,5 @@
+import { isPdsNameBlocked } from "@/lib/pds-name-blocklist";
+
 const PDS_HOSTNAME_SUFFIX = process.env.NEXT_PUBLIC_PDS_HOSTNAME_SUFFIX ?? ".eny.space";
 
 export function normalizePdsSlug(value: string): string {
@@ -43,6 +45,10 @@ export function validatePdsSlugInput(raw: string): PdsSlugValidation {
       ok: false,
       error: "Name must start and end with a letter or number.",
     };
+  }
+
+  if (isPdsNameBlocked(slug)) {
+    return { ok: false, error: "This name is not allowed. Please choose another." };
   }
 
   return { ok: true, slug, hostname: pdsHostnameForSlug(slug) };
