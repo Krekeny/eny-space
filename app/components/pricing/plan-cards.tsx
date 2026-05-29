@@ -7,7 +7,7 @@ import {
 import { ButtonLink } from "@/components/button-link";
 import { Paragraph } from "@/components/paragraph";
 import { formatStripePrice } from "@/lib/format-stripe-price";
-import { welcomePath } from "@/lib/onboarding";
+import { welcomeNamePath } from "@/lib/onboarding";
 import { PLAN_CATALOG } from "@/lib/plan-catalog";
 import { getStripePlanAmounts, PLAN_KEYS } from "@/lib/stripe-plans";
 
@@ -27,7 +27,7 @@ export async function PlanCards({ isLoggedIn = false }: Props) {
 
         const onboarding = { pds_plan: plan.key };
         const ctaHref = isLoggedIn
-          ? welcomePath(onboarding)
+          ? welcomeNamePath(onboarding)
           : `/signup?${new URLSearchParams(onboarding).toString()}`;
 
         return (

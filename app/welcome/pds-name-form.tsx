@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createSubscriptionCheckout } from "@/actions/subscription";
 import { Button } from "@/actions/components/ui/button";
@@ -9,6 +9,8 @@ import { Label } from "@/actions/components/ui/label";
 import { Paragraph } from "@/components/paragraph";
 import { validatePdsSlugInput } from "@/lib/pds-slug";
 import { welcomePath } from "@/lib/onboarding";
+
+type Availability = "idle" | "checking" | "available" | "taken";
 
 type PdsNameFormProps = {
   pdsPlan: string;
@@ -19,19 +21,51 @@ export function PdsNameForm({ pdsPlan }: PdsNameFormProps) {
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [availability, setAvailability] = useState<Availability>("idle");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const preview = useMemo(() => {
-    const result = validatePdsSlugInput(name);
-    return result.ok ? result.hostname : null;
-  }, [name]);
+  const validation = validatePdsSlugInput(name);
+  const preview = validation.ok ? validation.hostname : null;
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (!preview) {
+      setAvailability("idle");
+      return;
+    }
+
+    setAvailability("checking");
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/pds/check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ hostname: preview }),
+        });
+        const data = await res.json();
+        setAvailability(data.exists ? "taken" : "available");
+      } catch {
+        setAvailability("idle");
+      }
+    }, 500);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [preview]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    const validation = validatePdsSlugInput(name);
     if (!validation.ok) {
       setError(validation.error);
+      return;
+    }
+
+    if (availability === "taken") {
+      setError("This name is already taken. Please choose another.");
       return;
     }
 
@@ -46,9 +80,7 @@ export function PdsNameForm({ pdsPlan }: PdsNameFormProps) {
     } catch (err) {
       console.error("Checkout error:", err);
       setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to start checkout. Please try again.",
+        err instanceof Error ? err.message : "Failed to start checkout. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -81,10 +113,18 @@ export function PdsNameForm({ pdsPlan }: PdsNameFormProps) {
       </div>
 
       {preview && (
-        <Paragraph className="text-sm text-white/80">
-          Your PDS will be provisioned at{" "}
-          <span className="font-mono text-white">{preview}</span>
-        </Paragraph>
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-white/70 font-mono">{preview}</span>
+          {availability === "checking" && (
+            <span className="text-white/40 text-xs">Checking…</span>
+          )}
+          {availability === "available" && (
+            <span className="text-emerald-400 text-xs">Available</span>
+          )}
+          {availability === "taken" && (
+            <span className="text-rose-400 text-xs">Already taken</span>
+          )}
+        </div>
       )}
 
       {error && (
@@ -93,14 +133,7 @@ export function PdsNameForm({ pdsPlan }: PdsNameFormProps) {
         </p>
       )}
 
-      <div className="flex flex-wrap gap-3 pt-1">
-        <Button
-          type="submit"
-          disabled={loading}
-          className="rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
-        >
-          {loading ? "Redirecting…" : "Continue to payment"}
-        </Button>
+      <div className="flex items-center justify-between pt-1">
         <Button
           type="button"
           variant="ghost"
@@ -109,6 +142,13 @@ export function PdsNameForm({ pdsPlan }: PdsNameFormProps) {
           onClick={() => router.push(welcomePath({ pds_plan: pdsPlan }))}
         >
           Back
+        </Button>
+        <Button
+          type="submit"
+          disabled={loading || availability === "checking" || availability === "taken"}
+          className="rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80 disabled:opacity-50"
+        >
+          {loading ? "Redirecting…" : "Continue to payment"}
         </Button>
       </div>
     </form>
