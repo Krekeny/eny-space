@@ -13,18 +13,14 @@ import DashboardClient from "../dashboard-client";
 import { ServiceDetailsClient } from "../service-details-client";
 import { AtprotoTestClient } from "../atproto-test-client";
 import { CollapsibleSection } from "../collapsible-section";
-import { prelaunch } from "@/lib/prelaunch";
-import { getPriceIdForPlan } from "@/lib/stripe-plans";
 import { getPdsServiceForCurrentUser } from "../../api/pds/atproto/helpers";
+import { welcomePath } from "@/lib/onboarding";
 import { pdsStateLabel } from "@/lib/pds-state";
 import { PdsHealthClient } from "../pds-health-client";
 
 type DashboardPageProps = {
   searchParams?: Promise<{
-    auto_checkout?: string;
     pds_plan?: string;
-    pds_username?: string;
-    pds_hostname?: string;
     pds_disksize_gb?: string;
   }>;
 };
@@ -42,8 +38,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const { subscribed, subscription } = await getSubscriptionStatus();
 
-  if (prelaunch && !subscribed) {
-    redirect("/welcome");
+  if (!subscribed) {
+    redirect(
+      welcomePath({
+        pds_plan: params?.pds_plan,
+        pds_disksize_gb: params?.pds_disksize_gb,
+      }),
+    );
   }
 
   let pdsHostname: string | null = null;
@@ -138,11 +139,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <DashboardClient
           subscribed={subscribed}
           subscription={subscription}
-          priceId={getPriceIdForPlan(params?.pds_plan)}
-          autoCheckoutFromPlan={params?.auto_checkout === "1"}
+          priceId=""
           pdsPlan={params?.pds_plan}
-          pdsUsername={params?.pds_username}
-          pdsHostname={params?.pds_hostname}
           pdsDisksizeGb={params?.pds_disksize_gb}
         />
       </CollapsibleSection>

@@ -7,102 +7,22 @@ import {
 import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
+import { createClient } from "@/lib/supabase/server";
 import { prelaunch } from "@/lib/prelaunch";
-import { getStripePlanAmounts, type PlanKey } from "@/lib/stripe-plans";
-
-type PricingPlan = {
-  key: string;
-  name: string;
-  price: string;
-  period: string;
-  badge?: string;
-  description: string;
-  highlight?: boolean;
-  pdsDiskSizeGb: number;
-  features: string[];
-  launchOnly?: boolean;
-};
-
-const PLANS: PricingPlan[] = [
-  {
-    key: "personal",
-    name: "Personal",
-    price: "$19",
-    period: "per month",
-    description: "Perfect for small projects.",
-    pdsDiskSizeGb: 10,
-    features: [
-      "1 GB storage",
-      "5 app deployments",
-      "Basic security protocols",
-      "24/7 support access",
-    ],
-  },
-  {
-    key: "community",
-    name: "Community",
-    price: "$49",
-    period: "per month",
-    badge: "Popular",
-    description: "Scale without limits.",
-    highlight: true,
-    pdsDiskSizeGb: 50,
-    features: [
-      "10 GB storage",
-      "Unlimited app deployments",
-      "Advanced security and encryption",
-      "Priority support with dedicated manager",
-    ],
-  },
-  {
-    key: "business",
-    name: "Business",
-    price: "$99",
-    period: "per month",
-    description: "Enterprise‑level performance.",
-    pdsDiskSizeGb: 200,
-    launchOnly: true,
-    features: [
-      "Unlimited storage",
-      "Custom domain support",
-      "Dedicated node hosting",
-      "Real‑time monitoring and analytics",
-      "Premium 24/7 support with SLA",
-    ],
-  },
-];
-
-function formatStripePrice(unitAmount: number | null, currency: string | null) {
-  if (!unitAmount || !currency) return null;
-
-  const normalized = currency.toLowerCase();
-  const zeroDecimalCurrencies = new Set([
-    "jpy",
-    "krw",
-    "clp",
-    "vnd",
-    "idr",
-    "huf",
-    "pyg",
-  ]);
-  const decimals = zeroDecimalCurrencies.has(normalized) ? 0 : 2;
-  const major = unitAmount / 10 ** decimals;
-
-  try {
-    return new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency: normalized.toUpperCase(),
-      maximumFractionDigits: decimals,
-    }).format(major);
-  } catch {
-    return null;
-  }
-}
+import { formatStripePrice } from "@/lib/format-stripe-price";
+import { welcomePath } from "@/lib/onboarding";
+import { PLAN_CATALOG } from "@/lib/plan-catalog";
+import { getStripePlanAmounts, PLAN_KEYS } from "@/lib/stripe-plans";
 
 export async function PricingSection() {
   // Hide the pricing block entirely during prelaunch mode.
   // This keeps the "prelaunch vs launch" behavior controlled by one global flag.
   if (prelaunch) return null;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const stripeAmounts = await getStripePlanAmounts();
 
@@ -128,21 +48,20 @@ export async function PricingSection() {
       </div>
 
       <div className="mx-auto mt-12 grid max-w-6xl gap-6 md:grid-cols-3">
-        {PLANS.map((plan) =>
-          (() => {
-            const planKey = plan.key as PlanKey;
-            const { unitAmount, currency } = stripeAmounts[planKey];
-            const displayPrice =
-              formatStripePrice(unitAmount, currency) ?? plan.price;
+        {PLAN_KEYS.map((planKey) => {
+          const plan = PLAN_CATALOG[planKey];
+          const { unitAmount, currency } = stripeAmounts[planKey];
+          const displayPrice = formatStripePrice(unitAmount, currency);
 
-            const params = new URLSearchParams({
-              auto_checkout: "1",
-              pds_plan: plan.key,
-              pds_disksize_gb: String(plan.pdsDiskSizeGb),
-            });
-            const signupHref = `/signup?${params.toString()}`;
+          const onboarding = {
+            pds_plan: plan.key,
+            pds_disksize_gb: String(plan.pdsDiskSizeGb),
+          };
+          const ctaHref = user
+            ? welcomePath(onboarding)
+            : `/signup?${new URLSearchParams(onboarding).toString()}`;
 
-            return (
+          return (
               <Card
                 key={plan.name}
                 className={[
@@ -167,10 +86,10 @@ export async function PricingSection() {
                   </div>
                   <div className="mt-4 flex items-baseline gap-2">
                     <span className="text-4xl font-semibold sm:text-5xl text-white">
-                      {displayPrice}
+                      {displayPrice ?? "—"}
                     </span>
                     <span className="text-sm font-medium opacity-80 text-white">
-                      {plan.period}
+                      per month
                     </span>
                   </div>
                   <Paragraph
@@ -182,7 +101,7 @@ export async function PricingSection() {
 
                 <CardContent className="mt-6 flex flex-1 flex-col gap-6 px-0">
                   <ButtonLink
-                    href={signupHref}
+                    href={ctaHref}
                     className={[
                       "w-full rounded-full px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide transition",
                       plan.highlight
@@ -219,9 +138,8 @@ export async function PricingSection() {
                   </div>
                 </CardContent>
               </Card>
-            );
-          })()
-        )}
+          );
+        })}
       </div>
     </section>
   );

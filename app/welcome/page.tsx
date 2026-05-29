@@ -13,19 +13,18 @@ import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import DashboardClient from "../dashboard/dashboard-client";
-import { getPriceIdForPlan } from "@/lib/stripe-plans";
+import { getPlanCatalogEntry } from "@/lib/plan-catalog";
+import { formatStripePrice } from "@/lib/format-stripe-price";
+import { getStripePlanAmounts } from "@/lib/stripe-plans";
+import type { OnboardingSearchParams } from "@/lib/onboarding";
+import { WelcomeCheckout } from "./welcome-checkout";
 
 type WelcomePageProps = {
-  searchParams?: {
-    auto_checkout?: string;
-    pds_plan?: string;
-    pds_username?: string;
-    pds_hostname?: string;
-    pds_disksize_gb?: string;
-  };
+  searchParams?: Promise<OnboardingSearchParams>;
 };
 
 export default async function WelcomePage({ searchParams }: WelcomePageProps) {
+  const params = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -37,10 +36,23 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
 
   const { subscribed, subscription } = await getSubscriptionStatus();
 
-  // If they already have access, skip the onboarding.
   if (subscribed) {
     redirect("/dashboard");
   }
+
+  const selectedPlan = params?.pds_plan
+    ? getPlanCatalogEntry(params.pds_plan)
+    : null;
+  const stripeAmounts = selectedPlan
+    ? await getStripePlanAmounts()
+    : null;
+  const displayPrice =
+    selectedPlan && stripeAmounts
+      ? formatStripePrice(
+          stripeAmounts[selectedPlan.key].unitAmount,
+          stripeAmounts[selectedPlan.key].currency,
+        )
+      : null;
 
   return (
     <main className="flex min-h-[60vh] items-center justify-center px-4 py-8">
@@ -50,7 +62,9 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
           <CardDescription>
             {prelaunch
               ? "Thanks for registering. We'll notify you when we're live."
-              : "Almost there — pick a plan to activate your access."}
+              : selectedPlan
+                ? `Confirm your ${selectedPlan.name} plan and continue setup.`
+                : "Almost there — pick a plan to activate your access."}
           </CardDescription>
         </CardHeader>
 
@@ -82,16 +96,31 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
               <Heading as="h2" className="text-base font-semibold">
                 Subscribe to Access
               </Heading>
-              <DashboardClient
-                subscribed={subscribed}
-                subscription={subscription}
-                priceId={getPriceIdForPlan(searchParams?.pds_plan)}
-                autoCheckoutFromPlan={searchParams?.auto_checkout === "1"}
-                pdsPlan={searchParams?.pds_plan}
-                pdsUsername={searchParams?.pds_username}
-                pdsHostname={searchParams?.pds_hostname}
-                pdsDisksizeGb={searchParams?.pds_disksize_gb}
-              />
+              {selectedPlan ? (
+                <WelcomeCheckout plan={selectedPlan} displayPrice={displayPrice} />
+              ) : (
+                <div className="space-y-3">
+                  <Paragraph className="text-sm text-white/80">
+                    Choose a plan on our pricing page, then return here to finish
+                    setup.
+                  </Paragraph>
+                  <ButtonLink
+                    href="/#pricing"
+                    className="inline-flex rounded-full bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
+                  >
+                    View pricing
+                  </ButtonLink>
+                </div>
+              )}
+              {subscription && selectedPlan && (
+                <DashboardClient
+                  subscribed={subscribed}
+                  subscription={subscription}
+                  priceId=""
+                  pdsPlan={selectedPlan.key}
+                  pdsDisksizeGb={String(selectedPlan.pdsDiskSizeGb)}
+                />
+              )}
             </div>
           )}
         </CardContent>
@@ -99,4 +128,3 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
     </main>
   );
 }
-

@@ -5,13 +5,18 @@ import { Card, CardContent, CardHeader } from "@/actions/components/ui/card";
 import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
-import { prelaunch } from "@/lib/prelaunch";
 import { getPdsServiceForCurrentUser } from "../api/pds/atproto/helpers";
+import { welcomePath, type OnboardingSearchParams } from "@/lib/onboarding";
 import { isPdsReady, pdsStateLabel } from "@/lib/pds-state";
 import { PdsHealthClient } from "./pds-health-client";
 import { UserDashboardClient } from "./user-dashboard-client";
 
-export default async function DashboardPage() {
+type DashboardPageProps = {
+  searchParams?: Promise<OnboardingSearchParams>;
+};
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  const params = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -23,8 +28,13 @@ export default async function DashboardPage() {
 
   const { subscribed } = await getSubscriptionStatus();
 
-  if (prelaunch && !subscribed) {
-    redirect("/welcome");
+  if (!subscribed) {
+    redirect(
+      welcomePath({
+        pds_plan: params?.pds_plan,
+        pds_disksize_gb: params?.pds_disksize_gb,
+      }),
+    );
   }
 
   let pdsHostname: string | null = null;

@@ -1,15 +1,11 @@
 import { stripe } from "@/lib/stripe";
+import {
+  normalizePlanKey,
+  PLAN_KEYS,
+  type PlanKey,
+} from "@/lib/plan-keys";
 
-/** Matches Stripe product names: Personal, Community, Business */
-export const PLAN_KEYS = ["personal", "community", "business"] as const;
-export type PlanKey = (typeof PLAN_KEYS)[number];
-
-/** Old query-param keys → current plan keys (backwards compatibility). */
-const LEGACY_PLAN_KEYS: Record<string, PlanKey> = {
-  starter: "personal",
-  growth: "community",
-  pro: "business",
-};
+export { normalizePlanKey, PLAN_KEYS, type PlanKey };
 
 function getDefaultFallbackPriceId(): string | null {
   const fallback = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID;
@@ -26,15 +22,6 @@ function getEnvPriceId(planKey: PlanKey): string | null {
   };
 
   return (map[planKey] && map[planKey]!.trim().length ? map[planKey]! : fallback) ?? null;
-}
-
-function normalizePlanKey(planKey: string | undefined | null): PlanKey {
-  const raw = (planKey || "personal").toLowerCase();
-  const fromLegacy = LEGACY_PLAN_KEYS[raw];
-  const candidate = fromLegacy ?? raw;
-  return (PLAN_KEYS as readonly string[]).includes(candidate)
-    ? (candidate as PlanKey)
-    : "personal";
 }
 
 export function getPriceIdForPlan(planKey: string | undefined | null): string {

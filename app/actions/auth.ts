@@ -14,13 +14,16 @@ export async function signUp(
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const next = (formData.get("next") as string) || "/welcome";
+  const confirmUrl = new URL("/auth/confirm-callback", appOrigin);
+  confirmUrl.searchParams.set("next", next);
 
   try {
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${appOrigin}/auth/confirm-callback`,
+        emailRedirectTo: confirmUrl.toString(),
       },
     });
 
@@ -59,7 +62,7 @@ export async function signIn(formData: FormData) {
     return { error: error.message };
   }
 
-  const next = (formData.get("next") as string) || "/dashboard";
+  const next = (formData.get("next") as string) || "/welcome";
   revalidatePath("/", "layout");
   redirect(next);
 }

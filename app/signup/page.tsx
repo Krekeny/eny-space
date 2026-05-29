@@ -1,29 +1,34 @@
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { createClient } from "@/lib/supabase/server";
 import { SignUpForm } from "./signup-form";
+import { welcomePath, type OnboardingSearchParams } from "@/lib/onboarding";
 
 type SignUpPageProps = {
-  searchParams?: Promise<{
-    auto_checkout?: string;
-    pds_plan?: string;
-    pds_username?: string;
-    pds_hostname?: string;
-    pds_disksize_gb?: string;
-  }>;
+  searchParams?: Promise<OnboardingSearchParams>;
 };
 
 export default async function SignUpPage({ searchParams }: SignUpPageProps) {
   const params = await searchParams;
-  const nextParams = new URLSearchParams();
+  const onboarding = {
+    pds_plan: params?.pds_plan,
+    pds_disksize_gb: params?.pds_disksize_gb,
+  };
+  const next = welcomePath(onboarding);
 
-  if (params?.auto_checkout) nextParams.set("auto_checkout", params.auto_checkout);
-  if (params?.pds_plan) nextParams.set("pds_plan", params.pds_plan);
-  if (params?.pds_username) nextParams.set("pds_username", params.pds_username);
-  if (params?.pds_hostname) nextParams.set("pds_hostname", params.pds_hostname);
-  if (params?.pds_disksize_gb) nextParams.set("pds_disksize_gb", params.pds_disksize_gb);
-
-  const qs = nextParams.toString();
-  const next = `/dashboard${qs ? `?${qs}` : ""}`;
-  const loginHref = `/login${qs ? `?${qs}` : ""}`;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    redirect(next);
+  }
+  const loginQs = new URLSearchParams();
+  if (params?.pds_plan) loginQs.set("pds_plan", params.pds_plan);
+  if (params?.pds_disksize_gb) {
+    loginQs.set("pds_disksize_gb", params.pds_disksize_gb);
+  }
+  const loginHref = `/login${loginQs.toString() ? `?${loginQs}` : ""}`;
 
   return (
     <Suspense>

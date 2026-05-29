@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import {
-  createSubscriptionCheckout,
   cancelSubscription,
   resumeSubscription,
   createBillingPortalSession,
@@ -10,114 +9,31 @@ import {
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import { Button } from "@/actions/components/ui/button";
+import { ButtonLink } from "@/components/button-link";
+import { welcomeNamePath } from "@/lib/onboarding";
 
 interface DashboardClientProps {
   subscribed: boolean;
   subscription: any;
   priceId: string;
-  autoCheckoutFromPlan?: boolean;
   pdsPlan?: string;
-  pdsUsername?: string;
-  pdsHostname?: string;
   pdsDisksizeGb?: string;
 }
 
 export default function DashboardClient({
   subscribed,
   subscription,
-  priceId,
-  autoCheckoutFromPlan,
   pdsPlan,
-  pdsUsername,
-  pdsHostname,
   pdsDisksizeGb,
 }: DashboardClientProps) {
-  const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const hasAutoStartedCheckout = useRef(false);
-
-  const planBasedDisksize = useMemo(() => {
-    if (pdsDisksizeGb && Number(pdsDisksizeGb) > 0) {
-      return Number(pdsDisksizeGb);
-    }
-
-    const p = (pdsPlan || "").toLowerCase();
-    if (p === "community" || p === "growth") return 50;
-    if (p === "business" || p === "pro") return 200;
-    return 10;
-  }, [pdsDisksizeGb, pdsPlan]);
-
-  const selectedUsername = pdsUsername || undefined;
-  const selectedHostname = pdsHostname || undefined;
-
-  const handleSubscribe = async () => {
-    if (!priceId) {
-      alert(
-        "Stripe price ID not configured. Set NEXT_PUBLIC_STRIPE_PRICE_PERSONAL_ID (and COMMUNITY/BUSINESS) or NEXT_PUBLIC_STRIPE_PRICE_ID as fallback.",
-      );
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { url } = await createSubscriptionCheckout(priceId, {
-        username: selectedUsername,
-        hostname: selectedHostname,
-        disksizeGb: planBasedDisksize,
-      });
-      if (url) {
-        window.location.href = url;
-      }
-    } catch (error) {
-      console.error("Error creating checkout:", error);
-      alert("Failed to create checkout session. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (
-      autoCheckoutFromPlan &&
-      !subscribed &&
-      !loading &&
-      !hasAutoStartedCheckout.current
-    ) {
-      hasAutoStartedCheckout.current = true;
-      void handleSubscribe();
-    }
-  }, [autoCheckoutFromPlan, subscribed, loading]);
 
   const hasSubscription = !!subscription;
   const isCanceled =
     subscription?.status === "canceled" || subscription?.status === "past_due";
 
   if (!hasSubscription) {
-    return (
-      <div className="space-y-3 text-white">
-        <Heading as="h2" className="text-base font-semibold">
-          Subscribe to Access
-        </Heading>
-        <Paragraph className="text-sm text-white/80">
-          You need an active subscription to access the server features.
-        </Paragraph>
-        {(pdsPlan || selectedHostname || selectedUsername) && (
-          <Paragraph className="text-xs text-white/70">
-            Selected plan settings: plan={pdsPlan || "personal"}, disksize=
-            {planBasedDisksize}GiB
-            {selectedHostname ? `, hostname=${selectedHostname}` : ""}
-            {selectedUsername ? `, username=${selectedUsername}` : ""}
-          </Paragraph>
-        )}
-        <Button
-          onClick={handleSubscribe}
-          disabled={loading}
-          className="mt-1 rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
-        >
-          {loading ? "Loading..." : "Subscribe Now"}
-        </Button>
-      </div>
-    );
+    return null;
   }
 
   if (isCanceled) {
@@ -127,15 +43,18 @@ export default function DashboardClient({
           Subscription Canceled
         </Heading>
         <Paragraph className="text-sm text-white/80">
-          Your subscription has been canceled. Subscribe again to regain access.
+          Your subscription has been canceled. Choose a PDS name and subscribe
+          again to regain access.
         </Paragraph>
-        <Button
-          onClick={handleSubscribe}
-          disabled={loading}
-          className="mt-1 rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
+        <ButtonLink
+          href={welcomeNamePath({
+            pds_plan: pdsPlan,
+            pds_disksize_gb: pdsDisksizeGb,
+          })}
+          className="mt-1 inline-flex rounded-full bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
         >
-          {loading ? "Loading..." : "Subscribe Again"}
-        </Button>
+          Subscribe again
+        </ButtonLink>
       </div>
     );
   }

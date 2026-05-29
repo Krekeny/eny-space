@@ -5,20 +5,14 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import type { Stripe } from "stripe";
-
-function normalizeSlug(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9-]/g, "-")
-    .replace(/^-+/, "")
-    .replace(/-+$/, "")
-    .slice(0, 63);
-}
+import { pdsHostnameForSlug, validatePdsSlugInput } from "@/lib/pds-slug";
+import { welcomeNamePath } from "@/lib/onboarding";
 
 type PdsCheckoutOptions = {
   username?: string;
   hostname?: string;
   disksizeGb?: number;
+  planKey?: string;
 };
 
 /**
@@ -211,32 +205,37 @@ export async function createSubscriptionCheckout(
     process.env.NEXT_PUBLIC_APP_URL ||
     "http://localhost:3000";
 
+  const rawUsername = (options?.username || "").trim();
+  if (!rawUsername) {
+    throw new Error("PDS name is required before checkout.");
+  }
+
+  const validation = validatePdsSlugInput(rawUsername);
+  if (!validation.ok) {
+    throw new Error(validation.error);
+  }
+
+  const pdsUsername = validation.slug;
+  const pdsDisksizeGb = Number(options?.disksizeGb);
+  const normalizedDisksize =
+    Number.isFinite(pdsDisksizeGb) && pdsDisksizeGb > 0
+      ? String(Math.floor(pdsDisksizeGb))
+      : "1";
+
+  const requestedHostname = (options?.hostname || "").trim();
+  const cleanedHostname = requestedHostname
+    .replace(/^https?:\/\//i, "")
+    .replace(/\/.*$/, "");
+  const pdsHostnameBase = cleanedHostname || pdsHostnameForSlug(pdsUsername);
+
   const checkoutSession = await stripe.checkout.sessions.create({
-    // Used later in the Stripe webhook to provision the user's PDS
-    // with user-selected settings.
-    metadata: (() => {
-      const fallbackUsername = normalizeSlug(user.email!.split("@")[0] || "pds");
-      const pdsUsername = normalizeSlug(options?.username || fallbackUsername);
-      const pdsDisksizeGb = Number(options?.disksizeGb);
-      const normalizedDisksize =
-        Number.isFinite(pdsDisksizeGb) && pdsDisksizeGb > 0
-          ? String(Math.floor(pdsDisksizeGb))
-          : "10";
-
-      const requestedHostname = (options?.hostname || "").trim();
-      const cleanedHostname = requestedHostname
-        .replace(/^https?:\/\//i, "")
-        .replace(/\/.*$/, "");
-      const pdsHostnameBase = cleanedHostname || `${pdsUsername}.eny.k8s.frx.pub`;
-
-      return {
-        user_id: user.id,
-        user_email: user.email!,
-        pds_username: pdsUsername,
-        pds_disksize_gb: normalizedDisksize,
-        pds_hostname_base: pdsHostnameBase,
-      };
-    })(),
+    metadata: {
+      user_id: user.id,
+      user_email: user.email!,
+      pds_username: pdsUsername,
+      pds_disksize_gb: normalizedDisksize,
+      pds_hostname_base: pdsHostnameBase,
+    },
     customer: customerId,
     mode: "subscription",
     payment_method_types: ["card"],
@@ -247,7 +246,10 @@ export async function createSubscriptionCheckout(
       },
     ],
     success_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/dashboard`,
+    cancel_url: `${origin}${welcomeNamePath({
+      pds_plan: options?.planKey,
+      pds_disksize_gb: normalizedDisksize,
+    })}`,
   });
 
   return { url: checkoutSession.url };

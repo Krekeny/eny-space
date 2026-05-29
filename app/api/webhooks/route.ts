@@ -6,17 +6,9 @@ import { randomBytes } from "crypto";
 
 import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { normalizePdsSlug } from "@/lib/pds-slug";
 
 const PDS_API_BASE_URL = process.env.PDS_API_BASE_URL;
-
-function normalizeSlug(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9-]/g, "-")
-    .replace(/^-+/, "")
-    .replace(/-+$/, "")
-    .slice(0, 63);
-}
 
 function normalizeDeployHostname(raw: string) {
   let h = raw.trim();
@@ -220,16 +212,16 @@ export async function POST(req: Request) {
 
         // Next step: provision the user's PDS
         if (userEmail) {
-          const fallbackUsername = normalizeSlug(
+          const fallbackUsername = normalizePdsSlug(
             userEmail.split("@")[0] || "pds",
           );
-          const pdsUsername = normalizeSlug(
+          const pdsUsername = normalizePdsSlug(
             session.metadata?.pds_username || fallbackUsername,
           );
           const pdsHostnameBase =
             session.metadata?.pds_hostname_base ||
             `${pdsUsername}.eny.k8s.frx.pub`;
-          const disksizeGb = session.metadata?.pds_disksize_gb || "10";
+          const disksizeGb = session.metadata?.pds_disksize_gb || "1";
 
           try {
             console.log(`✅ Provisioning PDS for user ${userId}...`);

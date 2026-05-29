@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { signIn } from "@/actions/auth";
+import { createClient } from "@/lib/supabase/server";
+import { welcomePath, type OnboardingSearchParams } from "@/lib/onboarding";
 import { Button } from "@/actions/components/ui/button";
 import {
   Card,
@@ -13,37 +16,34 @@ import { Input } from "@/actions/components/ui/input";
 import { Label } from "@/actions/components/ui/label";
 
 type LoginPageProps = {
-  searchParams?: Promise<{
-    auto_checkout?: string;
-    pds_plan?: string;
-    pds_username?: string;
-    pds_hostname?: string;
-    pds_disksize_gb?: string;
-    message?: string;
-  }>;
+  searchParams?: Promise<
+    OnboardingSearchParams & {
+      message?: string;
+    }
+  >;
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
-  const nextParams = new URLSearchParams();
-  if (params?.auto_checkout) {
-    nextParams.set("auto_checkout", params.auto_checkout);
-  }
-  if (params?.pds_plan) {
-    nextParams.set("pds_plan", params.pds_plan);
-  }
-  if (params?.pds_username) {
-    nextParams.set("pds_username", params.pds_username);
-  }
-  if (params?.pds_hostname) {
-    nextParams.set("pds_hostname", params.pds_hostname);
-  }
-  if (params?.pds_disksize_gb) {
-    nextParams.set("pds_disksize_gb", params.pds_disksize_gb);
-  }
+  const onboarding = {
+    pds_plan: params?.pds_plan,
+    pds_disksize_gb: params?.pds_disksize_gb,
+  };
+  const next = welcomePath(onboarding);
 
-  const next = `/dashboard${nextParams.toString() ? `?${nextParams.toString()}` : ""}`;
-  const signupHref = `/signup${nextParams.toString() ? `?${nextParams.toString()}` : ""}`;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    redirect(next);
+  }
+  const signupQs = new URLSearchParams();
+  if (params?.pds_plan) signupQs.set("pds_plan", params.pds_plan);
+  if (params?.pds_disksize_gb) {
+    signupQs.set("pds_disksize_gb", params.pds_disksize_gb);
+  }
+  const signupHref = `/signup${signupQs.toString() ? `?${signupQs}` : ""}`;
 
   return (
     <main className="flex min-h-[60vh] items-center justify-center px-4">
