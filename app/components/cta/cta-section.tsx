@@ -2,7 +2,6 @@ import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import { ArrowRightIcon } from "lucide-react";
-import { prelaunch } from "@/lib/prelaunch";
 
 export function CTASection() {
   return (
@@ -20,24 +19,22 @@ export function CTASection() {
           JSON—then upgrade to dedicated hosting when you're ready.
         </Paragraph>
 
-        {!prelaunch && (
-          <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
-            <ButtonLink
-              href="/demo"
-              className="border border-white/30 bg-transparent px-6 text-xs font-semibold uppercase tracking-wide text-white hover:border-white hover:bg-white/10"
-              endIcon={<ArrowRightIcon className="size-4" aria-hidden />}
-            >
-              Open PDS UI demo
-            </ButtonLink>
-            <ButtonLink
-              href="/signup"
-              className="px-6 text-xs font-semibold uppercase tracking-wide text-neutral-950 shadow-[0_0_40px_rgba(232,121,249,0.45)] bg-fuchsia-400 hover:bg-fuchsia-300"
-              endIcon={<ArrowRightIcon className="size-4" aria-hidden />}
-            >
-              Start free trial
-            </ButtonLink>
-          </div>
-        )}
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
+          <ButtonLink
+            href="/demo"
+            className="border border-white/30 bg-transparent px-6 text-xs font-semibold uppercase tracking-wide text-white hover:border-white hover:bg-white/10"
+            endIcon={<ArrowRightIcon className="size-4" aria-hidden />}
+          >
+            Open PDS UI demo
+          </ButtonLink>
+          <ButtonLink
+            href="/signup"
+            className="px-6 text-xs font-semibold uppercase tracking-wide text-neutral-950 shadow-[0_0_40px_rgba(232,121,249,0.45)] bg-fuchsia-400 hover:bg-fuchsia-300"
+            endIcon={<ArrowRightIcon className="size-4" aria-hidden />}
+          >
+            Start free trial
+          </ButtonLink>
+        </div>
       </div>
     </section>
   );

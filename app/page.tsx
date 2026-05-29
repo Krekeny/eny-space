@@ -5,7 +5,6 @@ import { FeaturesSection } from "@/components/features";
 import { PricingSection } from "@/components/pricing";
 import { FAQSection } from "@/components/faq";
 import { CTASection } from "@/components/cta";
-import { PrelaunchSection } from "./components/prelaunch";
 
 type HomePageProps = {
   searchParams?: Promise<{
@@ -36,7 +35,7 @@ export default async function Page({ searchParams }: HomePageProps) {
       <Hero />
       <LogoBar />
       <FeaturesSection />
-      <PrelaunchSection /> <PricingSection />
+      <PricingSection />
       <FAQSection />
       <CTASection />
     </>

@@ -9,7 +9,6 @@ import {
   CardTitle,
 } from "@/actions/components/ui/card";
 import { PlanSummaryCard } from "@/components/plan/plan-summary-card";
-import { prelaunch } from "@/lib/prelaunch";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 import { formatStripePrice } from "@/lib/format-stripe-price";
 import { getStripePlanAmounts } from "@/lib/stripe-plans";
@@ -31,10 +30,6 @@ export default async function WelcomeNamePage({
 
   if (!user) {
     redirect("/login");
-  }
-
-  if (prelaunch) {
-    redirect("/welcome");
   }
 
   const { subscribed } = await getSubscriptionStatus();

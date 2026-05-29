@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Paragraph } from "@/components/paragraph";
-import { prelaunch } from "@/lib/prelaunch";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -30,11 +29,9 @@ export function Footer() {
             <Link href="/#features" className="hover:text-white">
               Features
             </Link>
-            {!prelaunch && (
-              <Link href="/#pricing" className="hover:text-white">
-                Pricing
-              </Link>
-            )}
+            <Link href="/#pricing" className="hover:text-white">
+              Pricing
+            </Link>
             <Link href="/#faq" className="hover:text-white">
               FAQ
             </Link>

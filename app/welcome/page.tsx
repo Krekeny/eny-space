@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSubscriptionStatus } from "@/actions/subscription";
-import { prelaunch } from "@/lib/prelaunch";
 import {
   Card,
   CardContent,
@@ -60,67 +59,41 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
         <CardHeader>
           <CardTitle>Welcome</CardTitle>
           <CardDescription>
-            {prelaunch
-              ? "Thanks for registering. We'll notify you when we're live."
-              : selectedPlan
-                ? `Confirm your ${selectedPlan.name} plan and continue setup.`
-                : "Almost there — pick a plan to activate your access."}
+            {selectedPlan
+              ? `Confirm your ${selectedPlan.name} plan and continue setup.`
+              : "Almost there — pick a plan to activate your access."}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {prelaunch ? (
-            <div className="space-y-3 text-white">
-              <Heading as="h2" className="text-base font-semibold text-white">
-                You're on the launch list
-              </Heading>
-              <Paragraph className="text-sm text-white/80">
-                We don't offer PDS hosting yet. Once we launch and start
-                offering packages, we'll email you and unlock your dashboard.
-              </Paragraph>
-              <Paragraph className="text-xs text-white/60">
-                Registered as:{" "}
-                <span className="font-mono text-white">{user.email}</span>
-              </Paragraph>
-              <div className="flex flex-wrap gap-3 pt-2">
+          <div className="space-y-4 text-white">
+            <Heading as="h2" className="text-base font-semibold">
+              Subscribe to Access
+            </Heading>
+            {selectedPlan ? (
+              <WelcomeCheckout plan={selectedPlan} displayPrice={displayPrice} />
+            ) : (
+              <div className="space-y-3">
+                <Paragraph className="text-sm text-white/80">
+                  Choose a plan on our pricing page, then return here to finish
+                  setup.
+                </Paragraph>
                 <ButtonLink
-                  href="/"
-                  className="border border-white/80 bg-transparent uppercase tracking-wide text-white hover:bg-white/10 hover:border-white focus-visible:ring-white/50"
+                  href="/#pricing"
+                  className="inline-flex rounded-full bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
                 >
-                  Back to home
+                  View pricing
                 </ButtonLink>
               </div>
-            </div>
-          ) : (
-            <div className="space-y-4 text-white">
-              <Heading as="h2" className="text-base font-semibold">
-                Subscribe to Access
-              </Heading>
-              {selectedPlan ? (
-                <WelcomeCheckout plan={selectedPlan} displayPrice={displayPrice} />
-              ) : (
-                <div className="space-y-3">
-                  <Paragraph className="text-sm text-white/80">
-                    Choose a plan on our pricing page, then return here to finish
-                    setup.
-                  </Paragraph>
-                  <ButtonLink
-                    href="/#pricing"
-                    className="inline-flex rounded-full bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
-                  >
-                    View pricing
-                  </ButtonLink>
-                </div>
-              )}
-              {subscription && selectedPlan && (
-                <DashboardClient
-                  subscribed={subscribed}
-                  subscription={subscription}
-                  pdsPlan={selectedPlan.key}
-                />
-              )}
-            </div>
-          )}
+            )}
+            {subscription && selectedPlan && (
+              <DashboardClient
+                subscribed={subscribed}
+                subscription={subscription}
+                pdsPlan={selectedPlan.key}
+              />
+            )}
+          </div>
         </CardContent>
       </Card>
     </main>

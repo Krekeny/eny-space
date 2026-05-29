@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { ChevronDownIcon } from "lucide-react";
-import { prelaunch } from "@/lib/prelaunch";
 
 const navItems = [
   { label: "Key features", href: "/#features" },
-  ...(!prelaunch ? [{ label: "Pricing", href: "/#pricing" }] : []),
+  { label: "Pricing", href: "/#pricing" },
   { label: "FAQs", href: "/#faq" },
 ];
 
