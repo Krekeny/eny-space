@@ -20,7 +20,7 @@
   </defs>
 
   <!-- Ring (back half: top edge of the flat ellipse, behind the planet) -->
-  <g fill="#9ca3af">
+  <g fill="#9ca3af" transform="rotate(-20 10.5 11.5)">
     <rect x="6"  y="9"  width="10" height="1" />
     <rect x="2"  y="10" width="4"  height="1" />
     <rect x="16" y="10" width="4"  height="1" />
@@ -77,7 +77,7 @@
   </g>
 
   <!-- Ring (front half: bottom edge of the flat ellipse, in front of the planet) -->
-  <g fill="#d4d4d8">
+  <g fill="#d4d4d8" transform="rotate(-20 10.5 11.5)">
     <rect x="0"  y="12" width="2"  height="1" />
     <rect x="20" y="12" width="2"  height="1" />
     <rect x="2"  y="13" width="4"  height="1" />
