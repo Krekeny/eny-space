@@ -21,6 +21,9 @@ export function Footer() {
             <Paragraph className="text-xs text-white/60">
               © {year} eny.space. All rights reserved.
             </Paragraph>
+            <Paragraph className="text-xs text-white/40">
+              eny.space is a brand of krekeny GmbH.
+            </Paragraph>
           </div>
         </div>
 
@@ -35,6 +38,22 @@ export function Footer() {
             <Link href="/#faq" className="hover:text-white">
               FAQ
             </Link>
+            <a
+              href="https://krekeny.com/legal-notice"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-white"
+            >
+              Impressum
+            </a>
+            <a
+              href="https://krekeny.com/privacy-policy"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-white"
+            >
+              Privacy
+            </a>
           </nav>
         </div>
       </div>

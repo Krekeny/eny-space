@@ -10,6 +10,8 @@ import { welcomePath, type OnboardingSearchParams } from "@/lib/onboarding";
 import { isPdsReady } from "@/lib/pds-state";
 import { PdsStatusCard } from "./pds-status-card";
 import { UserDashboardClient } from "./user-dashboard-client";
+import DashboardClient from "./dashboard-client";
+import { CollapsibleSection } from "./collapsible-section";
 
 type DashboardPageProps = {
   searchParams?: Promise<OnboardingSearchParams>;
@@ -26,7 +28,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     redirect("/login");
   }
 
-  const { subscribed } = await getSubscriptionStatus();
+  const { subscribed, subscription } = await getSubscriptionStatus();
 
   if (!subscribed) {
     redirect(welcomePath({ pds_plan: params?.pds_plan }));
@@ -77,6 +79,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </CardContent>
         </Card>
       )}
+
+      {/* Billing & Subscription */}
+      <CollapsibleSection title="Billing & Subscription">
+        <DashboardClient
+          subscribed={subscribed}
+          subscription={subscription}
+          pdsPlan={params?.pds_plan}
+        />
+      </CollapsibleSection>
     </main>
   );
 }

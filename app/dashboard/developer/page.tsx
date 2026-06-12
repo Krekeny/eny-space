@@ -9,7 +9,6 @@ import {
 import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
-import DashboardClient from "../dashboard-client";
 import { ServiceDetailsClient } from "../service-details-client";
 import { AtprotoTestClient } from "../atproto-test-client";
 import { CollapsibleSection } from "../collapsible-section";
@@ -35,7 +34,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     redirect("/login");
   }
 
-  const { subscribed, subscription } = await getSubscriptionStatus();
+  const { subscribed } = await getSubscriptionStatus();
 
   if (!subscribed) {
     redirect(welcomePath({ pds_plan: params?.pds_plan }));
@@ -128,15 +127,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       {/* AT Protocol */}
       <CollapsibleSection title="AT Protocol">
         <AtprotoTestClient />
-      </CollapsibleSection>
-
-      {/* Billing & Subscription */}
-      <CollapsibleSection title="Billing & Subscription" defaultOpen>
-        <DashboardClient
-          subscribed={subscribed}
-          subscription={subscription}
-          pdsPlan={params?.pds_plan}
-        />
       </CollapsibleSection>
     </main>
   );
