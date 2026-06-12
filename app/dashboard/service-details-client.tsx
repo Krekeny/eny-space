@@ -7,8 +7,6 @@ import { pdsStateLabel } from "@/lib/pds-state";
 import { CollapsibleSection } from "./collapsible-section";
 
 type ServiceStats = {
-  cpuUsagePercent?: number;
-  ramUsagePercent?: number;
   storageUsedBytes?: number;
   storageAllocatedBytes?: number;
   storageObjectsCount?: number;
@@ -318,46 +316,24 @@ export function ServiceDetailsClient({
           <div className="grid gap-3 md:grid-cols-3 text-sm text-white/80">
             <div className="rounded border border-white/10 bg-white/5 p-3">
               <Paragraph className="text-xs font-medium text-white/60">
-                CPU usage
+                Active users
               </Paragraph>
               <Paragraph className="text-sm font-semibold text-white">
-                {stats.cpuUsagePercent !== undefined
-                  ? `${clampPct(stats.cpuUsagePercent).toFixed(0)}%`
+                {stats.activeUsers !== undefined
+                  ? stats.activeUsers.toLocaleString()
                   : "—"}
               </Paragraph>
-              {stats.cpuUsagePercent !== undefined && (
-                <div className="mt-2 h-2 w-full rounded bg-white/10">
-                  <div
-                    className="h-2 rounded bg-fuchsia-400/80"
-                    style={{ width: `${clampPct(stats.cpuUsagePercent)}%` }}
-                  />
-                </div>
-              )}
-            </div>
-
-            <div className="rounded border border-white/10 bg-white/5 p-3">
-              <Paragraph className="text-xs font-medium text-white/60">
-                RAM usage
-              </Paragraph>
-              <Paragraph className="text-sm font-semibold text-white">
-                {stats.ramUsagePercent !== undefined
-                  ? `${clampPct(stats.ramUsagePercent).toFixed(0)}%`
-                  : "—"}
-              </Paragraph>
-              {stats.ramUsagePercent !== undefined && (
-                <div className="mt-2 h-2 w-full rounded bg-white/10">
-                  <div
-                    className="h-2 rounded bg-amber-300/80"
-                    style={{ width: `${clampPct(stats.ramUsagePercent)}%` }}
-                  />
-                </div>
-              )}
               {stats.userSlotsUsed !== undefined &&
                 stats.userSlotsTotal !== undefined && (
                   <Paragraph className="mt-2 text-xs text-white/70">
                     Users: {stats.userSlotsUsed}/{stats.userSlotsTotal}
                   </Paragraph>
                 )}
+              {stats.uniqueUsersLast30d !== undefined && (
+                <Paragraph className="mt-1 text-xs text-white/70">
+                  Unique (30d): {stats.uniqueUsersLast30d.toLocaleString()}
+                </Paragraph>
+              )}
             </div>
 
             <div className="rounded border border-white/10 bg-white/5 p-3">

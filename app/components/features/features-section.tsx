@@ -26,7 +26,7 @@ const FEATURES = [
   {
     title: "Live resource insights.",
     description:
-      "Track active users, storage, CPU and RAM as intuitive percentages so you instantly see how loaded your server is, instead of digging through logs.",
+      "See active users and exactly how much of your storage your PDS is using, as clear live figures—so you always know where you stand, without digging through logs. Performance is on us, so it's never something you have to watch.",
     icon: <ScaleIcon className="size-5" aria-hidden />,
   },
   {
