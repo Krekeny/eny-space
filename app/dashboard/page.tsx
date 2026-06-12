@@ -53,12 +53,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <Heading as="h1" className="text-xl font-semibold text-white">
           My PDS
         </Heading>
-        <ButtonLink
-          href="/dashboard/developer"
-          className="text-sm text-white/40 hover:text-white/80"
-        >
-          Developer Settings →
-        </ButtonLink>
+        {process.env.NODE_ENV !== "production" && (
+          <ButtonLink
+            href="/dev"
+            className="text-sm text-white/40 hover:text-white/80"
+          >
+            Debug →
+          </ButtonLink>
+        )}
       </div>
 
       <PdsStatusCard initialState={pdsState} initialHostname={pdsHostname} />
