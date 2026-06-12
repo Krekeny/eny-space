@@ -71,37 +71,27 @@ export async function schedulePdsTermination(
 }
 
 /**
- * PLACEHOLDER — reactivate a service whose termination was scheduled, so a
- * resubscribing user gets their PDS back with no data loss.
- *
- * The backend endpoint for this does not exist yet (to be implemented in their
- * Laravel service). The shape below is an ASSUMPTION — adjust the method/path/
- * body once the real endpoint is known. Likely candidates:
- *   - POST   /service/{id}/reactivate        (clear termination, turn back on)
- *   - PATCH  /service/{id}  { termination_date: null }
- *   - POST   /service/{id}/restore
+ * Cancel a scheduled termination so a resubscribing user gets their PDS back
+ * with no data loss. Calls `PATCH /service/{id}` with `cancel_termination: true`,
+ * which clears the termination and returns the service to running.
  */
 export async function reactivatePdsService(serviceId: number): Promise<void> {
   if (!LIFECYCLE_ENABLED) {
-    console.log(
-      `[pds-infra] (disabled) would reactivate /service/${serviceId}`,
-    );
+    console.log(`[pds-infra] (disabled) would PATCH /service/${serviceId}`, {
+      cancel_termination: true,
+    });
     return;
   }
 
   const { baseUrl, token } = requireConfig();
-
-  // TODO: replace with the real reactivation endpoint once the Laravel backend
-  // implements it. Assumed: POST /service/{id}/reactivate clears the scheduled
-  // termination and brings the service back to a running (active) state.
-  const res = await fetch(`${baseUrl}/service/${serviceId}/reactivate`, {
-    method: "POST",
+  const res = await fetch(`${baseUrl}/service/${serviceId}`, {
+    method: "PATCH",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({}),
+    body: JSON.stringify({ cancel_termination: true }),
   });
 
   if (!res.ok) {
