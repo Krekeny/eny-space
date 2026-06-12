@@ -10,11 +10,12 @@ export function HeroLeft() {
         as="h1"
         className="font-heading text-4xl leading-tight tracking-tight text-white sm:text-5xl md:text-6xl"
       >
-        Managed PDS hosting, launching soon.
+        Managed PDS hosting, made for you.
       </Heading>
       <Paragraph className="text-lg text-white/90 sm:text-xl">
-        eny.space will let you run your own Personal Data Server with a real UI.
-        For now, sign up and we&apos;ll notify you when packages go live.
+        We run your Personal Data Server with a real dashboard — no
+        infrastructure to manage. Concentrate on building things on the AT
+        Protocol, or just have your own personal social cloud space.
       </Paragraph>
       <div className="flex flex-wrap gap-3">
         <ButtonLink
