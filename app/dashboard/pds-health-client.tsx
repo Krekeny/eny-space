@@ -8,7 +8,6 @@ type HealthStatus = "checking" | "reachable" | "unreachable";
 type DescribeServer = {
   did?: string;
   availableUserDomains?: string[];
-  inviteCodeRequired?: boolean;
   links?: {
     privacyPolicy?: string;
     termsOfService?: string;
@@ -101,12 +100,6 @@ export function PdsHealthClient({ pdsHost }: { pdsHost: string }) {
               <Paragraph className="font-mono text-xs text-white">
                 {describe.availableUserDomains.join(", ")}
               </Paragraph>
-            </div>
-          )}
-          {describe.inviteCodeRequired !== undefined && (
-            <div className="space-y-0.5">
-              <Paragraph className="text-xs font-medium text-white/60">Invite required</Paragraph>
-              <Paragraph className="text-xs text-white">{describe.inviteCodeRequired ? "Yes" : "No"}</Paragraph>
             </div>
           )}
         </div>
