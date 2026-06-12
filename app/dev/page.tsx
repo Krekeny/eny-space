@@ -4,6 +4,7 @@ import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import { ButtonLink } from "@/components/button-link";
 import { DebugClient } from "./debug-client";
+import { LifecyclePanel } from "./lifecycle-panel";
 
 // Dev-only: surfaces raw responses from our backend / infrastructure provider.
 // Returns 404 on the production server.
@@ -42,6 +43,8 @@ export default async function DevDebugPage() {
         currently authenticated user. Also logged to the browser console. This
         page is only reachable on the development server.
       </Paragraph>
+
+      <LifecyclePanel />
 
       <DebugClient />
     </main>

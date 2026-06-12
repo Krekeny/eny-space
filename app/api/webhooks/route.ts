@@ -8,6 +8,11 @@ import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { normalizePdsSlug, pdsHostnameForSlug } from "@/lib/pds-slug";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
+import {
+  userIdForCustomer,
+  startPdsGrace,
+  reactivatePds,
+} from "@/lib/pds-lifecycle-server";
 
 const PDS_API_BASE_URL = process.env.PDS_API_BASE_URL;
 
@@ -236,12 +241,44 @@ export async function POST(req: Request) {
             `⚠️ Missing user_email metadata in checkout session for user ${userId}.`,
           );
         }
+
+        // Resubscribe: clear any in-progress lifecycle and reactivate the PDS.
+        await reactivatePds(userId);
       }
     }
   }
 
-  // All other subscription events are handled by querying Stripe directly
-  // No need to sync subscription details to database
+  // Post-subscription lifecycle (grace -> suspended -> deleted) transitions.
+  if (event.type === "customer.subscription.deleted") {
+    const sub = event.data.object as Stripe.Subscription;
+    const customerId =
+      typeof sub.customer === "string" ? sub.customer : sub.customer.id;
+    // Deliberate cancellation reaching period end. (A past_due grace already in
+    // progress is left untouched by startPdsGrace's guard.)
+    const userId = await userIdForCustomer(customerId);
+    if (userId) await startPdsGrace(userId, "canceled");
+  }
+
+  if (event.type === "invoice.payment_failed") {
+    const invoice = event.data.object as Stripe.Invoice;
+    const customerId =
+      typeof invoice.customer === "string"
+        ? invoice.customer
+        : invoice.customer?.id;
+    const userId = customerId ? await userIdForCustomer(customerId) : null;
+    if (userId) await startPdsGrace(userId, "past_due");
+  }
+
+  if (event.type === "invoice.paid") {
+    const invoice = event.data.object as Stripe.Invoice;
+    const customerId =
+      typeof invoice.customer === "string"
+        ? invoice.customer
+        : invoice.customer?.id;
+    // Payment recovered — undo a past_due grace if one was running.
+    const userId = customerId ? await userIdForCustomer(customerId) : null;
+    if (userId) await reactivatePds(userId);
+  }
 
   return NextResponse.json({ message: "Received" }, { status: 200 });
 }
