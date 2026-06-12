@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { signOut } from "@/actions/auth";
 import { Button } from "@/actions/components/ui/button";
 import { ArrowUpRightIcon, MenuIcon, XIcon } from "lucide-react";
@@ -86,9 +85,12 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
           className="flex items-center gap-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
           onClick={() => setMobileOpen(false)}
         >
-          <Image
-            src="/logo.svg"
+          {/* Decorative animated pixel planet — plain img so SMIL plays. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/pixel-planet.svg"
             alt=""
+            aria-hidden
             width={32}
             height={32}
             className="shrink-0"
