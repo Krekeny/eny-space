@@ -127,15 +127,23 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
                   <ArrowUpRightIcon className="ml-1 size-3.5" />
                 </Link>
               </Button>
-              <form action={signOut}>
-                <Button
-                  type="submit"
-                  size="default"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-transparent px-4 text-xs font-medium uppercase tracking-wide text-white/70 cursor-pointer hover:border-white/60 hover:text-white"
-                >
-                  Sign out
-                </Button>
-              </form>
+              <div className="group relative">
+                <form action={signOut}>
+                  <Button
+                    type="submit"
+                    size="default"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-transparent px-4 text-xs font-medium uppercase tracking-wide text-white/70 cursor-pointer hover:border-white/60 hover:text-white"
+                  >
+                    Sign out
+                  </Button>
+                </form>
+                <div className="pointer-events-none absolute right-0 top-full z-50 mt-2 whitespace-nowrap rounded-md border border-white/10 bg-slate-900/95 px-3 py-1.5 text-xs text-white/80 opacity-0 shadow-lg backdrop-blur transition-opacity duration-150 group-hover:opacity-100">
+                  Signed in as{" "}
+                  <span className="font-medium text-white">
+                    {user.email ?? "your account"}
+                  </span>
+                </div>
+              </div>
             </>
           ) : (
             <>
