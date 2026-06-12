@@ -22,31 +22,31 @@ const FAQ_ITEMS: FaqItem[] = [
     id: "standard-pds-federation",
     question: "Is it a standard PDS, and is it fully federated?",
     answer:
-      "Yes. eny.space provisions a standard AT Protocol PDS that speaks the normal com.atproto XRPC API, so it federates like any other: relays crawl it, your records hit the firehose, and AppViews — including Bluesky — can read your account. There is no proprietary fork of the protocol. [CONFIRM: whether you run the upstream bluesky-social/pds image or a protocol-compatible implementation.]",
+      "Yes. eny.space provisions a standard AT Protocol PDS that speaks the normal com.atproto XRPC API, so it federates like any other: relays crawl it, your records hit the firehose, and AppViews — including Bluesky — can read your account. It's a standard PDS, not a proprietary fork of the protocol.",
   },
   {
     id: "migration-portability",
     question: "Can I bring my existing account in, and leave with my data later?",
     answer:
-      "Your repository is a standard ATProto repo, portable by design — you can export it as a CAR file and move your identity using the protocol's account-migration flow, so you are never locked in. [CONFIRM: whether inbound migration and one-click repo export are surfaced in the dashboard today, or are currently manual via XRPC.]",
+      "Your repository is a standard ATProto repo, portable by design — your identity is a did:plc you can move to another PDS, and your data exports as a CAR file, all through the protocol's standard account-migration flow. So you are never locked in. One-click import and export from the dashboard is on our roadmap; today it runs through the standard XRPC flow.",
   },
   {
     id: "did-and-keys",
     question: "Who controls my DID and PLC rotation key?",
     answer:
-      "Your identity is a did:plc that resolves to your PDS. By default eny.space manages your PLC rotation key so setup stays one-click and you can't accidentally lock yourself out of your own account. [CONFIRM: whether users can hold or rotate their own key, or request a key handoff — state your actual custody policy here, this is the question this audience cares most about.]",
+      "Your identity is a did:plc. By default eny.space holds your PLC rotation key — the same model as running your own PDS or using bsky.social, where the key lives with the server operator. That keeps setup one-click and lets us help you recover access. You can still migrate to another PDS anytime via the standard email-confirmed account-migration flow: your PDS signs the operation for you, so you don't need to hold the key to leave. Letting you hold your own rotation key for full self-custody is on our roadmap.",
   },
   {
     id: "api-and-access",
     question: "Can I access my PDS programmatically?",
     answer:
-      "Yes — it's a normal ATProto endpoint. You get a default handle at your-name.eny.space (or point your own domain at it via the standard _atproto DNS record), and you can authenticate and call com.atproto XRPC methods directly, issue app passwords, and create accounts and invite codes for people you host. [CONFIRM: OAuth support and which admin endpoints are exposed to customers.]",
+      "Yes — it's a normal ATProto endpoint. You get a default handle at your-name.eny.space (custom domains coming soon) and can call com.atproto XRPC methods directly. Third-party Atmosphere apps sign in to your account the standard ways: app passwords, and OAuth — the 'sign in with your handle' flow where the app receives a scoped, revocable token and never sees your password. You can also create accounts and invite codes for the people you host.",
   },
   {
     id: "managed-infra",
     question: "Who runs the infrastructure, and what if my PDS goes down?",
     answer:
-      "eny.space is managed hosting: you create a PDS in a click and we run the infrastructure, TLS, updates and uptime — no kubectl or cloud console. The underlying hardware is held by a dedicated hosting partner that monitors the pods and provides operational support, so failures are detected and recovered at the infrastructure layer without you having to do anything. [CONFIRM: backup/restore policy and any uptime SLA you want to commit to here.]",
+      "eny.space is managed hosting: you create a PDS in a click and we run the infrastructure, TLS, updates and uptime — no kubectl or cloud console. The underlying hardware is held by a dedicated hosting partner that monitors the pods and provides operational support, so failures are detected and recovered at the infrastructure layer without you having to do anything. Your PDS is backed up as part of the managed service. (We don't publish a formal uptime SLA yet.)",
   },
   {
     id: "why-no-atmosphere-login",
