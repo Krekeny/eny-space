@@ -16,7 +16,13 @@ dependencies:
 steps:
   - name: "Mirror to a different CI Repository"
     command: |
+      set -eu
+      if [ -z "${ACCESS_TOKEN:-}" ]; then
+        echo "ERROR: ACCESS_TOKEN is empty — configure it as a secret in Tangled." >&2
+        exit 1
+      fi
+      echo "repo=$GIT_REPOSITORY  token_len=${#ACCESS_TOKEN}"
       git fetch --unshallow || true
-      git remote add github https://x-access-token:$ACCESS_TOKEN@$GIT_REPOSITORY
+      git remote add github "https://x-access-token:$ACCESS_TOKEN@$GIT_REPOSITORY"
       REF_NAME=${TANGLED_REF_NAME:-$TANGLED_PR_TARGET_BRANCH}
-      git push github HEAD:refs/heads/mirror/$REF_NAME --force
+      git push github "HEAD:refs/heads/mirror/$REF_NAME" --force
