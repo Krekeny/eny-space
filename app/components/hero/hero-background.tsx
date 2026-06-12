@@ -79,7 +79,7 @@ export function HeroBackground({
       {/* LAYER 1 – Deep tiny stars */}
       <motion.div
         className="pointer-events-none fixed inset-0 -z-10"
-        style={{ y: deepStarsY }}
+        style={{ y: deepStarsY, willChange: "transform" }}
         aria-hidden
       >
         <svg
@@ -92,26 +92,56 @@ export function HeroBackground({
               <stop offset="0%" stopColor="white" stopOpacity="0.9" />
               <stop offset="100%" stopColor="white" stopOpacity="0" />
             </radialGradient>
+            {/* Single shared blur applied to the soft-star group below,
+                instead of a per-circle CSS filter (which forced a separate
+                rasterization region per star and repainted on every scroll). */}
+            <filter
+              id="starBlur"
+              x="-50%"
+              y="-50%"
+              width="200%"
+              height="200%"
+            >
+              <feGaussianBlur stdDeviation="0.8" />
+            </filter>
           </defs>
 
-          {stars.map((s, i) => (
-            <circle
-              key={i}
-              cx={s.cx}
-              cy={s.cy}
-              r={s.r}
-              fill="url(#starGradient)"
-              opacity={s.opacity}
-              style={{ filter: s.blur ? `blur(${s.blur}px)` : undefined }}
-            />
-          ))}
+          {/* Sharp stars */}
+          <g fill="url(#starGradient)">
+            {stars
+              .filter((s) => !s.blur)
+              .map((s, i) => (
+                <circle
+                  key={i}
+                  cx={s.cx}
+                  cy={s.cy}
+                  r={s.r}
+                  opacity={s.opacity}
+                />
+              ))}
+          </g>
+
+          {/* Soft stars – blurred once as a group */}
+          <g fill="url(#starGradient)" filter="url(#starBlur)">
+            {stars
+              .filter((s) => s.blur)
+              .map((s, i) => (
+                <circle
+                  key={i}
+                  cx={s.cx}
+                  cy={s.cy}
+                  r={s.r}
+                  opacity={s.opacity}
+                />
+              ))}
+          </g>
         </svg>
       </motion.div>
 
       {/* LAYER 2 – Mid orbs / energy fields */}
       <motion.div
         className="pointer-events-none fixed inset-0 -z-5"
-        style={{ y: midOrbsY }}
+        style={{ y: midOrbsY, willChange: "transform" }}
         aria-hidden
       >
         <div className="pointer-events-none fixed inset-0 -z-5 [mask-image:linear-gradient(to_bottom,transparent,black_14%,black_86%,transparent)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_14%,black_86%,transparent)]">
@@ -128,7 +158,7 @@ export function HeroBackground({
       {showPlanets && (
         <>
           {/* LAYER 3 – Foreground planet (Jupiter image) */}
-          <motion.div
+          {/* <motion.div
             className="pointer-events-none fixed inset-0 -z-[1]"
             style={{
               y: planetY,
@@ -147,10 +177,10 @@ export function HeroBackground({
                 className="object-cover object-center"
               />
             </div>
-          </motion.div>
+          </motion.div> */}
 
           {/* LAYER 3b – Secondary planets (Earth, Mars, Venus, Neptune images) */}
-          <motion.div
+          {/* <motion.div
             className="pointer-events-none fixed inset-0 -z-[1]"
             style={{
               y: planetY,
@@ -196,7 +226,7 @@ export function HeroBackground({
                 className="object-cover object-center"
               />
             </div>
-          </motion.div>
+          </motion.div> */}
         </>
       )}
     </>
