@@ -48,26 +48,6 @@ export async function getLifecycle(userId: string) {
 }
 
 /**
- * Dev helper: ensure a pds_services row exists so the lifecycle can be exercised
- * without going through checkout. Uses a dummy service id so the (guarded) infra
- * call has something to log.
- */
-export async function ensureStubPdsRow(userId: string) {
-  const supabase = createAdminClient();
-  const existing = await getRow(supabase, userId);
-  if (existing) return existing;
-
-  await supabase.from("pds_services").insert({
-    user_id: userId,
-    pds_service_id: 999999,
-    hostname: "dev-stub.eny.space",
-    status: "provisioning",
-    lifecycle_status: "active",
-  });
-  return getRow(supabase, userId);
-}
-
-/**
  * Begin the grace period (cancel or payment failure): persist the timestamps
  * and schedule the infra termination at the grace end. No-op if a lifecycle is
  * already in progress, so a later event can't override an in-flight grace.
