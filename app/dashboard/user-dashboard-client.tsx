@@ -29,7 +29,11 @@ async function apiCall(path: string, body: unknown) {
   return payload;
 }
 
-export function UserDashboardClient() {
+export function UserDashboardClient({
+  readOnly = false,
+}: {
+  readOnly?: boolean;
+}) {
   const [pdsBareHost, setPdsBareHost] = useState<string>("");
   const [fetchError, setFetchError] = useState<string | null>(null);
 
@@ -49,16 +53,28 @@ export function UserDashboardClient() {
 
   return (
     <div className="space-y-6">
+      {readOnly && (
+        <Paragraph className="text-xs text-amber-300">
+          Read-only: management actions are disabled while your subscription is
+          inactive.
+        </Paragraph>
+      )}
       <div className="grid gap-6 md:grid-cols-2">
-        <CreateUserSection pdsBareHost={pdsBareHost} />
-        <InviteSection />
+        <CreateUserSection pdsBareHost={pdsBareHost} readOnly={readOnly} />
+        <InviteSection readOnly={readOnly} />
       </div>
-      <UsersSection />
+      <UsersSection readOnly={readOnly} />
     </div>
   );
 }
 
-function CreateUserSection({ pdsBareHost }: { pdsBareHost: string }) {
+function CreateUserSection({
+  pdsBareHost,
+  readOnly,
+}: {
+  pdsBareHost: string;
+  readOnly: boolean;
+}) {
   const [handle, setHandle] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -127,7 +143,7 @@ function CreateUserSection({ pdsBareHost }: { pdsBareHost: string }) {
       </div>
       <Button
         onClick={submit}
-        disabled={loading || !handle || !password || !pdsBareHost}
+        disabled={loading || !handle || !password || !pdsBareHost || readOnly}
         className="rounded-full w-full"
       >
         {loading ? "Creating…" : "Create account"}
@@ -138,7 +154,7 @@ function CreateUserSection({ pdsBareHost }: { pdsBareHost: string }) {
   );
 }
 
-function InviteSection() {
+function InviteSection({ readOnly }: { readOnly: boolean }) {
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -173,7 +189,7 @@ function InviteSection() {
           Generate a one-time code for an external person to create their own account.
         </Paragraph>
       </div>
-      <Button onClick={generate} disabled={loading} className="rounded-full w-full">
+      <Button onClick={generate} disabled={loading || readOnly} className="rounded-full w-full">
         {loading ? "Generating…" : "Generate invite code"}
       </Button>
       {inviteCode && (
@@ -250,7 +266,15 @@ function DeleteDialog({
   );
 }
 
-function AccountRow({ account, onRefresh }: { account: PdsAccount; onRefresh: () => void }) {
+function AccountRow({
+  account,
+  onRefresh,
+  readOnly,
+}: {
+  account: PdsAccount;
+  onRefresh: () => void;
+  readOnly: boolean;
+}) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [busy, setBusy] = useState(false);
   const [rowError, setRowError] = useState<string | null>(null);
@@ -291,13 +315,15 @@ function AccountRow({ account, onRefresh }: { account: PdsAccount; onRefresh: ()
               {new Date(account.indexedAt).toLocaleDateString()}
             </Paragraph>
           )}
-          <button
-            onClick={() => setShowDeleteDialog(true)}
-            disabled={busy || showDeleteDialog}
-            className="text-xs text-white/40 hover:text-rose-400 transition-colors disabled:opacity-40"
-          >
-            Delete
-          </button>
+          {!readOnly && (
+            <button
+              onClick={() => setShowDeleteDialog(true)}
+              disabled={busy || showDeleteDialog}
+              className="text-xs text-white/40 hover:text-rose-400 transition-colors disabled:opacity-40"
+            >
+              Delete
+            </button>
+          )}
         </div>
       </div>
       {showDeleteDialog && (
@@ -315,7 +341,7 @@ function AccountRow({ account, onRefresh }: { account: PdsAccount; onRefresh: ()
   );
 }
 
-function UsersSection() {
+function UsersSection({ readOnly }: { readOnly: boolean }) {
   const [accounts, setAccounts] = useState<PdsAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -361,7 +387,12 @@ function UsersSection() {
       {accounts.length > 0 && (
         <div className="divide-y divide-white/5">
           {accounts.map((account) => (
-            <AccountRow key={account.did} account={account} onRefresh={load} />
+            <AccountRow
+              key={account.did}
+              account={account}
+              onRefresh={load}
+              readOnly={readOnly}
+            />
           ))}
         </div>
       )}

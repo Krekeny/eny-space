@@ -12,6 +12,12 @@ import { PdsStatusCard } from "./pds-status-card";
 import { UserDashboardClient } from "./user-dashboard-client";
 import DashboardClient from "./dashboard-client";
 import { CollapsibleSection } from "./collapsible-section";
+import {
+  effectiveLifecycle,
+  type PdsLifecycleStatus,
+  type PdsLifecycleReason,
+} from "@/lib/pds-lifecycle";
+import { LifecycleGraceBanner, LifecycleBlocked } from "./lifecycle-notice";
 
 type DashboardPageProps = {
   searchParams?: Promise<OnboardingSearchParams>;
@@ -30,10 +36,54 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const { active, subscribed, subscription } = await getSubscriptionStatus();
 
-  // Gate on "active" (active/trialing, including when scheduled to cancel at
-  // period end) so a canceled-but-still-paid user keeps dashboard access until
-  // the period actually ends.
-  if (!active) {
+  // Resolve the PDS lifecycle (RLS scopes this to the user's own row).
+  const { data: lifecycleRow } = await supabase
+    .from("pds_services")
+    .select("lifecycle_status, lifecycle_reason, grace_until, delete_at")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  const lifecycle: PdsLifecycleStatus = lifecycleRow
+    ? effectiveLifecycle({
+        status: (lifecycleRow.lifecycle_status ??
+          "active") as PdsLifecycleStatus,
+        graceUntil: lifecycleRow.grace_until
+          ? new Date(lifecycleRow.grace_until)
+          : null,
+        deleteAt: lifecycleRow.delete_at
+          ? new Date(lifecycleRow.delete_at)
+          : null,
+      })
+    : "active";
+  const reason = (lifecycleRow?.lifecycle_reason ??
+    null) as PdsLifecycleReason | null;
+  const readOnly = lifecycle === "grace";
+
+  // The lifecycle drives the degraded states; the subscription's "active" flag
+  // only decides full-access vs onboarding when the lifecycle is active.
+  //   grace               -> read-only access + banner (below)
+  //   suspended / deleted  -> blocked screen
+  //   active + no sub      -> onboarding
+  //   active + sub         -> full access
+  if (lifecycle === "suspended" || lifecycle === "deleted") {
+    return (
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 sm:px-6">
+        <Heading as="h1" className="text-xl font-semibold text-white">
+          My PDS
+        </Heading>
+        <LifecycleBlocked
+          status={lifecycle}
+          reason={reason}
+          graceUntil={lifecycleRow?.grace_until ?? null}
+          deleteAt={lifecycleRow?.delete_at ?? null}
+          pdsPlan={params?.pds_plan}
+        />
+      </main>
+    );
+  }
+
+  // Lifecycle is active: require an active subscription, otherwise onboard.
+  if (lifecycle === "active" && !active) {
     redirect(welcomePath({ pds_plan: params?.pds_plan }));
   }
 
@@ -66,13 +116,22 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         )}
       </div>
 
+      {readOnly && (
+        <LifecycleGraceBanner
+          reason={reason}
+          graceUntil={lifecycleRow?.grace_until ?? null}
+          deleteAt={lifecycleRow?.delete_at ?? null}
+          pdsPlan={params?.pds_plan}
+        />
+      )}
+
       <PdsStatusCard initialState={pdsState} initialHostname={pdsHostname} />
 
       {/* Forms — only shown when PDS is reachable */}
       {ready ? (
         <Card>
           <CardContent className="pt-6">
-            <UserDashboardClient />
+            <UserDashboardClient readOnly={readOnly} />
           </CardContent>
         </Card>
       ) : (
