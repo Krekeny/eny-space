@@ -32,6 +32,10 @@ yarn-error.log*
 # local env files
 .env*.local
 
+# supabase (local CLI cache / linked-project state)
+supabase/.temp/
+supabase/.branches/
+
 # vercel
 .vercel
 
