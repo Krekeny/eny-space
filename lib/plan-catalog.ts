@@ -23,7 +23,6 @@ export const PLAN_CATALOG: Record<PlanKey, PlanCatalogEntry> = {
       "1 GB blob & repo storage",
       "Personal AT Protocol PDS",
       "Your handle: yourpds.eny.space",
-      "Invite code generation",
       "Managed updates & backups",
     ],
   },
@@ -32,7 +31,7 @@ export const PLAN_CATALOG: Record<PlanKey, PlanCatalogEntry> = {
     name: "Community",
     description: "Host your own corner of the Atmosphere.",
     pdsDiskSizeGb: 10,
-    badge: "Popular",
+    // badge: "Popular",
     highlight: true,
     features: [
       "10 GB blob & repo storage",

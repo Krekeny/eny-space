@@ -13,8 +13,7 @@ export function HeroLeft() {
         Managed PDS hosting, made for you.
       </Heading>
       <Paragraph className="text-lg text-white/90 sm:text-xl">
-        We run your Personal Data Server, no infrastructure to manage. Concentrate on building things on the AT
-        Protocol, or just have your own personal social cloud space.
+        We run your Personal Data Server, no infrastructure to manage. Concentrate on building things on the ATmosphere, or just have your own personal social cloud space.
       </Paragraph>
       <div className="flex flex-wrap gap-3">
         <ButtonLink

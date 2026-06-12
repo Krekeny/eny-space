@@ -104,3 +104,30 @@ export function getPdsBaseUrlFromService(service: any): string {
   return withScheme.replace(/\/+$/, "");
 }
 
+function toBasicAuth(user: string, pass: string): string {
+  return `Basic ${Buffer.from(`${user}:${pass}`).toString("base64")}`;
+}
+
+/**
+ * Resolve the PDS base URL and an admin Basic-auth header from a service record.
+ * Throws a status-tagged error (handled by the route catch blocks) when the
+ * admin credentials are missing.
+ */
+export function getPdsAdminAuth(service: any): {
+  pdsBaseUrl: string;
+  authHeader: string;
+} {
+  const adminPassword = service?.encrypted_config?.adminPassword as
+    | string
+    | undefined;
+  if (!adminPassword) {
+    throw Object.assign(new Error("Missing PDS admin credentials"), {
+      status: 500,
+    });
+  }
+  return {
+    pdsBaseUrl: getPdsBaseUrlFromService(service),
+    authHeader: toBasicAuth("admin", String(adminPassword).trim()),
+  };
+}
+

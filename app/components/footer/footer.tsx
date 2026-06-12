@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Paragraph } from "@/components/paragraph";
+import { LEGAL_NOTICE_URL, PRIVACY_POLICY_URL } from "@/lib/site-config";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -39,7 +40,7 @@ export function Footer() {
               FAQ
             </Link>
             <a
-              href="https://krekeny.com/legal-notice"
+              href={LEGAL_NOTICE_URL}
               target="_blank"
               rel="noreferrer"
               className="hover:text-white"
@@ -47,7 +48,7 @@ export function Footer() {
               Impressum
             </a>
             <a
-              href="https://krekeny.com/privacy-policy"
+              href={PRIVACY_POLICY_URL}
               target="_blank"
               rel="noreferrer"
               className="hover:text-white"

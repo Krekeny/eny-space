@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import { MinusIcon, PlusIcon } from "lucide-react";
+import { SUPPORT_MAILTO } from "@/lib/site-config";
 
 type FaqItem = {
   id: string;
@@ -73,7 +74,7 @@ export function FAQSection() {
           eny.space PDS browser. If you can't find what you're looking for, feel
           free to{" "}
           <a
-            href="mailto:hello+eny-space@krekeny.com"
+            href={SUPPORT_MAILTO}
             className="font-semibold text-white underline underline-offset-2 hover:text-white/80"
           >
             reach out to our friendly team

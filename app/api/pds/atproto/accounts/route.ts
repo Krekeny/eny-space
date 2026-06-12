@@ -1,30 +1,11 @@
 import { NextResponse } from "next/server";
 
-import {
-  getPdsBaseUrlFromService,
-  getPdsServiceForCurrentUser,
-} from "../helpers";
-
-function toBasicAuth(user: string, pass: string) {
-  return `Basic ${Buffer.from(`${user}:${pass}`).toString("base64")}`;
-}
+import { getPdsAdminAuth, getPdsServiceForCurrentUser } from "../helpers";
 
 export async function GET() {
   try {
     const { service } = await getPdsServiceForCurrentUser();
-
-    const adminPassword = service?.encrypted_config?.adminPassword as
-      | string
-      | undefined;
-    if (!adminPassword) {
-      return NextResponse.json(
-        { message: "Missing PDS admin credentials" },
-        { status: 500 }
-      );
-    }
-
-    const pdsBaseUrl = getPdsBaseUrlFromService(service);
-    const authHeader = toBasicAuth("admin", String(adminPassword).trim());
+    const { pdsBaseUrl, authHeader } = getPdsAdminAuth(service);
 
     // Step 1: list all repos (public endpoint, gives us DIDs)
     const listUrl = new URL(`${pdsBaseUrl}/xrpc/com.atproto.sync.listRepos`);
@@ -100,18 +81,7 @@ export async function DELETE(req: Request) {
     }
 
     const { service } = await getPdsServiceForCurrentUser();
-    const adminPassword = service?.encrypted_config?.adminPassword as
-      | string
-      | undefined;
-    if (!adminPassword) {
-      return NextResponse.json(
-        { message: "Missing PDS admin credentials" },
-        { status: 500 }
-      );
-    }
-
-    const pdsBaseUrl = getPdsBaseUrlFromService(service);
-    const authHeader = toBasicAuth("admin", String(adminPassword).trim());
+    const { pdsBaseUrl, authHeader } = getPdsAdminAuth(service);
 
     const res = await fetch(
       `${pdsBaseUrl}/xrpc/com.atproto.admin.deleteAccount`,

@@ -1,34 +1,13 @@
 import { NextResponse } from "next/server";
 
-import { getPdsBaseUrlFromService, getPdsServiceForCurrentUser } from "../helpers";
-
-function toBasicAuth(user: string, pass: string) {
-  return `Basic ${Buffer.from(`${user}:${pass}`).toString("base64")}`;
-}
+import { getPdsAdminAuth, getPdsServiceForCurrentUser } from "../helpers";
 
 export async function POST(req: Request) {
   try {
     const { useCount } = (await req.json()) as { useCount?: number };
 
     const { service } = await getPdsServiceForCurrentUser();
-
-    const adminPassword = service?.encrypted_config?.adminPassword as
-      | string
-      | undefined;
-
-    if (!service?.encrypted_config || !adminPassword) {
-      return NextResponse.json(
-        { message: "Missing PDS host/admin credentials" },
-        { status: 500 },
-      );
-    }
-
-    const trimmedAdminPassword = String(adminPassword).trim();
-
-    // PDS scripts use `admin:${PDS_ADMIN_PASSWORD}`
-    const authHeader = toBasicAuth("admin", trimmedAdminPassword);
-
-    const pdsBaseUrl = getPdsBaseUrlFromService(service);
+    const { pdsBaseUrl, authHeader } = getPdsAdminAuth(service);
 
     const res = await fetch(
       `${pdsBaseUrl}/xrpc/com.atproto.server.createInviteCode`,
