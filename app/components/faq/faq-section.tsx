@@ -16,37 +16,43 @@ const FAQ_ITEMS: FaqItem[] = [
     id: "what-is-pds",
     question: "What is a Personal Data Server (PDS)?",
     answer:
-      "A PDS is the place where your data and identity for the AT Protocol live. Instead of being locked into one platform, your posts, media and profile are stored on a server you control - and eny.space makes running that server manageable through a simple dashboard.",
+      "Your PDS is the home of your AT Protocol identity and data — your repository, blobs and account live there, signed under your DID. On the network, your PDS is what relays crawl and AppViews read from. eny.space runs that server for you, so you get the ownership without operating the box.",
   },
   {
-    id: "do-i-need-own-server",
-    question: "Do I need to understand Kubernetes, Docker or cloud hosting?",
+    id: "standard-pds-federation",
+    question: "Is it a standard PDS, and is it fully federated?",
     answer:
-      "No. The whole point of eny.space is managed PDS hosting: you click to create a PDS and we take care of the underlying infrastructure. You can still bring your own domain and adjust settings, but you never have to touch kubectl or obscure cloud dashboards.",
+      "Yes. eny.space provisions a standard AT Protocol PDS that speaks the normal com.atproto XRPC API, so it federates like any other: relays crawl it, your records hit the firehose, and AppViews — including Bluesky — can read your account. There is no proprietary fork of the protocol. [CONFIRM: whether you run the upstream bluesky-social/pds image or a protocol-compatible implementation.]",
   },
   {
-    id: "pds-browser-free",
-    question: "Is the PDS browser UI free to use?",
+    id: "migration-portability",
+    question: "Can I bring my existing account in, and leave with my data later?",
     answer:
-      "The PDS explorer UI is designed to be freely accessible for browsing public data on your PDS - similar to how you might explore content on Bluesky today. Managed hosting, dedicated resources and custom domains sit on top as paid features when you want your own isolated space.",
+      "Your repository is a standard ATProto repo, portable by design — you can export it as a CAR file and move your identity using the protocol's account-migration flow, so you are never locked in. [CONFIRM: whether inbound migration and one-click repo export are surfaced in the dashboard today, or are currently manual via XRPC.]",
   },
   {
-    id: "billing-and-payments",
-    question: "How do billing and payments work for eny.space?",
+    id: "did-and-keys",
+    question: "Who controls my DID and PLC rotation key?",
     answer:
-      "We integrate with modern payment providers so you can subscribe in a few clicks. Behind the scenes, we handle invoices, taxes and payouts for you, so you only see a clear monthly charge for your plan instead of having to reconcile every PDS user manually.",
+      "Your identity is a did:plc that resolves to your PDS. By default eny.space manages your PLC rotation key so setup stays one-click and you can't accidentally lock yourself out of your own account. [CONFIRM: whether users can hold or rotate their own key, or request a key handoff — state your actual custody policy here, this is the question this audience cares most about.]",
   },
   {
-    id: "who-is-it-for",
-    question: "Who is eny.space built for?",
+    id: "api-and-access",
+    question: "Can I access my PDS programmatically?",
     answer:
-      "eny.space is aimed at AT Protocol and Bluesky power users, indie developers and communities who want their own PDS without becoming infrastructure engineers. If you care about owning your data and having a clear UI to manage it, you are our target audience.",
+      "Yes — it's a normal ATProto endpoint. You get a default handle at your-name.eny.space (or point your own domain at it via the standard _atproto DNS record), and you can authenticate and call com.atproto XRPC methods directly, issue app passwords, and create accounts and invite codes for people you host. [CONFIRM: OAuth support and which admin endpoints are exposed to customers.]",
+  },
+  {
+    id: "managed-infra",
+    question: "Who runs the infrastructure, and what if my PDS goes down?",
+    answer:
+      "eny.space is managed hosting: you create a PDS in a click and we run the infrastructure, TLS, updates and uptime — no kubectl or cloud console. The underlying hardware is held by a dedicated hosting partner that monitors the pods and provides operational support, so failures are detected and recovered at the infrastructure layer without you having to do anything. [CONFIRM: backup/restore policy and any uptime SLA you want to commit to here.]",
   },
   {
     id: "why-no-atmosphere-login",
     question: 'Why can\'t I log in with my "@" handle or Atmosphere account?',
     answer:
-      "eny.space provisions Personal Data Servers — your account here is separate from your AT Protocol identity on purpose. Allowing Atmosphere login before your PDS is fully set up could lock you out of your own server. We are working on Atmosphere login as an option, but an email address will always be required as a secure fallback.",
+      "Your eny.space account is separate from your AT Protocol identity on purpose. Allowing Atmosphere login before your PDS is fully set up could lock you out of your own server. We're working on Atmosphere login as an option, but an email address will always be required as a secure fallback.",
   },
 ];
 
@@ -67,7 +73,7 @@ export function FAQSection() {
           eny.space PDS browser. If you can't find what you're looking for, feel
           free to{" "}
           <a
-            href="mailto:hello@krekeny.com"
+            href="mailto:hello+eny-space@krekeny.com"
             className="font-semibold text-white underline underline-offset-2 hover:text-white/80"
           >
             reach out to our friendly team

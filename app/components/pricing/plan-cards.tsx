@@ -83,7 +83,7 @@ export async function PlanCards({ isLoggedIn = false }: Props) {
             <CardContent className="mt-6 flex flex-1 flex-col gap-6 px-0">
               {plan.disabled ? (
                 <ButtonLink
-                  href="mailto:hello@krekeny.com"
+                  href="mailto:hello+eny-space@krekeny.com"
                   className="w-full rounded-full px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide transition border border-white/20 bg-transparent text-white/60 hover:border-white/40 hover:text-white/80"
                 >
                   Contact us

@@ -17,7 +17,7 @@ export const PLAN_CATALOG: Record<PlanKey, PlanCatalogEntry> = {
   personal: {
     key: "personal",
     name: "Personal",
-    description: "Your own AT Protocol PDS, ready in minutes.",
+    description: "Your own AT Protocol PDS, ready in seconds.",
     pdsDiskSizeGb: 1,
     features: [
       "1 GB blob & repo storage",
@@ -49,7 +49,7 @@ export const PLAN_CATALOG: Record<PlanKey, PlanCatalogEntry> = {
     pdsDiskSizeGb: 100,
     disabled: true,
     features: [
-      "100 GB blob & repo storage",
+      "100+ GB blob & repo storage",
       "Unlimited hosted accounts",
       "Dedicated node",
       "Custom domain & SLA",

@@ -70,13 +70,17 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full border-b transition-colors duration-300 ${
-        scrolled || mobileOpen
-          ? "border-white/10 bg-slate-950/85"
-          : "border-transparent bg-transparent"
+      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        scrolled ? "px-3 pt-3" : "px-0 pt-0"
       }`}
     >
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+      <div
+        className={`mx-auto flex items-center justify-between gap-4 border transition-all duration-300 ${
+          scrolled
+            ? "h-12 max-w-2xl rounded-full border-white/10 bg-slate-950/85 px-5 shadow-lg shadow-black/30 backdrop-blur-md"
+            : "h-14 max-w-7xl rounded-none border-transparent bg-transparent px-4 sm:px-6"
+        }`}
+      >
         <Link
           href="/"
           className="flex items-center gap-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"

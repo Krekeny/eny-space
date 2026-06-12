@@ -19,20 +19,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { service, pdsServiceId } = await getPdsServiceForCurrentUser();
-
-    const requiredServiceIdRaw = process.env.PDS_TEST_SERVICE_ID;
-    if (requiredServiceIdRaw) {
-      const requiredServiceId = Number(requiredServiceIdRaw);
-      if (pdsServiceId !== requiredServiceId) {
-        return NextResponse.json(
-          {
-            message: `PDS service id mismatch: expected ${requiredServiceId}, got ${pdsServiceId}`,
-          },
-          { status: 409 },
-        );
-      }
-    }
+    const { service } = await getPdsServiceForCurrentUser();
 
     const pdsBaseUrl = getPdsBaseUrlFromService(service);
 

@@ -1,17 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
-import { getMockPdsService } from "@/lib/mocks/pds-service";
 
 const PDS_API_BASE_URL = process.env.PDS_API_BASE_URL;
 
 export async function GET() {
   try {
-    const useMock = process.env.PDS_USE_MOCK === "true";
-    if (useMock) {
-      return NextResponse.json(getMockPdsService());
-    }
-
     if (!PDS_API_BASE_URL) {
       return NextResponse.json(
         { error: "Missing PDS_API_BASE_URL env variable" },
@@ -46,19 +40,10 @@ export async function GET() {
       .eq("user_id", user.id)
       .maybeSingle();
 
-    const forcedServiceIdRaw =
-      process.env.PDS_FORCE_SERVICE_ID === "true"
-        ? process.env.PDS_TEST_SERVICE_ID
-        : undefined;
-    const forcedServiceId = forcedServiceIdRaw
-      ? Number(forcedServiceIdRaw)
-      : null;
-
-    const pdsServiceId = (
-      forcedServiceId !== null && Number.isFinite(forcedServiceId)
-        ? forcedServiceId
-        : pdsServiceRow?.pds_service_id
-    ) as number | null | undefined;
+    const pdsServiceId = pdsServiceRow?.pds_service_id as
+      | number
+      | null
+      | undefined;
 
     if (!pdsServiceId) {
       return NextResponse.json(

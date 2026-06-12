@@ -32,15 +32,10 @@ export async function getPdsServiceForCurrentUser(): Promise<{
     .eq("user_id", user.id)
     .maybeSingle();
 
-  const forcedServiceIdRaw =
-    process.env.PDS_FORCE_SERVICE_ID === "true"
-      ? process.env.PDS_TEST_SERVICE_ID
-      : undefined;
-  const forcedServiceId = forcedServiceIdRaw ? Number(forcedServiceIdRaw) : null;
-
-  const pdsServiceId = (forcedServiceId !== null && Number.isFinite(forcedServiceId)
-    ? forcedServiceId
-    : pdsServiceRow?.pds_service_id) as number | null | undefined;
+  const pdsServiceId = pdsServiceRow?.pds_service_id as
+    | number
+    | null
+    | undefined;
 
   if (!pdsServiceId) {
     return Promise.reject(
