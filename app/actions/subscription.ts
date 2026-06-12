@@ -71,6 +71,7 @@ export async function getSubscriptionStatus() {
   if (!customerId) {
     return {
       subscribed: false,
+      active: false,
       subscription: null,
     };
   }
@@ -85,6 +86,7 @@ export async function getSubscriptionStatus() {
     if (!subscriptions.data.length) {
       return {
         subscribed: false,
+        active: false,
         subscription: null,
       };
     }
@@ -101,16 +103,24 @@ export async function getSubscriptionStatus() {
     if (!latest) {
       return {
         subscribed: false,
+        active: false,
         subscription: null,
       };
     }
 
+    const isActiveOrTrialing =
+      latest.status === "active" || latest.status === "trialing";
+
+    // "subscribed" = fully subscribed and not scheduled to cancel.
+    // "active" = still has access right now, including when set to cancel at
+    // period end. Use "active" for access gates so a cancellation only takes
+    // effect once the paid period actually ends.
     const isCurrentlySubscribed =
-      (latest.status === "active" || latest.status === "trialing") &&
-      latest.cancel_at_period_end === false;
+      isActiveOrTrialing && latest.cancel_at_period_end === false;
 
     return {
       subscribed: isCurrentlySubscribed,
+      active: isActiveOrTrialing,
       subscription: {
         status: latest.status,
         cancel_at_period_end: latest.cancel_at_period_end,
@@ -126,6 +136,7 @@ export async function getSubscriptionStatus() {
     console.error("Error fetching subscription status from Stripe:", error);
     return {
       subscribed: false,
+      active: false,
       subscription: null,
     };
   }

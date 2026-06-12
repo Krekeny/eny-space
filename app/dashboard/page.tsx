@@ -28,9 +28,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     redirect("/login");
   }
 
-  const { subscribed, subscription } = await getSubscriptionStatus();
+  const { active, subscribed, subscription } = await getSubscriptionStatus();
 
-  if (!subscribed) {
+  // Gate on "active" (active/trialing, including when scheduled to cancel at
+  // period end) so a canceled-but-still-paid user keeps dashboard access until
+  // the period actually ends.
+  if (!active) {
     redirect(welcomePath({ pds_plan: params?.pds_plan }));
   }
 

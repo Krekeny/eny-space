@@ -33,8 +33,8 @@ export default async function WelcomeNamePage({
     redirect("/login");
   }
 
-  const { subscribed } = await getSubscriptionStatus();
-  if (subscribed) {
+  const { active } = await getSubscriptionStatus();
+  if (active) {
     redirect("/dashboard");
   }
 

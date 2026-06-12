@@ -24,9 +24,11 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
     redirect("/login");
   }
 
-  const { subscribed } = await getSubscriptionStatus();
+  const { active } = await getSubscriptionStatus();
 
-  if (subscribed) {
+  // Bounce users who still have access (incl. cancel-at-period-end) to the
+  // dashboard rather than back into onboarding.
+  if (active) {
     redirect("/dashboard");
   }
 
