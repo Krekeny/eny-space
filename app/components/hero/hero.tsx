@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { HeroLeft } from "./hero-left";
 import { HeroRight } from "./hero-right";
 
@@ -10,9 +9,12 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-15 -mt-24"
         style={{ zIndex: 1 }}
       >
-        <Image
-          src="/logo.svg"
-          alt="eny.space logo"
+        {/* Decorative animated SVG — plain img so the SMIL animation plays. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/pixel-planet.svg"
+          alt=""
+          aria-hidden
           width={520}
           height={520}
           className="shrink-0"
