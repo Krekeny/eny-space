@@ -95,7 +95,7 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
           />
 
           {/* THE LAYOUT FIX IS HERE */}
-          <div className="relative text-lg flex items-center tabular-nums">
+          <div className="relative text-2xl flex items-center tabular-nums font-heading">
             {/* Hidden ghost text that reserves the full width of "eny.space" */}
             <span
               className="invisible pointer-events-none select-none"
