@@ -20,13 +20,13 @@ export function CTASection() {
         </Paragraph>
 
         <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
-          <ButtonLink
+          {/* <ButtonLink
             href="/demo"
             className="border border-white/30 bg-transparent px-6 text-xs font-semibold uppercase tracking-wide text-white hover:border-white hover:bg-white/10"
             endIcon={<ArrowRightIcon className="size-4" aria-hidden />}
           >
             Open PDS UI demo
-          </ButtonLink>
+          </ButtonLink> */}
           <ButtonLink
             href="/signup"
             className="px-6 text-xs font-semibold uppercase tracking-wide text-neutral-950 shadow-[0_0_40px_rgba(232,121,249,0.45)] bg-fuchsia-400 hover:bg-fuchsia-300"
