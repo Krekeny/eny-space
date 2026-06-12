@@ -20,12 +20,15 @@
   </defs>
 
   <!-- Ring (back half: top edge of the flat ellipse, behind the planet) -->
-  <g fill="#9ca3af" transform="rotate(-20 10.5 11.5)">
-    <rect x="6"  y="9"  width="10" height="1" />
-    <rect x="2"  y="10" width="4"  height="1" />
-    <rect x="16" y="10" width="4"  height="1" />
-    <rect x="0"  y="11" width="2"  height="1" />
-    <rect x="20" y="11" width="2"  height="1" />
+  <g fill="#9ca3af">
+    <rect x="13" y="7"  width="7" height="1" />
+    <rect x="10" y="8"  width="3" height="1" />
+    <rect x="20" y="8"  width="1" height="2" />
+    <rect x="8"  y="9"  width="2" height="1" />
+    <rect x="6"  y="10" width="2" height="1" />
+    <rect x="3"  y="11" width="3" height="1" />
+    <rect x="2"  y="12" width="1" height="1" />
+    <rect x="1"  y="13" width="1" height="2" />
   </g>
 
   <!-- Surface, clipped to the disc -->
@@ -77,12 +80,15 @@
   </g>
 
   <!-- Ring (front half: bottom edge of the flat ellipse, in front of the planet) -->
-  <g fill="#d4d4d8" transform="rotate(-20 10.5 11.5)">
-    <rect x="0"  y="12" width="2"  height="1" />
-    <rect x="20" y="12" width="2"  height="1" />
-    <rect x="2"  y="13" width="4"  height="1" />
-    <rect x="16" y="13" width="4"  height="1" />
-    <rect x="6"  y="14" width="10" height="1" />
+  <g fill="#d4d4d8">
+    <rect x="19" y="10" width="1" height="1" />
+    <rect x="18" y="11" width="2" height="1" />
+    <rect x="16" y="12" width="2" height="1" />
+    <rect x="14" y="13" width="2" height="1" />
+    <rect x="12" y="14" width="2" height="1" />
+    <rect x="9"  y="15" width="3" height="1" />
+    <rect x="1"  y="15" width="1" height="1" />
+    <rect x="2"  y="16" width="7" height="1" />
   </g>
 
   <!-- Twinkling pixel stars -->
