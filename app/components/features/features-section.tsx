@@ -12,33 +12,33 @@ import { FeatureCard } from "./feature-card";
 
 const FEATURES = [
   {
-    title: "One‑click managed PDS.",
+    title: "One-click managed PDS.",
     description:
-      "Create a Personal Data Server directly from the eny.space UI—no Kubernetes clusters, Docker images or cloud consoles to wire up. Choose your settings, attach a domain and go live in minutes.",
+      "Spin up a Personal Data Server from a simple UI, no infrastructure to wire up.",
     icon: <NetworkIcon className="size-5" aria-hidden />,
   },
   {
-    title: "Dashboard‑first administration.",
+    title: "Easy administration.",
     description:
-      "Invite users to your PDS, manage access and roles, and handle tasks you would normally script on the command line from a clear web dashboard.",
+      "Invite users and run what you'd normally script on the command line, all from a web dashboard.",
     icon: <CloudIcon className="size-5" aria-hidden />,
   },
   {
     title: "Live resource insights.",
     description:
-      "See active users and exactly how much of your storage your PDS is using, as clear live figures—so you always know where you stand, without digging through logs. Performance is on us, so it's never something you have to watch.",
+      "See active users and storage usage at a glance. Performance is on us, so it's never something you have to watch.",
     icon: <ScaleIcon className="size-5" aria-hidden />,
   },
   {
-    title: "AT Protocol‑native access.",
+    title: "AT Protocol-native access.",
     description:
-      "Built for AT Protocol and Bluesky power users who arrive with an email and handle, not yet another social login. Your PDS becomes your social cloud space.",
+      "Built for AT Protocol users, email and handle, no extra login. Your PDS becomes your social cloud space.",
     icon: <ShieldCheckIcon className="size-5" aria-hidden />,
   },
   {
     title: "PDS explorer UI.",
     description:
-      "Browse everything on your PDS like a file explorer—posts, images, PDFs and collections. See what’s stored, which apps use it and treat your PDS as a real, visual space.",
+      "Browse your PDS like a file explorer: posts, images and collections. Your data as a real, visual space.",
     icon: <ZapIcon className="size-5" aria-hidden />,
   },
 ];

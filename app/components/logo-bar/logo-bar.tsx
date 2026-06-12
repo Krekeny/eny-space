@@ -31,6 +31,11 @@ const ATMOSPHERE_APPS: { label: string; href?: string; icon: string }[] = [
     icon: "/atmosphere-icons/logo-bookhive.svg",
   },
   {
+    label: "Eurosky",
+    href: "https://eurosky.tech/",
+    icon: "/atmosphere-icons/logo-eurosky.svg",
+  },
+  {
     label: "Grain",
     href: "https://grain.social",
     icon: "/atmosphere-icons/logo-grain.svg",
