@@ -19,61 +19,63 @@ const headerCtaClass =
 
 export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [displayText, setDisplayText] = useState(".");
+  const [scrolled, setScrolled] = useState(false);
+  const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    let dotCycle = 1;
-    let repeatCount = 0;
-    const fullWord = "space";
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll(); // sync initial state (e.g. reload while scrolled down)
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const fullWord = ".space";
     let charIndex = 0;
 
-    const DOT_SPEED = 400;
     const CURSOR_BLINK_SPEED = 500;
     const TYPE_SPEED = 200;
 
-    const dotInterval = setInterval(() => {
-      if (dotCycle < 3) {
-        dotCycle++;
-      } else {
-        dotCycle = 1;
-        repeatCount++;
-      }
+    let typeInterval: ReturnType<typeof setInterval>;
 
-      if (repeatCount < 2) {
-        setDisplayText(".".repeat(dotCycle));
-      } else {
-        clearInterval(dotInterval);
-        setDisplayText(".");
+    // Blink the cursor a few times, then type out "space".
+    let blinks = 0;
+    setIsTyping(true);
+    const blinkInterval = setInterval(() => {
+      setIsTyping((prev) => !prev);
+      blinks++;
 
-        let blinks = 0;
-        const blinkInterval = setInterval(() => {
-          setIsTyping((prev) => !prev);
-          blinks++;
+      if (blinks === 4) {
+        clearInterval(blinkInterval);
+        setIsTyping(true);
 
-          if (blinks === 4) {
-            clearInterval(blinkInterval);
-            setIsTyping(true);
+        typeInterval = setInterval(() => {
+          setDisplayText(fullWord.slice(0, charIndex + 1));
+          charIndex++;
 
-            const typeInterval = setInterval(() => {
-              setDisplayText("." + fullWord.slice(0, charIndex + 1));
-              charIndex++;
-
-              if (charIndex === fullWord.length) {
-                clearInterval(typeInterval);
-                setTimeout(() => setIsTyping(false), 400);
-              }
-            }, TYPE_SPEED);
+          if (charIndex === fullWord.length) {
+            clearInterval(typeInterval);
+            setTimeout(() => setIsTyping(false), 400);
           }
-        }, CURSOR_BLINK_SPEED);
+        }, TYPE_SPEED);
       }
-    }, DOT_SPEED);
+    }, CURSOR_BLINK_SPEED);
 
-    return () => clearInterval(dotInterval);
+    return () => {
+      clearInterval(blinkInterval);
+      clearInterval(typeInterval);
+    };
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-slate-950/85">
+    <header
+      className={`sticky top-0 z-50 w-full border-b transition-colors duration-300 ${
+        scrolled || mobileOpen
+          ? "border-white/10 bg-slate-950/85"
+          : "border-transparent bg-transparent"
+      }`}
+    >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link
           href="/"
