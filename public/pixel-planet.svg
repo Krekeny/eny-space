@@ -19,6 +19,17 @@
     </clipPath>
   </defs>
 
+  <!-- Ring (back half: top arc of the ellipse, behind the planet) -->
+  <g fill="#9ca3af">
+    <rect x="7"  y="8"  width="8" height="1" />
+    <rect x="4"  y="9"  width="3" height="1" />
+    <rect x="15" y="9"  width="3" height="1" />
+    <rect x="2"  y="10" width="2" height="1" />
+    <rect x="18" y="10" width="2" height="1" />
+    <rect x="0"  y="11" width="2" height="1" />
+    <rect x="20" y="11" width="2" height="1" />
+  </g>
+
   <!-- Surface, clipped to the disc -->
   <g clip-path="url(#disc)">
     <!-- Ocean base -->
@@ -65,6 +76,17 @@
     <rect x="7" y="7" width="1" height="1" />
     <rect x="8" y="7" width="1" height="1" />
     <rect x="7" y="8" width="1" height="1" />
+  </g>
+
+  <!-- Ring (front half: bottom arc of the ellipse, in front of the planet) -->
+  <g fill="#d4d4d8">
+    <rect x="0"  y="12" width="2" height="1" />
+    <rect x="20" y="12" width="2" height="1" />
+    <rect x="2"  y="13" width="2" height="1" />
+    <rect x="18" y="13" width="2" height="1" />
+    <rect x="4"  y="14" width="3" height="1" />
+    <rect x="15" y="14" width="3" height="1" />
+    <rect x="7"  y="15" width="8" height="1" />
   </g>
 
   <!-- Twinkling pixel stars -->
