@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSubscriptionStatus, getActivePlanKey } from "@/actions/subscription";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 import { Card, CardContent } from "@/actions/components/ui/card";
+import { FolderTreeIcon } from "lucide-react";
 import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
@@ -155,6 +156,32 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </CardContent>
         </Card>
       )}
+
+      {/* PDS Explorer — upcoming */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white">
+              <FolderTreeIcon className="size-5" aria-hidden />
+            </span>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Heading as="h2" className="text-base font-semibold text-white">
+                  PDS Explorer
+                </Heading>
+                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white/50">
+                  Coming soon
+                </span>
+              </div>
+              <Paragraph className="text-sm text-white/60">
+                Browse everything on your PDS like a file explorer — posts,
+                images, video and the records your apps store. See what&apos;s
+                there and which apps use it.
+              </Paragraph>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Billing & Subscription */}
       <CollapsibleSection title="Billing & Subscription">
