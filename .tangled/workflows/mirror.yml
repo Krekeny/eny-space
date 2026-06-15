@@ -2,7 +2,6 @@
 when:
   - event: ["push"]
     branch: ["main", "develop", "feature/*", "docs/*"]
-  - event: ["pull_request"]
 
 engine: "nixery"
 
@@ -24,5 +23,6 @@ steps:
       echo "repo=$GIT_REPOSITORY  token_len=${#ACCESS_TOKEN}"
       git fetch --unshallow || true
       git remote add github "https://x-access-token:$ACCESS_TOKEN@$GIT_REPOSITORY"
-      REF_NAME=${TANGLED_REF_NAME:-$TANGLED_PR_TARGET_BRANCH}
+      REF_NAME="${TANGLED_REF_NAME:-${TANGLED_PR_TARGET_BRANCH:-}}"
+      [ -n "$REF_NAME" ] || { echo "ERROR: no branch ref available" >&2; exit 1; }
       git push github "HEAD:refs/heads/mirror/$REF_NAME" --force
