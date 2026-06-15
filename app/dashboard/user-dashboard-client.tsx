@@ -563,7 +563,23 @@ function AccountRow({
     <div className="py-3 text-sm space-y-1">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-0.5 min-w-0">
-          <Paragraph className="font-medium text-white truncate">{account.handle}</Paragraph>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <Paragraph className="font-medium text-white truncate">{account.handle}</Paragraph>
+            <a
+              href={`https://pdsls.dev/at://${account.did}`}
+              target="_blank"
+              rel="noreferrer"
+              title="View on PDSls"
+              className="shrink-0 opacity-60 transition-opacity hover:opacity-100"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/atmosphere-icons/logo-pdsls.svg"
+                alt="View on PDSls"
+                className="size-4"
+              />
+            </a>
+          </div>
           {account.email && (
             <Paragraph className="text-xs text-white/50 truncate">{account.email}</Paragraph>
           )}
