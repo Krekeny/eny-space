@@ -6,6 +6,8 @@ export type PlanCatalogEntry = {
   description: string;
   /** PDS disk size (GB) for marketing UI and provisioning. */
   pdsDiskSizeGb: number;
+  /** Max ATProto accounts allowed on the PDS. Use Infinity for unlimited. */
+  maxAccounts: number;
   badge?: string;
   highlight?: boolean;
   /** When true the plan is shown on the pricing page but cannot be purchased yet. */
@@ -19,9 +21,11 @@ export const PLAN_CATALOG: Record<PlanKey, PlanCatalogEntry> = {
     name: "Personal",
     description: "Your own AT Protocol PDS, ready in seconds.",
     pdsDiskSizeGb: 1,
+    maxAccounts: 1,
     features: [
       "1 GB blob & repo storage",
       "Personal AT Protocol PDS",
+      "Single account",
       "Your handle: yourpds.eny.space",
       "Managed updates & backups",
     ],
@@ -31,6 +35,7 @@ export const PLAN_CATALOG: Record<PlanKey, PlanCatalogEntry> = {
     name: "Community",
     description: "Host your own corner of the Atmosphere.",
     pdsDiskSizeGb: 10,
+    maxAccounts: Infinity,
     // badge: "Popular",
     highlight: true,
     features: [
@@ -46,6 +51,7 @@ export const PLAN_CATALOG: Record<PlanKey, PlanCatalogEntry> = {
     name: "Organization",
     description: "Dedicated infrastructure for teams and companies.",
     pdsDiskSizeGb: 100,
+    maxAccounts: Infinity,
     disabled: true,
     features: [
       "100+ GB blob & repo storage",

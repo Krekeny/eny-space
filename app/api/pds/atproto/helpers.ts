@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import type { PlanCatalogEntry } from "@/lib/plan-catalog";
 
 const PDS_API_BASE_URL = process.env.PDS_API_BASE_URL;
 
@@ -129,5 +130,44 @@ export function getPdsAdminAuth(service: any): {
     pdsBaseUrl: getPdsBaseUrlFromService(service),
     authHeader: toBasicAuth("admin", String(adminPassword).trim()),
   };
+}
+
+/** Count the ATProto accounts hosted on a PDS (public listRepos endpoint). */
+export async function countPdsAccounts(pdsBaseUrl: string): Promise<number> {
+  const url = new URL(`${pdsBaseUrl}/xrpc/com.atproto.sync.listRepos`);
+  url.searchParams.set("limit", "100");
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: { Accept: "application/json" },
+  });
+  if (!res.ok) {
+    throw Object.assign(new Error("Could not verify current account count"), {
+      status: 502,
+    });
+  }
+  const data = (await res.json().catch(() => ({}))) as { repos?: unknown[] };
+  return Array.isArray(data?.repos) ? data.repos.length : 0;
+}
+
+/**
+ * Enforce a plan's account limit before creating/onboarding another account.
+ * Throws a status-tagged 403 error (handled by route catch blocks) when full.
+ */
+export async function assertCanAddAccount(
+  pdsBaseUrl: string,
+  plan: PlanCatalogEntry,
+): Promise<void> {
+  if (!Number.isFinite(plan.maxAccounts)) return; // unlimited
+  const count = await countPdsAccounts(pdsBaseUrl);
+  if (count >= plan.maxAccounts) {
+    throw Object.assign(
+      new Error(
+        `Your ${plan.name} plan allows ${plan.maxAccounts} account${
+          plan.maxAccounts === 1 ? "" : "s"
+        }. Upgrade to host more.`,
+      ),
+      { status: 403 },
+    );
+  }
 }
 

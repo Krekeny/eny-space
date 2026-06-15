@@ -8,7 +8,11 @@ import type { Stripe } from "stripe";
 import { pdsHostnameForSlug, validatePdsSlugInput } from "@/lib/pds-slug";
 import { welcomeNamePath } from "@/lib/onboarding";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
-import { getPriceIdForPlan } from "@/lib/stripe-plans";
+import {
+  getPriceIdForPlan,
+  getPlanKeyForPriceId,
+  type PlanKey,
+} from "@/lib/stripe-plans";
 
 /**
  * Get user's Stripe customer ID from database (minimal storage)
@@ -140,6 +144,16 @@ export async function getSubscriptionStatus() {
       subscription: null,
     };
   }
+}
+
+/**
+ * Resolve the current user's active plan from their live subscription.
+ * Returns null when there is no active subscription / matching plan.
+ */
+export async function getActivePlanKey(): Promise<PlanKey | null> {
+  const subscription = await getActiveSubscription();
+  const priceId = subscription?.items?.data?.[0]?.price?.id;
+  return getPlanKeyForPriceId(priceId ?? null);
 }
 
 /**

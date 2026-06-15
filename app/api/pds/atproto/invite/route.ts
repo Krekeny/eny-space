@@ -1,10 +1,23 @@
 import { NextResponse } from "next/server";
 
 import { getPdsAdminAuth, getPdsServiceForCurrentUser } from "../helpers";
+import { getActivePlanKey } from "@/actions/subscription";
+import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 
 export async function POST(req: Request) {
   try {
     const { useCount } = (await req.json()) as { useCount?: number };
+
+    // Invites onboard other people — not available on single-account plans.
+    const plan = getPlanCatalogEntry(await getActivePlanKey());
+    if (plan.maxAccounts <= 1) {
+      return NextResponse.json(
+        {
+          message: `Invites aren't available on the ${plan.name} plan. Upgrade to host more accounts.`,
+        },
+        { status: 403 },
+      );
+    }
 
     const { service } = await getPdsServiceForCurrentUser();
     const { pdsBaseUrl, authHeader } = getPdsAdminAuth(service);

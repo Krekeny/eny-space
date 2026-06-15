@@ -29,6 +29,20 @@ export function getPriceIdForPlan(planKey: string | undefined | null): string {
   return getEnvPriceId(key) || "";
 }
 
+/**
+ * Reverse of getPriceIdForPlan: resolve which plan a Stripe Price ID belongs to.
+ * Returns null if no per-plan env Price ID matches.
+ */
+export function getPlanKeyForPriceId(
+  priceId: string | undefined | null,
+): PlanKey | null {
+  if (!priceId) return null;
+  for (const key of PLAN_KEYS) {
+    if (getEnvPriceId(key) === priceId) return key;
+  }
+  return null;
+}
+
 type StripePriceAmount = {
   priceId: string;
   unitAmount: number | null;

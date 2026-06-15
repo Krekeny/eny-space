@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
 
-import { getPdsAdminAuth, getPdsServiceForCurrentUser } from "../helpers";
+import {
+  assertCanAddAccount,
+  getPdsAdminAuth,
+  getPdsServiceForCurrentUser,
+} from "../helpers";
+import { getActivePlanKey } from "@/actions/subscription";
+import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 
 async function generateInviteCode(pdsBaseUrl: string, authHeader: string): Promise<string> {
   const res = await fetch(`${pdsBaseUrl}/xrpc/com.atproto.server.createInviteCode`, {
@@ -36,6 +42,10 @@ export async function POST(req: Request) {
 
     const { service } = await getPdsServiceForCurrentUser();
     const { pdsBaseUrl, authHeader } = getPdsAdminAuth(service);
+
+    // Enforce the plan's account limit (single account on the personal plan).
+    const plan = getPlanCatalogEntry(await getActivePlanKey());
+    await assertCanAddAccount(pdsBaseUrl, plan);
 
     let emailToUse = body.email;
     if (!emailToUse) {

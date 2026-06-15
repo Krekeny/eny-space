@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getSubscriptionStatus } from "@/actions/subscription";
+import { getSubscriptionStatus, getActivePlanKey } from "@/actions/subscription";
+import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 import { Card, CardContent } from "@/actions/components/ui/card";
 import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
@@ -87,6 +88,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     redirect(welcomePath({ pds_plan: params?.pds_plan }));
   }
 
+  // Account limits from the user's plan (personal = single account, no invites).
+  const plan = getPlanCatalogEntry(await getActivePlanKey());
+  const planMaxAccounts = Number.isFinite(plan.maxAccounts)
+    ? plan.maxAccounts
+    : undefined;
+  const canInvite = plan.maxAccounts > 1;
+
   let pdsHostname: string | null = null;
   let pdsState: number | string | null = null;
 
@@ -131,7 +139,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       {ready ? (
         <Card>
           <CardContent className="pt-6">
-            <UserDashboardClient readOnly={readOnly} />
+            <UserDashboardClient
+              readOnly={readOnly}
+              canInvite={canInvite}
+              maxAccounts={planMaxAccounts}
+            />
           </CardContent>
         </Card>
       ) : (

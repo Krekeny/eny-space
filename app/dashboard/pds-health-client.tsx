@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ChevronDownIcon } from "lucide-react";
 import { Paragraph } from "@/components/paragraph";
 
 type HealthStatus = "checking" | "reachable" | "unreachable";
@@ -27,6 +28,7 @@ export function PdsHealthClient({ pdsHost }: { pdsHost: string }) {
   const [version, setVersion] = useState<string | null>(null);
   const [describe, setDescribe] = useState<DescribeServer | null>(null);
   const [checkedAt, setCheckedAt] = useState<Date | null>(null);
+  const [open, setOpen] = useState(false);
 
   const check = async () => {
     setStatus("checking");
@@ -61,7 +63,12 @@ export function PdsHealthClient({ pdsHost }: { pdsHost: string }) {
   return (
     <div className="space-y-3 rounded-md border border-white/10 bg-white/5 p-4 text-white backdrop-blur-xl">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="flex items-center gap-2 text-left"
+          aria-expanded={open}
+        >
           <StatusDot status={status} />
           <Paragraph className="text-sm font-semibold">
             {status === "checking" && "Checking…"}
@@ -71,7 +78,11 @@ export function PdsHealthClient({ pdsHost }: { pdsHost: string }) {
           {version && (
             <Paragraph className="text-xs text-white/50 font-mono">v{version}</Paragraph>
           )}
-        </div>
+          <ChevronDownIcon
+            className={`size-4 text-white/40 transition-transform ${open ? "rotate-180" : ""}`}
+            aria-hidden
+          />
+        </button>
         <button
           onClick={check}
           className="text-xs text-white/40 hover:text-white/80 transition-colors"
@@ -80,29 +91,33 @@ export function PdsHealthClient({ pdsHost }: { pdsHost: string }) {
         </button>
       </div>
 
-      {checkedAt && (
-        <Paragraph className="text-xs text-white/40">
-          Last checked {checkedAt.toLocaleTimeString()}
-        </Paragraph>
-      )}
+      {open && (
+        <>
+          {checkedAt && (
+            <Paragraph className="text-xs text-white/40">
+              Last checked {checkedAt.toLocaleTimeString()}
+            </Paragraph>
+          )}
 
-      {describe && (
-        <div className="grid gap-2 text-sm md:grid-cols-2">
-          {describe.did && (
-            <div className="space-y-0.5">
-              <Paragraph className="text-xs font-medium text-white/60">DID</Paragraph>
-              <Paragraph className="font-mono text-xs text-white break-all">{describe.did}</Paragraph>
+          {describe && (
+            <div className="grid gap-2 text-sm md:grid-cols-2">
+              {describe.did && (
+                <div className="space-y-0.5">
+                  <Paragraph className="text-xs font-medium text-white/60">DID</Paragraph>
+                  <Paragraph className="font-mono text-xs text-white break-all">{describe.did}</Paragraph>
+                </div>
+              )}
+              {Array.isArray(describe.availableUserDomains) && describe.availableUserDomains.length > 0 && (
+                <div className="space-y-0.5">
+                  <Paragraph className="text-xs font-medium text-white/60">User domains</Paragraph>
+                  <Paragraph className="font-mono text-xs text-white">
+                    {describe.availableUserDomains.join(", ")}
+                  </Paragraph>
+                </div>
+              )}
             </div>
           )}
-          {Array.isArray(describe.availableUserDomains) && describe.availableUserDomains.length > 0 && (
-            <div className="space-y-0.5">
-              <Paragraph className="text-xs font-medium text-white/60">User domains</Paragraph>
-              <Paragraph className="font-mono text-xs text-white">
-                {describe.availableUserDomains.join(", ")}
-              </Paragraph>
-            </div>
-          )}
-        </div>
+        </>
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { createBillingPortalSession } from "@/actions/subscription";
 import { Paragraph } from "@/components/paragraph";
 import { Button } from "@/actions/components/ui/button";
 import { Input } from "@/actions/components/ui/input";
@@ -31,11 +32,35 @@ async function apiCall(path: string, body: unknown) {
 
 export function UserDashboardClient({
   readOnly = false,
+  canInvite = true,
+  maxAccounts = Infinity,
 }: {
   readOnly?: boolean;
+  canInvite?: boolean;
+  maxAccounts?: number;
 }) {
   const [pdsBareHost, setPdsBareHost] = useState<string>("");
   const [fetchError, setFetchError] = useState<string | null>(null);
+
+  const [accounts, setAccounts] = useState<PdsAccount[]>([]);
+  const [accountsLoading, setAccountsLoading] = useState(true);
+  const [accountsLoaded, setAccountsLoaded] = useState(false);
+  const [accountsError, setAccountsError] = useState<string | null>(null);
+  const [upgrading, setUpgrading] = useState(false);
+
+  const openUpgrade = async () => {
+    setUpgrading(true);
+    try {
+      const res = await createBillingPortalSession();
+      if (res.success && res.url) {
+        window.location.href = res.url;
+        return;
+      }
+    } catch {
+      // fall through to re-enable the link
+    }
+    setUpgrading(false);
+  };
 
   useEffect(() => {
     fetch("/api/pds/service")
@@ -44,12 +69,43 @@ export function UserDashboardClient({
         const host = data?.hostname || data?.encrypted_config?.hostname || "";
         setPdsBareHost(stripScheme(host));
       })
-      .catch((e) => setFetchError(e instanceof Error ? e.message : "Failed to load PDS info"));
+      .catch((e) =>
+        setFetchError(
+          e instanceof Error ? e.message : "Failed to load PDS info",
+        ),
+      );
   }, []);
+
+  const loadAccounts = useCallback(async () => {
+    setAccountsLoading(true);
+    setAccountsError(null);
+    try {
+      const res = await fetch("/api/pds/atproto/accounts");
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok)
+        throw new Error(
+          `${payload?.message || "Failed to load accounts"} — ${JSON.stringify(payload?.upstream ?? {})}`,
+        );
+      setAccounts(payload?.accounts ?? []);
+    } catch (e) {
+      setAccountsError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setAccountsLoading(false);
+      setAccountsLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAccounts();
+  }, [loadAccounts]);
 
   if (fetchError) {
     return <Paragraph className="text-sm text-rose-300">{fetchError}</Paragraph>;
   }
+
+  const atLimit =
+    Number.isFinite(maxAccounts) && accounts.length >= maxAccounts;
+  const showCreate = !atLimit;
 
   return (
     <div className="space-y-6">
@@ -59,11 +115,42 @@ export function UserDashboardClient({
           inactive.
         </Paragraph>
       )}
-      <div className="grid gap-6 md:grid-cols-2">
-        <CreateUserSection pdsBareHost={pdsBareHost} readOnly={readOnly} />
-        <InviteSection readOnly={readOnly} />
-      </div>
-      <UsersSection readOnly={readOnly} />
+
+      {accountsLoaded && (showCreate || canInvite) && (
+        <div className="grid gap-6 md:grid-cols-2">
+          {showCreate && (
+            <CreateUserSection
+              pdsBareHost={pdsBareHost}
+              readOnly={readOnly}
+              onCreated={loadAccounts}
+            />
+          )}
+          {canInvite && <InviteSection readOnly={readOnly} />}
+        </div>
+      )}
+
+      {accountsLoaded && atLimit && !canInvite && (
+        <Paragraph className="text-xs text-white/50">
+          Your plan supports a single account.{" "}
+          <button
+            type="button"
+            onClick={openUpgrade}
+            disabled={upgrading}
+            className="underline underline-offset-2 text-white/80 transition-colors hover:text-white disabled:opacity-50"
+          >
+            {upgrading ? "Opening…" : "Upgrade to Community"}
+          </button>{" "}
+          to host more.
+        </Paragraph>
+      )}
+
+      <UsersSection
+        accounts={accounts}
+        loading={accountsLoading}
+        error={accountsError}
+        onRefresh={loadAccounts}
+        readOnly={readOnly}
+      />
     </div>
   );
 }
@@ -71,9 +158,11 @@ export function UserDashboardClient({
 function CreateUserSection({
   pdsBareHost,
   readOnly,
+  onCreated,
 }: {
   pdsBareHost: string;
   readOnly: boolean;
+  onCreated: () => void;
 }) {
   const [handle, setHandle] = useState("");
   const [password, setPassword] = useState("");
@@ -99,6 +188,7 @@ function CreateUserSection({
       setSuccess(`Account created: ${fullHandle}`);
       setHandle("");
       setPassword("");
+      onCreated();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -341,34 +431,25 @@ function AccountRow({
   );
 }
 
-function UsersSection({ readOnly }: { readOnly: boolean }) {
-  const [accounts, setAccounts] = useState<PdsAccount[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const load = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/pds/atproto/accounts");
-      const payload = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(`${payload?.message || "Failed to load accounts"} — ${JSON.stringify(payload?.upstream ?? {})}`);
-      setAccounts(payload?.accounts ?? []);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { load(); }, []);
-
+function UsersSection({
+  accounts,
+  loading,
+  error,
+  onRefresh,
+  readOnly,
+}: {
+  accounts: PdsAccount[];
+  loading: boolean;
+  error: string | null;
+  onRefresh: () => void;
+  readOnly: boolean;
+}) {
   return (
     <section className="space-y-3 rounded-md border border-white/10 bg-white/5 p-4">
       <div className="flex items-center justify-between">
         <Paragraph className="text-sm font-semibold text-white">Users</Paragraph>
         <button
-          onClick={load}
+          onClick={onRefresh}
           disabled={loading}
           className="text-xs text-white/40 hover:text-white/80 transition-colors disabled:opacity-40"
         >
@@ -390,7 +471,7 @@ function UsersSection({ readOnly }: { readOnly: boolean }) {
             <AccountRow
               key={account.did}
               account={account}
-              onRefresh={load}
+              onRefresh={onRefresh}
               readOnly={readOnly}
             />
           ))}
