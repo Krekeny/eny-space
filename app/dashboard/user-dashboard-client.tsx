@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createBillingPortalSession } from "@/actions/subscription";
 import { Paragraph } from "@/components/paragraph";
 import { Button } from "@/actions/components/ui/button";
 import { Input } from "@/actions/components/ui/input";
@@ -46,21 +45,6 @@ export function UserDashboardClient({
   const [accountsLoading, setAccountsLoading] = useState(true);
   const [accountsLoaded, setAccountsLoaded] = useState(false);
   const [accountsError, setAccountsError] = useState<string | null>(null);
-  const [upgrading, setUpgrading] = useState(false);
-
-  const openUpgrade = async () => {
-    setUpgrading(true);
-    try {
-      const res = await createBillingPortalSession();
-      if (res.success && res.url) {
-        window.location.href = res.url;
-        return;
-      }
-    } catch {
-      // fall through to re-enable the link
-    }
-    setUpgrading(false);
-  };
 
   useEffect(() => {
     fetch("/api/pds/service")
@@ -131,16 +115,9 @@ export function UserDashboardClient({
 
       {accountsLoaded && atLimit && !canInvite && (
         <Paragraph className="text-xs text-white/50">
-          Your plan supports a single account.{" "}
-          <button
-            type="button"
-            onClick={openUpgrade}
-            disabled={upgrading}
-            className="underline underline-offset-2 text-white/80 transition-colors hover:text-white disabled:opacity-50"
-          >
-            {upgrading ? "Opening…" : "Upgrade to Community"}
-          </button>{" "}
-          to host more.
+          Your plan supports a single account. We&apos;re working on plan
+          upgrades — soon you&apos;ll be able to switch to the Community plan for
+          more space and additional users.
         </Paragraph>
       )}
 
