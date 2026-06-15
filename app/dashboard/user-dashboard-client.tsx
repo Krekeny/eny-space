@@ -151,7 +151,7 @@ export function UserDashboardClient({
       {accountsLoaded && atLimit && !canInvite && (
         <Paragraph className="text-xs text-white/50">
           Your plan supports a single account. We&apos;re working on plan
-          upgrades — soon you&apos;ll be able to switch to the Community plan for
+          upgrades, soon you&apos;ll be able to switch to the Community plan for
           more space and additional users.
         </Paragraph>
       )}
@@ -575,14 +575,16 @@ function AccountRow({
             <button
               type="button"
               onClick={() => setOpen((o) => !o)}
-              className="flex items-center gap-1.5 min-w-0 text-left"
+              className="group flex items-center gap-1.5 min-w-0 text-left"
               aria-expanded={open}
             >
               <ChevronDownIcon
-                className={`size-3.5 shrink-0 text-white/40 transition-transform ${open ? "rotate-180" : ""}`}
+                className={`size-3.5 shrink-0 text-white/40 transition group-hover:text-white/80 ${open ? "rotate-180" : ""}`}
                 aria-hidden
               />
-              <Paragraph className="font-medium text-white truncate">{account.handle}</Paragraph>
+              <Paragraph className="font-medium text-white truncate transition-colors group-hover:text-white/80">
+                {account.handle}
+              </Paragraph>
             </button>
             <a
               href={`https://pdsls.dev/at://${account.did}`}

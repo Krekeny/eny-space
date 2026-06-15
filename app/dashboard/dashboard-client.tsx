@@ -137,9 +137,12 @@ export default function DashboardClient({
           {subscription.current_period_end && (
             <Paragraph>
               <span className="font-semibold text-white">
-                {isCanceling ? "Access until:" : "Renews:"}
+                PDS running until:
               </span>{" "}
               {new Date(subscription.current_period_end).toLocaleDateString()}
+              {!isCanceling && (
+                <span className="text-white/50"> — renews automatically</span>
+              )}
             </Paragraph>
           )}
           {isCanceling && (
