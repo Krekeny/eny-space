@@ -20,7 +20,7 @@ export function ResetPasswordForm() {
 
   function handleCancel() {
     startCancelTransition(async () => {
-      await signOut({ redirectAllowed: true });
+      await signOut();
     });
   }
 
