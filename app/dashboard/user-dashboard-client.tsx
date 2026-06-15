@@ -675,16 +675,22 @@ function UsersSection({
   onRefresh: () => void;
   readOnly: boolean;
 }) {
+  // Only reflect the (client-only) loading state after mount, so the server
+  // HTML and the first client render agree — avoids a hydration mismatch.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const busy = mounted && loading;
+
   return (
     <section className="space-y-3 rounded-md border border-white/10 bg-white/5 p-4">
       <div className="flex items-center justify-between">
         <Paragraph className="text-sm font-semibold text-white">Users</Paragraph>
         <button
           onClick={onRefresh}
-          disabled={loading}
+          disabled={busy}
           className="text-xs text-white/40 hover:text-white/80 transition-colors disabled:opacity-40"
         >
-          {loading ? "Loading…" : "Refresh"}
+          {busy ? "Loading…" : "Refresh"}
         </button>
       </div>
 
@@ -692,7 +698,7 @@ function UsersSection({
         <Paragraph className="text-sm text-rose-300">{error}</Paragraph>
       )}
 
-      {!loading && !error && accounts.length === 0 && (
+      {mounted && !loading && !error && accounts.length === 0 && (
         <Paragraph className="text-sm text-white/40">No accounts found.</Paragraph>
       )}
 
