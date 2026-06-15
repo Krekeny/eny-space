@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { getPdsAdminAuth, getPdsServiceForCurrentUser } from "../helpers";
+import {
+  assertCanAddAccount,
+  getPdsAdminAuth,
+  getPdsServiceForCurrentUser,
+} from "../helpers";
 import { getActivePlanKey } from "@/actions/subscription";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 
@@ -8,19 +12,14 @@ export async function POST(req: Request) {
   try {
     const { useCount } = (await req.json()) as { useCount?: number };
 
-    // Invites onboard other people — not available on single-account plans.
-    const plan = getPlanCatalogEntry(await getActivePlanKey());
-    if (plan.maxAccounts <= 1) {
-      return NextResponse.json(
-        {
-          message: `Invites aren't available on the ${plan.name} plan. Upgrade to host more accounts.`,
-        },
-        { status: 403 },
-      );
-    }
-
     const { service } = await getPdsServiceForCurrentUser();
     const { pdsBaseUrl, authHeader } = getPdsAdminAuth(service);
+
+    // Gate by the plan's account limit (an invite fills the same limit as a
+    // direct create). This still allows a migration code while the single slot
+    // is open, but blocks once the limit is reached.
+    const plan = getPlanCatalogEntry(await getActivePlanKey());
+    await assertCanAddAccount(pdsBaseUrl, plan);
 
     const res = await fetch(
       `${pdsBaseUrl}/xrpc/com.atproto.server.createInviteCode`,

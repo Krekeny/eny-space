@@ -45,6 +45,7 @@ export function UserDashboardClient({
   const [accountsLoading, setAccountsLoading] = useState(true);
   const [accountsLoaded, setAccountsLoaded] = useState(false);
   const [accountsError, setAccountsError] = useState<string | null>(null);
+  const [mode, setMode] = useState<"create" | "migrate" | "invite">("create");
 
   useEffect(() => {
     fetch("/api/pds/service")
@@ -100,16 +101,44 @@ export function UserDashboardClient({
         </Paragraph>
       )}
 
-      {accountsLoaded && (showCreate || canInvite) && (
-        <div className="grid gap-6 md:grid-cols-2">
-          {showCreate && (
+      {accountsLoaded && showCreate && !readOnly && (
+        <div className="space-y-4">
+          <div className="inline-flex flex-wrap gap-1 rounded-full border border-white/10 bg-white/5 p-1">
+            {(
+              [
+                { id: "create", label: "Create user" },
+                { id: "migrate", label: "Migrate user" },
+                ...(canInvite
+                  ? [{ id: "invite", label: "Invite someone" }]
+                  : []),
+              ] as { id: "create" | "migrate" | "invite"; label: string }[]
+            ).map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setMode(tab.id)}
+                className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+                  mode === tab.id
+                    ? "bg-white text-neutral-950"
+                    : "text-white/60 hover:text-white"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {mode === "create" && (
             <CreateUserSection
               pdsBareHost={pdsBareHost}
               readOnly={readOnly}
               onCreated={loadAccounts}
             />
           )}
-          {canInvite && <InviteSection readOnly={readOnly} />}
+          {mode === "migrate" && <MigrateSection pdsBareHost={pdsBareHost} />}
+          {mode === "invite" && canInvite && (
+            <InviteSection readOnly={readOnly} />
+          )}
         </div>
       )}
 
@@ -270,6 +299,93 @@ function InviteSection({ readOnly }: { readOnly: boolean }) {
         </div>
       )}
       {error && <Paragraph className="text-sm text-rose-300 break-all">{error}</Paragraph>}
+    </section>
+  );
+}
+
+function MigrateSection({ pdsBareHost }: { pdsBareHost: string }) {
+  const [code, setCode] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const start = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const payload = await apiCall("/api/pds/atproto/invite", { useCount: 1 });
+      setCode(payload?.code || payload?.inviteCode || "");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const host = pdsBareHost ? `https://${pdsBareHost}` : "https://<your-pds-host>";
+
+  return (
+    <section className="space-y-4 rounded-md border border-white/10 bg-white/5 p-4">
+      <div>
+        <Paragraph className="text-sm font-semibold text-white">
+          Migrate an existing account
+        </Paragraph>
+        <Paragraph className="text-xs text-white/50 mt-1">
+          Already have an AT Protocol account on another PDS? Move it here — you
+          keep your DID and handle. Generate a one-time code, then run the
+          migration with the AT Protocol CLI.
+        </Paragraph>
+      </div>
+
+      {!code ? (
+        <Button onClick={start} disabled={loading} className="rounded-full w-full">
+          {loading ? "Generating…" : "Start migration"}
+        </Button>
+      ) : (
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Paragraph className="text-xs text-white/50">
+              Your one-time migration code:
+            </Paragraph>
+            <Paragraph className="font-mono text-sm text-white break-all rounded bg-black/20 p-2">
+              {code}
+            </Paragraph>
+          </div>
+          <div className="space-y-1">
+            <Paragraph className="text-xs font-medium text-white/70">
+              Migrate with goat (the AT Protocol CLI):
+            </Paragraph>
+            <pre className="overflow-auto rounded bg-neutral-900/90 p-3 text-[11px] leading-relaxed text-neutral-100">
+{`# 1. Install goat
+go install github.com/bluesky-social/indigo/cmd/goat@latest
+
+# 2. Log in to your CURRENT account
+goat account login -u <your-current-handle> -p <app-password>
+
+# 3. Migrate (see \`goat account migrate --help\` for all flags)
+goat account migrate \\
+  --pds-host ${host} \\
+  --invite-code ${code}
+
+# goat emails you a confirmation token from your old PDS to
+# authorize the identity (PLC) update — paste it when prompted.`}
+            </pre>
+            <Paragraph className="text-[11px] text-white/40">
+              Full guide:{" "}
+              <a
+                href="https://github.com/bluesky-social/indigo/tree/main/cmd/goat"
+                target="_blank"
+                rel="noreferrer"
+                className="underline text-white/60 hover:text-white"
+              >
+                goat account migrate
+              </a>
+            </Paragraph>
+          </div>
+        </div>
+      )}
+      {error && (
+        <Paragraph className="text-sm text-rose-300 break-all">{error}</Paragraph>
+      )}
     </section>
   );
 }
