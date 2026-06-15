@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Paragraph } from "@/components/paragraph";
 import { LEGAL_NOTICE_URL, PRIVACY_POLICY_URL } from "@/lib/site-config";
 
@@ -10,9 +9,11 @@ export function Footer() {
     <footer className="w-full border-t border-white/10 bg-slate-950/90">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="flex items-center gap-3">
-          <Image
-            src="/logo.svg"
-            alt="eny.space"
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/pixel-planet.svg"
+            alt=""
+            aria-hidden
             width={32}
             height={32}
             className="shrink-0"
