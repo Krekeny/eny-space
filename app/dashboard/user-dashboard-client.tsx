@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { GlobeIcon, TerminalIcon, SparklesIcon } from "lucide-react";
 import { Paragraph } from "@/components/paragraph";
 import { Button } from "@/actions/components/ui/button";
 import { Input } from "@/actions/components/ui/input";
@@ -210,7 +211,7 @@ function CreateUserSection({
           Directly create an account on your PDS.
         </Paragraph>
       </div>
-      <div className="space-y-3">
+      <div className="space-y-3 max-w-sm">
         <div className="space-y-1">
           <Label htmlFor="handle">Handle</Label>
           <div className="flex items-center gap-1">
@@ -240,9 +241,9 @@ function CreateUserSection({
       <Button
         onClick={submit}
         disabled={loading || !handle || !password || !pdsBareHost || readOnly}
-        className="rounded-full w-full"
+        className="rounded-full w-full max-w-sm"
       >
-        {loading ? "Creating…" : "Create account"}
+        {loading ? "Creating…" : "Create user"}
       </Button>
       {success && <Paragraph className="text-sm text-emerald-300">{success}</Paragraph>}
       {error && <Paragraph className="text-sm text-rose-300 break-all">{error}</Paragraph>}
@@ -307,8 +308,11 @@ function MigrateSection({ pdsBareHost }: { pdsBareHost: string }) {
   const [code, setCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showCli, setShowCli] = useState(false);
 
-  const start = async () => {
+  const host = pdsBareHost ? `https://${pdsBareHost}` : "https://<your-pds-host>";
+
+  const generate = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -321,8 +325,6 @@ function MigrateSection({ pdsBareHost }: { pdsBareHost: string }) {
     }
   };
 
-  const host = pdsBareHost ? `https://${pdsBareHost}` : "https://<your-pds-host>";
-
   return (
     <section className="space-y-4 rounded-md border border-white/10 bg-white/5 p-4">
       <div>
@@ -330,31 +332,94 @@ function MigrateSection({ pdsBareHost }: { pdsBareHost: string }) {
           Migrate an existing account
         </Paragraph>
         <Paragraph className="text-xs text-white/50 mt-1">
-          Already have an AT Protocol account on another PDS? Move it here — you
-          keep your DID and handle. Generate a one-time code, then run the
-          migration with the AT Protocol CLI.
+          Already have an AT Protocol account elsewhere? Move it here — you keep
+          your DID and handle. Pick a method below.
         </Paragraph>
       </div>
 
-      {!code ? (
-        <Button onClick={start} disabled={loading} className="rounded-full w-full">
-          {loading ? "Generating…" : "Start migration"}
-        </Button>
-      ) : (
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <Paragraph className="text-xs text-white/50">
-              Your one-time migration code:
-            </Paragraph>
-            <Paragraph className="font-mono text-sm text-white break-all rounded bg-black/20 p-2">
+      {/* What every method needs */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-1">
+          <Paragraph className="text-xs font-medium text-white/60">
+            Destination PDS
+          </Paragraph>
+          <Paragraph className="font-mono text-xs text-white break-all rounded bg-black/20 p-2">
+            {host}
+          </Paragraph>
+        </div>
+        <div className="space-y-1">
+          <Paragraph className="text-xs font-medium text-white/60">
+            Migration code
+          </Paragraph>
+          {code ? (
+            <Paragraph className="font-mono text-xs text-white break-all rounded bg-black/20 p-2">
               {code}
             </Paragraph>
-          </div>
-          <div className="space-y-1">
-            <Paragraph className="text-xs font-medium text-white/70">
-              Migrate with goat (the AT Protocol CLI):
+          ) : (
+            <Button
+              onClick={generate}
+              disabled={loading}
+              className="h-9 w-full rounded-full text-xs"
+            >
+              {loading ? "Generating…" : "Generate code"}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-2.5">
+        {/* 1. PDS MOOver — recommended */}
+        <div className="flex items-start gap-3 rounded-md border border-emerald-400/30 bg-emerald-400/5 p-3">
+          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white">
+            <GlobeIcon className="size-4" aria-hidden />
+          </span>
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <div className="flex items-center gap-2">
+              <Paragraph className="text-sm font-semibold text-white">
+                PDS MOOver (web)
+              </Paragraph>
+              <span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-300">
+                Recommended
+              </span>
+            </div>
+            <Paragraph className="text-xs text-white/60">
+              Migrate in your browser: log in with your current handle + app
+              password, set the destination to the URL above, and paste the
+              migration code when asked. Use a desktop and keep the tab open —
+              blob uploads take 20–30 min.
             </Paragraph>
-            <pre className="overflow-auto rounded bg-neutral-900/90 p-3 text-[11px] leading-relaxed text-neutral-100">
+            <a
+              href="https://pdsmoover.com"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex rounded-full bg-white px-4 py-1.5 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
+            >
+              Open PDS MOOver ↗
+            </a>
+          </div>
+        </div>
+
+        {/* 2. goat CLI */}
+        <div className="flex items-start gap-3 rounded-md border border-white/10 bg-white/5 p-3">
+          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white">
+            <TerminalIcon className="size-4" aria-hidden />
+          </span>
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <Paragraph className="text-sm font-semibold text-white">
+              Command line (goat)
+            </Paragraph>
+            <Paragraph className="text-xs text-white/60">
+              For power users — the official AT Protocol CLI.
+            </Paragraph>
+            <button
+              type="button"
+              onClick={() => setShowCli((s) => !s)}
+              className="text-xs text-white/50 underline underline-offset-2 transition-colors hover:text-white"
+            >
+              {showCli ? "Hide commands" : "Show commands"}
+            </button>
+            {showCli && (
+              <pre className="mt-1 overflow-auto rounded bg-neutral-900/90 p-3 text-[11px] leading-relaxed text-neutral-100">
 {`# 1. Install goat
 go install github.com/bluesky-social/indigo/cmd/goat@latest
 
@@ -364,25 +429,37 @@ goat account login -u <your-current-handle> -p <app-password>
 # 3. Migrate (see \`goat account migrate --help\` for all flags)
 goat account migrate \\
   --pds-host ${host} \\
-  --invite-code ${code}
+  --invite-code ${code ?? "<generate a code above>"}
 
 # goat emails you a confirmation token from your old PDS to
 # authorize the identity (PLC) update — paste it when prompted.`}
-            </pre>
-            <Paragraph className="text-[11px] text-white/40">
-              Full guide:{" "}
-              <a
-                href="https://github.com/bluesky-social/indigo/tree/main/cmd/goat"
-                target="_blank"
-                rel="noreferrer"
-                className="underline text-white/60 hover:text-white"
-              >
-                goat account migrate
-              </a>
+              </pre>
+            )}
+          </div>
+        </div>
+
+        {/* 3. Built-in — coming soon */}
+        <div className="flex items-start gap-3 rounded-md border border-white/10 bg-white/5 p-3 opacity-70">
+          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white/70">
+            <SparklesIcon className="size-4" aria-hidden />
+          </span>
+          <div className="min-w-0 flex-1 space-y-1">
+            <div className="flex items-center gap-2">
+              <Paragraph className="text-sm font-semibold text-white/80">
+                Built-in migration
+              </Paragraph>
+              <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white/50">
+                Coming soon
+              </span>
+            </div>
+            <Paragraph className="text-xs text-white/50">
+              We&apos;re building guided migration right into eny.space — no
+              external tools, all in one place.
             </Paragraph>
           </div>
         </div>
-      )}
+      </div>
+
       {error && (
         <Paragraph className="text-sm text-rose-300 break-all">{error}</Paragraph>
       )}
