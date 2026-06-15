@@ -256,6 +256,9 @@ export async function POST(req: Request) {
     // Deliberate cancellation reaching period end. (A past_due grace already in
     // progress is left untouched by startPdsGrace's guard.)
     const userId = await userIdForCustomer(customerId);
+    console.log(
+      `🚫 Subscription canceled — customer ${customerId}, user ${userId ?? "UNKNOWN (no PDS row)"}`,
+    );
     if (userId) await startPdsGrace(userId, "canceled");
   }
 
@@ -266,6 +269,9 @@ export async function POST(req: Request) {
         ? invoice.customer
         : invoice.customer?.id;
     const userId = customerId ? await userIdForCustomer(customerId) : null;
+    console.log(
+      `⚠️ Payment failed — customer ${customerId ?? "?"}, user ${userId ?? "UNKNOWN (no PDS row)"}`,
+    );
     if (userId) await startPdsGrace(userId, "past_due");
   }
 
@@ -277,7 +283,12 @@ export async function POST(req: Request) {
         : invoice.customer?.id;
     // Payment recovered — undo a past_due grace if one was running.
     const userId = customerId ? await userIdForCustomer(customerId) : null;
-    if (userId) await reactivatePds(userId);
+    if (userId) {
+      console.log(
+        `💳 Payment received — customer ${customerId}, user ${userId} (reactivating if in grace)`,
+      );
+      await reactivatePds(userId);
+    }
   }
 
   return NextResponse.json({ message: "Received" }, { status: 200 });

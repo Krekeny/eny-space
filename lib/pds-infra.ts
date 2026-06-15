@@ -52,6 +52,10 @@ export async function schedulePdsTermination(
   }
 
   const { baseUrl, token } = requireConfig();
+  console.log(
+    `[pds-infra] DELETE /service/${serviceId} — flagging pod for termination`,
+    body,
+  );
   const res = await fetch(`${baseUrl}/service/${serviceId}`, {
     method: "DELETE",
     headers: {
@@ -68,6 +72,9 @@ export async function schedulePdsTermination(
       `PDS termination failed for service ${serviceId} (${res.status}): ${detail}`,
     );
   }
+  console.log(
+    `[pds-infra] ✅ service ${serviceId} flagged for termination (${res.status})`,
+  );
 }
 
 /**
