@@ -1,7 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { GlobeIcon, TerminalIcon, SparklesIcon } from "lucide-react";
+import {
+  GlobeIcon,
+  TerminalIcon,
+  SparklesIcon,
+  ChevronDownIcon,
+} from "lucide-react";
 import { Paragraph } from "@/components/paragraph";
 import { Button } from "@/actions/components/ui/button";
 import { Input } from "@/actions/components/ui/input";
@@ -472,6 +477,8 @@ type PdsAccount = {
   handle: string;
   email?: string;
   indexedAt?: string;
+  emailConfirmedAt?: string;
+  deactivatedAt?: string;
 };
 
 function DeleteDialog({
@@ -538,6 +545,7 @@ function AccountRow({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [busy, setBusy] = useState(false);
   const [rowError, setRowError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
 
   const deleteAccount = async () => {
     setBusy(true);
@@ -562,9 +570,20 @@ function AccountRow({
   return (
     <div className="py-3 text-sm space-y-1">
       <div className="flex items-start justify-between gap-4">
-        <div className="space-y-0.5 min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 min-w-0">
-            <Paragraph className="font-medium text-white truncate">{account.handle}</Paragraph>
+            <button
+              type="button"
+              onClick={() => setOpen((o) => !o)}
+              className="flex items-center gap-1.5 min-w-0 text-left"
+              aria-expanded={open}
+            >
+              <ChevronDownIcon
+                className={`size-3.5 shrink-0 text-white/40 transition-transform ${open ? "rotate-180" : ""}`}
+                aria-hidden
+              />
+              <Paragraph className="font-medium text-white truncate">{account.handle}</Paragraph>
+            </button>
             <a
               href={`https://pdsls.dev/at://${account.did}`}
               target="_blank"
@@ -580,10 +599,34 @@ function AccountRow({
               />
             </a>
           </div>
-          {account.email && (
-            <Paragraph className="text-xs text-white/50 truncate">{account.email}</Paragraph>
+
+          {open && (
+            <dl className="mt-2 ml-5 grid grid-cols-[6rem_1fr] gap-x-3 gap-y-1 text-xs text-white/70">
+              <dt className="text-white/40">Email</dt>
+              <dd className="break-all">
+                {account.email ?? "—"}
+                {account.email && !account.emailConfirmedAt && (
+                  <span className="ml-1 text-amber-300/80">(unconfirmed)</span>
+                )}
+              </dd>
+              <dt className="text-white/40">DID</dt>
+              <dd className="font-mono break-all">{account.did}</dd>
+              <dt className="text-white/40">Created</dt>
+              <dd>
+                {account.indexedAt
+                  ? new Date(account.indexedAt).toLocaleString()
+                  : "—"}
+              </dd>
+              <dt className="text-white/40">Status</dt>
+              <dd>
+                {account.deactivatedAt ? (
+                  <span className="text-rose-300">deactivated</span>
+                ) : (
+                  <span className="text-emerald-300">active</span>
+                )}
+              </dd>
+            </dl>
           )}
-          <Paragraph className="font-mono text-xs text-white/30 truncate">{account.did}</Paragraph>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {account.indexedAt && (
