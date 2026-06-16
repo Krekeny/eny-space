@@ -14,14 +14,19 @@ type Availability = "idle" | "checking" | "available" | "taken";
 
 type PdsNameFormProps = {
   pdsPlan: string;
+  /** When set, this is a resubscribe: lock to the user's existing PDS name. */
+  lockedName?: string;
 };
 
-export function PdsNameForm({ pdsPlan }: PdsNameFormProps) {
+export function PdsNameForm({ pdsPlan, lockedName }: PdsNameFormProps) {
   const router = useRouter();
-  const [name, setName] = useState("");
+  const locked = !!lockedName;
+  const [name, setName] = useState(lockedName ?? "");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [availability, setAvailability] = useState<Availability>("idle");
+  const [availability, setAvailability] = useState<Availability>(
+    locked ? "available" : "idle",
+  );
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const validation = validatePdsSlugInput(name);
@@ -29,6 +34,12 @@ export function PdsNameForm({ pdsPlan }: PdsNameFormProps) {
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    // The user's own existing PDS is always "available" to them — skip the check.
+    if (locked) {
+      setAvailability("available");
+      return;
+    }
 
     if (!preview) {
       setAvailability("idle");
@@ -53,7 +64,7 @@ export function PdsNameForm({ pdsPlan }: PdsNameFormProps) {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [preview]);
+  }, [preview, locked]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,13 +113,15 @@ export function PdsNameForm({ pdsPlan }: PdsNameFormProps) {
           autoComplete="off"
           autoCapitalize="none"
           spellCheck={false}
-          className="bg-white/10 text-white placeholder:text-white/40"
+          className="bg-white/10 text-white placeholder:text-white/40 disabled:opacity-100 read-only:opacity-70"
           disabled={loading}
+          readOnly={locked}
           required
         />
         <Paragraph className="text-xs text-white/60">
-          Letters, numbers, and hyphens. This becomes your hosting username and
-          part of your PDS URL.
+          {locked
+            ? "This is your existing PDS — resubscribe to bring it back online."
+            : "Letters, numbers, and hyphens. This becomes your hosting username and part of your PDS URL."}
         </Paragraph>
       </div>
 
@@ -148,7 +161,11 @@ export function PdsNameForm({ pdsPlan }: PdsNameFormProps) {
           disabled={loading || availability === "checking" || availability === "taken"}
           className="rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80 disabled:opacity-50"
         >
-          {loading ? "Redirecting…" : "Continue to payment"}
+          {loading
+            ? "Redirecting…"
+            : locked
+              ? "Resubscribe"
+              : "Continue to payment"}
         </Button>
       </div>
     </form>

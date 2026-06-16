@@ -42,6 +42,22 @@ export default async function WelcomeNamePage({
     redirect("/welcome");
   }
 
+  // If the user already has a PDS, this is a resubscribe — lock to their
+  // existing name. The webhook reactivates it on checkout (no new provisioning).
+  const { data: pdsRow } = await supabase
+    .from("pds_services")
+    .select("hostname")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const suffix = process.env.NEXT_PUBLIC_PDS_HOSTNAME_SUFFIX ?? ".eny.space";
+  const existingHost = pdsRow?.hostname
+    ?.replace(/^https?:\/\//i, "")
+    .replace(/\/.*$/, "");
+  const existingName =
+    existingHost && existingHost.endsWith(suffix)
+      ? existingHost.slice(0, -suffix.length)
+      : existingHost || null;
+
   const plan = getPlanCatalogEntry(params.pds_plan);
   const stripeAmounts = await getStripePlanAmounts();
   const displayPrice = formatStripePrice(
@@ -56,16 +72,20 @@ export default async function WelcomeNamePage({
           <div className="mb-4">
             <OnboardingSteps currentStep={2} />
           </div>
-          <CardTitle>Choose your PDS name</CardTitle>
+          <CardTitle>
+            {existingName ? "Welcome back" : "Choose your PDS name"}
+          </CardTitle>
           <CardDescription>
-            Pick a unique name for your {plan.name} PDS before we provision it.
+            {existingName
+              ? `Resubscribe to bring your PDS back online on the ${plan.name} plan.`
+              : `Pick a unique name for your ${plan.name} PDS before we provision it.`}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4 text-white">
           <PlanSummaryCard plan={plan} displayPrice={displayPrice} compact />
 
-          <PdsNameForm pdsPlan={plan.key} />
+          <PdsNameForm pdsPlan={plan.key} lockedName={existingName ?? undefined} />
         </CardContent>
       </Card>
     </main>

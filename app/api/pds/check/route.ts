@@ -34,6 +34,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "hostname is required" }, { status: 400 });
   }
 
+  // The user's own existing PDS counts as available to them (resubscribe flow),
+  // so their current name isn't reported as "taken".
+  const norm = (h: string) =>
+    h.replace(/^https?:\/\//i, "").replace(/\/.*$/, "").toLowerCase();
+  const { data: ownRow } = await supabase
+    .from("pds_services")
+    .select("hostname")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (ownRow?.hostname && norm(ownRow.hostname) === norm(hostname)) {
+    return NextResponse.json({ exists: false });
+  }
+
   const res = await fetch(`${PDS_API_BASE_URL}/check-pds`, {
     method: "POST",
     headers: {
