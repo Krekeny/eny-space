@@ -14,9 +14,13 @@ import { SUPPORT_MAILTO } from "@/lib/site-config";
 
 type Props = {
   isLoggedIn?: boolean;
+  isSubscribed?: boolean;
 };
 
-export async function PlanCards({ isLoggedIn = false }: Props) {
+export async function PlanCards({
+  isLoggedIn = false,
+  isSubscribed = false,
+}: Props) {
   const stripeAmounts = await getStripePlanAmounts();
 
   return (
@@ -89,7 +93,7 @@ export async function PlanCards({ isLoggedIn = false }: Props) {
                 >
                   Contact us
                 </ButtonLink>
-              ) : (
+              ) : isSubscribed ? null : (
                 <ButtonLink
                   href={ctaHref}
                   className={[

@@ -1,6 +1,7 @@
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import { createClient } from "@/lib/supabase/server";
+import { getSubscriptionStatus } from "@/actions/subscription";
 import { PlanCards } from "./plan-cards";
 
 export async function PricingSection() {
@@ -8,6 +9,13 @@ export async function PricingSection() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Hide the "Get started" CTAs for users who already have an active plan.
+  let isSubscribed = false;
+  if (user) {
+    const { active } = await getSubscriptionStatus();
+    isSubscribed = active;
+  }
 
   return (
     <section
@@ -31,7 +39,7 @@ export async function PricingSection() {
       </div>
 
       <div className="mx-auto mt-12 max-w-6xl">
-        <PlanCards isLoggedIn={!!user} />
+        <PlanCards isLoggedIn={!!user} isSubscribed={isSubscribed} />
       </div>
     </section>
   );
