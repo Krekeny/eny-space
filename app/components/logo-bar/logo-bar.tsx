@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Paragraph } from "@/components/paragraph";
 
@@ -149,10 +149,11 @@ function LogoBarItem({ item }: { item: (typeof ATMOSPHERE_APPS)[number] }) {
 }
 
 function LogoBarScroll() {
-  const shuffled = useMemo(
-    () => [...ATMOSPHERE_APPS].sort(() => Math.random() - 0.5),
-    []
-  );
+  const [shuffled, setShuffled] = useState(ATMOSPHERE_APPS);
+
+  useEffect(() => {
+    setShuffled((prev) => [...prev].sort(() => Math.random() - 0.5));
+  }, []);
 
   return (
     <div className="relative w-full overflow-hidden py-8 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
