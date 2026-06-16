@@ -6,6 +6,7 @@ import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import type { Stripe } from "stripe";
 import { pdsHostnameForSlug, validatePdsSlugInput } from "@/lib/pds-slug";
+import { isProfaneSlug } from "@/lib/profanity-server";
 import { welcomeNamePath } from "@/lib/onboarding";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 import {
@@ -197,6 +198,10 @@ export async function createSubscriptionCheckout(
   const validation = validatePdsSlugInput(rawUsername);
   if (!validation.ok) {
     throw new Error(validation.error);
+  }
+
+  if (isProfaneSlug(validation.slug)) {
+    throw new Error("This name is not allowed. Please choose another.");
   }
 
   const pdsUsername = validation.slug;

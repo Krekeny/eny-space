@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isProfaneSlug } from "@/lib/profanity-server";
 
 const PDS_API_BASE_URL = process.env.PDS_API_BASE_URL;
 
@@ -45,6 +46,17 @@ export async function POST(req: Request) {
     .maybeSingle();
   if (ownRow?.hostname && norm(ownRow.hostname) === norm(hostname)) {
     return NextResponse.json({ exists: false });
+  }
+
+  // Reject profane / disallowed names before they reach the backend. Derive the
+  // slug by stripping the hostname suffix (e.g. "name.eny.space" -> "name").
+  const suffix = (
+    process.env.NEXT_PUBLIC_PDS_HOSTNAME_SUFFIX ?? ".eny.space"
+  ).toLowerCase();
+  const host = norm(hostname);
+  const slug = host.endsWith(suffix) ? host.slice(0, -suffix.length) : host;
+  if (isProfaneSlug(slug)) {
+    return NextResponse.json({ exists: false, blocked: true });
   }
 
   const res = await fetch(`${PDS_API_BASE_URL}/check-pds`, {

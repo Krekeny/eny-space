@@ -18,6 +18,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.35.2",
     "lucide-react": "^0.562.0",
+    "naughty-words": "^1.2.0",
     "next": "latest",
     "postcss": "^8.5.6",
     "radix-ui": "^1.4.3",

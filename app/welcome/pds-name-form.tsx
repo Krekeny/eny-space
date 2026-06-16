@@ -10,7 +10,7 @@ import { Paragraph } from "@/components/paragraph";
 import { validatePdsSlugInput } from "@/lib/pds-slug";
 import { welcomePath } from "@/lib/onboarding";
 
-type Availability = "idle" | "checking" | "available" | "taken";
+type Availability = "idle" | "checking" | "available" | "taken" | "blocked";
 
 type PdsNameFormProps = {
   pdsPlan: string;
@@ -55,7 +55,9 @@ export function PdsNameForm({ pdsPlan, lockedName }: PdsNameFormProps) {
           body: JSON.stringify({ hostname: preview }),
         });
         const data = await res.json();
-        setAvailability(data.exists ? "taken" : "available");
+        setAvailability(
+          data.blocked ? "blocked" : data.exists ? "taken" : "available",
+        );
       } catch {
         setAvailability("idle");
       }
@@ -77,6 +79,11 @@ export function PdsNameForm({ pdsPlan, lockedName }: PdsNameFormProps) {
 
     if (availability === "taken") {
       setError("This name is already taken. Please choose another.");
+      return;
+    }
+
+    if (availability === "blocked") {
+      setError("This name is not allowed. Please choose another.");
       return;
     }
 
@@ -137,6 +144,9 @@ export function PdsNameForm({ pdsPlan, lockedName }: PdsNameFormProps) {
           {availability === "taken" && (
             <span className="text-rose-400 text-xs">Already taken</span>
           )}
+          {availability === "blocked" && (
+            <span className="text-rose-400 text-xs">Not allowed</span>
+          )}
         </div>
       )}
 
@@ -158,7 +168,12 @@ export function PdsNameForm({ pdsPlan, lockedName }: PdsNameFormProps) {
         </Button>
         <Button
           type="submit"
-          disabled={loading || availability === "checking" || availability === "taken"}
+          disabled={
+            loading ||
+            availability === "checking" ||
+            availability === "taken" ||
+            availability === "blocked"
+          }
           className="rounded-full bg-white px-4 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80 disabled:opacity-50"
         >
           {loading
