@@ -192,7 +192,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </Card>
 
       {/* Billing & Subscription */}
-      <CollapsibleSection title="Billing & Subscription">
+      <CollapsibleSection
+        title="Billing & Subscription"
+        warn={subscription?.cancel_at_period_end === true}
+        warnLabel="Cancellation scheduled"
+      >
         <DashboardClient
           subscribed={subscribed}
           subscription={subscription}
