@@ -6,6 +6,9 @@ import {
   TerminalIcon,
   SparklesIcon,
   ChevronDownIcon,
+  AtSignIcon,
+  EyeIcon,
+  EyeOffIcon,
 } from "lucide-react";
 import { Paragraph } from "@/components/paragraph";
 import { Button } from "@/actions/components/ui/button";
@@ -178,6 +181,7 @@ function CreateUserSection({
 }) {
   const [handle, setHandle] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -186,6 +190,15 @@ function CreateUserSection({
     () => (handle && pdsBareHost ? `${handle}.${pdsBareHost}` : ""),
     [handle, pdsBareHost],
   );
+
+  // Strong, readable password (no ambiguous chars like 0/O/1/l/I).
+  const generatePassword = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    const bytes = new Uint32Array(16);
+    crypto.getRandomValues(bytes);
+    setPassword(Array.from(bytes, (n) => chars[n % chars.length]).join(""));
+    setShowPassword(true);
+  };
 
   const submit = async () => {
     if (!handle || !password) return;
@@ -219,34 +232,76 @@ function CreateUserSection({
       <div className="space-y-3 max-w-sm">
         <div className="space-y-1">
           <Label htmlFor="handle">Handle</Label>
-          <div className="flex items-center gap-1">
+          <div className="group relative">
+            <AtSignIcon
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/40 transition-colors group-focus-within:text-fuchsia-400"
+              aria-hidden
+            />
             <Input
               id="handle"
               value={handle}
-              onChange={(e) => setHandle(e.target.value)}
+              onChange={(e) =>
+                setHandle(
+                  e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""),
+                )
+              }
               placeholder="username"
-              className="flex-1"
+              autoCapitalize="none"
+              autoComplete="off"
+              spellCheck={false}
+              className="h-10 pl-9 focus-visible:border-fuchsia-400/70 focus-visible:ring-fuchsia-400/30"
             />
-            {pdsBareHost && (
-              <Paragraph className="text-xs text-white/40 whitespace-nowrap">.{pdsBareHost}</Paragraph>
-            )}
           </div>
         </div>
         <div className="space-y-1">
-          <Label htmlFor="new-password">Password</Label>
-          <Input
-            id="new-password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-          />
+          <div className="flex items-center justify-between">
+            <Label htmlFor="new-password">Password</Label>
+            <button
+              type="button"
+              onClick={generatePassword}
+              className="inline-flex items-center gap-1 text-xs font-medium text-fuchsia-300/90 transition-colors hover:text-fuchsia-200"
+            >
+              <SparklesIcon className="size-3.5" aria-hidden />
+              Generate
+            </button>
+          </div>
+          <div className="group relative">
+            <Input
+              id="new-password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              autoComplete="new-password"
+              className="h-10 pr-10 font-mono focus-visible:border-fuchsia-400/70 focus-visible:ring-fuchsia-400/30"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((s) => !s)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/40 transition-colors hover:text-fuchsia-300"
+            >
+              {showPassword ? (
+                <EyeOffIcon className="size-4" aria-hidden />
+              ) : (
+                <EyeIcon className="size-4" aria-hidden />
+              )}
+            </button>
+          </div>
         </div>
       </div>
+      {pdsBareHost && (
+        <Paragraph className="max-w-sm text-xs text-white/50 break-all">
+          <span className="font-mono text-fuchsia-200/90">
+            {handle || "username"}.{pdsBareHost}
+          </span>{" "}
+          will be created
+        </Paragraph>
+      )}
       <Button
         onClick={submit}
         disabled={loading || !handle || !password || !pdsBareHost || readOnly}
-        className="rounded-full w-full max-w-sm"
+        className="w-full max-w-sm rounded-full bg-fuchsia-500 font-semibold text-white shadow-[0_0_24px_rgba(232,121,249,0.25)] transition-colors hover:bg-fuchsia-400 disabled:opacity-50 disabled:shadow-none"
       >
         {loading ? "Creating…" : "Create user"}
       </Button>
