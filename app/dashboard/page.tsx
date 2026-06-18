@@ -20,7 +20,7 @@ import {
   type PdsLifecycleReason,
 } from "@/lib/pds-lifecycle";
 import { LifecycleGraceBanner, LifecycleBlocked } from "./lifecycle-notice";
-import { reactivatePds } from "@/lib/pds-lifecycle-server";
+import { reactivatePds, startPdsGrace } from "@/lib/pds-lifecycle-server";
 
 type DashboardPageProps = {
   searchParams?: Promise<OnboardingSearchParams>;
@@ -40,29 +40,46 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const { active, subscribed, subscription } = await getSubscriptionStatus();
 
   // Resolve the PDS lifecycle (RLS scopes this to the user's own row).
-  const { data: lifecycleRow } = await supabase
+  const LIFECYCLE_SELECT =
+    "lifecycle_status, lifecycle_reason, grace_until, delete_at";
+  let { data: lifecycleRow } = await supabase
     .from("pds_services")
-    .select("lifecycle_status, lifecycle_reason, grace_until, delete_at")
+    .select(LIFECYCLE_SELECT)
     .eq("user_id", user.id)
     .maybeSingle();
 
-  let lifecycle: PdsLifecycleStatus = lifecycleRow
-    ? effectiveLifecycle({
-        status: (lifecycleRow.lifecycle_status ??
-          "active") as PdsLifecycleStatus,
-        graceUntil: lifecycleRow.grace_until
-          ? new Date(lifecycleRow.grace_until)
-          : null,
-        deleteAt: lifecycleRow.delete_at
-          ? new Date(lifecycleRow.delete_at)
-          : null,
-      })
-    : "active";
+  const resolveLifecycle = (row: typeof lifecycleRow): PdsLifecycleStatus =>
+    row
+      ? effectiveLifecycle({
+          status: (row.lifecycle_status ?? "active") as PdsLifecycleStatus,
+          graceUntil: row.grace_until ? new Date(row.grace_until) : null,
+          deleteAt: row.delete_at ? new Date(row.delete_at) : null,
+        })
+      : "active";
 
-  // Self-heal stale lifecycle. Stripe as source of truth
+  let lifecycle = resolveLifecycle(lifecycleRow);
+
+  // Self-heal UP: Stripe is the source of truth. Active subscription but a stale
+  // degraded lifecycle (missed reactivation webhook) → reset to active.
   if (active && lifecycle !== "active") {
     await reactivatePds(user.id);
     lifecycle = "active";
+  }
+
+  // Self-heal DOWN: Stripe canceled but the lifecycle is still "active" and the
+  // user has a provisioned PDS → the customer.subscription.deleted webhook was
+  // missed. Start grace so they keep read-only access + the migration window,
+  // instead of being bounced to onboarding. Gated on Stripe active===false
+  // (unforgeable truth) and an existing PDS, so it can't be abused.
+  if (!active && lifecycle === "active" && lifecycleRow) {
+    await startPdsGrace(user.id, "canceled");
+    const refetched = await supabase
+      .from("pds_services")
+      .select(LIFECYCLE_SELECT)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    lifecycleRow = refetched.data;
+    lifecycle = resolveLifecycle(lifecycleRow);
   }
 
   const reason = (lifecycleRow?.lifecycle_reason ??
