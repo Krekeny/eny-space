@@ -20,6 +20,7 @@ import {
   type PdsLifecycleReason,
 } from "@/lib/pds-lifecycle";
 import { LifecycleGraceBanner, LifecycleBlocked } from "./lifecycle-notice";
+import { reactivatePds } from "@/lib/pds-lifecycle-server";
 
 type DashboardPageProps = {
   searchParams?: Promise<OnboardingSearchParams>;
@@ -45,7 +46,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     .eq("user_id", user.id)
     .maybeSingle();
 
-  const lifecycle: PdsLifecycleStatus = lifecycleRow
+  let lifecycle: PdsLifecycleStatus = lifecycleRow
     ? effectiveLifecycle({
         status: (lifecycleRow.lifecycle_status ??
           "active") as PdsLifecycleStatus,
@@ -57,6 +58,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           : null,
       })
     : "active";
+
+  // Self-heal stale lifecycle. Stripe as source of truth
+  if (active && lifecycle !== "active") {
+    await reactivatePds(user.id);
+    lifecycle = "active";
+  }
+
   const reason = (lifecycleRow?.lifecycle_reason ??
     null) as PdsLifecycleReason | null;
   const readOnly = lifecycle === "grace";
