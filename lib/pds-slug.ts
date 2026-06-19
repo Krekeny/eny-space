@@ -15,6 +15,17 @@ export function pdsHostnameForSlug(slug: string): string {
   return `${slug}${PDS_HOSTNAME_SUFFIX}`;
 }
 
+/** Inverse of pdsHostnameForSlug: "krekeny.eny.space" / a full URL -> "krekeny". */
+export function slugFromHostname(hostname: string): string {
+  const host = hostname
+    .replace(/^https?:\/\//i, "")
+    .replace(/\/.*$/, "")
+    .toLowerCase();
+  return host.endsWith(PDS_HOSTNAME_SUFFIX)
+    ? host.slice(0, -PDS_HOSTNAME_SUFFIX.length)
+    : host;
+}
+
 export type PdsSlugValidation =
   | { ok: true; slug: string; hostname: string }
   | { ok: false; error: string };

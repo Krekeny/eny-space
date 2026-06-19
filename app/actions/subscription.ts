@@ -5,7 +5,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import type { Stripe } from "stripe";
-import { pdsHostnameForSlug, validatePdsSlugInput } from "@/lib/pds-slug";
+import {
+  normalizePdsSlug,
+  pdsHostnameForSlug,
+  slugFromHostname,
+  validatePdsSlugInput,
+} from "@/lib/pds-slug";
 import { isProfaneSlug } from "@/lib/profanity-server";
 import { welcomeNamePath } from "@/lib/onboarding";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
@@ -195,16 +200,30 @@ export async function createSubscriptionCheckout(
     throw new Error("PDS name is required before checkout.");
   }
 
-  const validation = validatePdsSlugInput(rawUsername);
-  if (!validation.ok) {
-    throw new Error(validation.error);
-  }
+  // Resubscribe to the user's OWN existing PDS bypasses name restrictions
+  // (reserved/brand + profanity) — the name is already theirs and provisioned.
+  const { data: ownPds } = await supabase
+    .from("pds_services")
+    .select("hostname")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const ownSlug = ownPds?.hostname ? slugFromHostname(ownPds.hostname) : null;
+  const isOwnName =
+    ownSlug !== null && ownSlug === normalizePdsSlug(rawUsername);
 
-  if (isProfaneSlug(validation.slug)) {
-    throw new Error("This name is not allowed. Please choose another.");
+  let pdsUsername: string;
+  if (isOwnName) {
+    pdsUsername = ownSlug;
+  } else {
+    const validation = validatePdsSlugInput(rawUsername);
+    if (!validation.ok) {
+      throw new Error(validation.error);
+    }
+    if (isProfaneSlug(validation.slug)) {
+      throw new Error("This name is not allowed. Please choose another.");
+    }
+    pdsUsername = validation.slug;
   }
-
-  const pdsUsername = validation.slug;
 
   // All plan config (price, disk size) comes from the server-side catalog
   const plan = getPlanCatalogEntry(planKey);
