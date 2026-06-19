@@ -1,7 +1,7 @@
 import { ButtonLink } from "@/components/button-link";
 import { PlanSummaryCard } from "@/components/plan/plan-summary-card";
 import type { PlanCatalogEntry } from "@/lib/plan-catalog";
-import { welcomeNamePath } from "@/lib/onboarding";
+import { subscribeNamePath } from "@/lib/onboarding";
 
 type WelcomeCheckoutProps = {
   plan: PlanCatalogEntry;
@@ -14,7 +14,7 @@ export function WelcomeCheckout({ plan, displayPrice }: WelcomeCheckoutProps) {
       <PlanSummaryCard plan={plan} displayPrice={displayPrice} />
 
       <ButtonLink
-        href={welcomeNamePath({ pds_plan: plan.key })}
+        href={subscribeNamePath({ pds_plan: plan.key })}
         className="inline-flex rounded-full bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
       >
         Choose PDS name

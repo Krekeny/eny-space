@@ -7,7 +7,7 @@ export async function GET(request: Request) {
     requestUrl.searchParams.get("next")?.startsWith("/") &&
     !requestUrl.searchParams.get("next")!.startsWith("//")
       ? requestUrl.searchParams.get("next")!
-      : "/welcome";
+      : "/subscribe";
 
   return exchangeCodeAndRedirect(
     request,

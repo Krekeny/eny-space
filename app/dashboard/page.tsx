@@ -8,7 +8,7 @@ import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import { getPdsServiceForCurrentUser } from "../api/pds/atproto/helpers";
-import { welcomePath, type OnboardingSearchParams } from "@/lib/onboarding";
+import { subscribePath, type OnboardingSearchParams } from "@/lib/onboarding";
 import { isPdsReady } from "@/lib/pds-state";
 import { PdsStatusCard } from "./pds-status-card";
 import { UserDashboardClient } from "./user-dashboard-client";
@@ -111,7 +111,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   // Lifecycle is active: require an active subscription, otherwise onboard.
   if (lifecycle === "active" && !active) {
-    redirect(welcomePath({ pds_plan: params?.pds_plan }));
+    redirect(subscribePath({ pds_plan: params?.pds_plan }));
   }
 
   // Account limits from the user's plan (personal = single account, no invites).

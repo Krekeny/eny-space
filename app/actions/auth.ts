@@ -14,7 +14,7 @@ export async function signUp(
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-  const next = (formData.get("next") as string) || "/welcome";
+  const next = (formData.get("next") as string) || "/subscribe";
   const confirmUrl = new URL("/auth/confirm-callback", appOrigin);
   confirmUrl.searchParams.set("next", next);
 
@@ -62,7 +62,7 @@ export async function signIn(formData: FormData) {
     return { error: error.message };
   }
 
-  const next = (formData.get("next") as string) || "/welcome";
+  const next = (formData.get("next") as string) || "/subscribe";
   revalidatePath("/", "layout");
   redirect(next);
 }

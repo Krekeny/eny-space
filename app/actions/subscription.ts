@@ -12,7 +12,7 @@ import {
   validatePdsSlugInput,
 } from "@/lib/pds-slug";
 import { isProfaneSlug } from "@/lib/profanity-server";
-import { welcomeNamePath } from "@/lib/onboarding";
+import { subscribeNamePath } from "@/lib/onboarding";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 import {
   getPriceIdForPlan,
@@ -290,7 +290,7 @@ export async function createSubscriptionCheckout(
       },
     ],
     success_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}${welcomeNamePath({ pds_plan: plan.key })}`,
+    cancel_url: `${origin}${subscribeNamePath({ pds_plan: plan.key })}`,
   });
 
   return { url: checkoutSession.url };

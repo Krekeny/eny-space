@@ -39,7 +39,7 @@ export default async function WelcomeNamePage({
   }
 
   if (!params?.pds_plan) {
-    redirect("/welcome");
+    redirect("/subscribe");
   }
 
   // If the user already has a PDS, this is a resubscribe — lock to their

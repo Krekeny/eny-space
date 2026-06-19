@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createMiddlewareClient } from "@/lib/supabase/middleware";
 import { isRecoverySession } from "@/lib/auth";
-import { welcomePath } from "@/lib/onboarding";
+import { subscribePath } from "@/lib/onboarding";
 
 const AUTH_ROUTES = ["/login", "/signup"];
 const RESET_PASSWORD_PATH = "/reset-password";
@@ -28,7 +28,7 @@ export async function proxy(request: NextRequest) {
 
     if (AUTH_ROUTES.includes(pathname)) {
       const pdsPlan = request.nextUrl.searchParams.get("pds_plan") ?? undefined;
-      const destination = welcomePath({ pds_plan: pdsPlan });
+      const destination = subscribePath({ pds_plan: pdsPlan });
       return NextResponse.redirect(new URL(destination, request.url));
     }
   }

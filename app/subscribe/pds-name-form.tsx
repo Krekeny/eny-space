@@ -8,7 +8,7 @@ import { Input } from "@/actions/components/ui/input";
 import { Label } from "@/actions/components/ui/label";
 import { Paragraph } from "@/components/paragraph";
 import { pdsHostnameForSlug, validatePdsSlugInput } from "@/lib/pds-slug";
-import { welcomePath } from "@/lib/onboarding";
+import { subscribePath } from "@/lib/onboarding";
 
 type Availability = "idle" | "checking" | "available" | "taken" | "blocked";
 
@@ -184,7 +184,7 @@ export function PdsNameForm({ pdsPlan, lockedName }: PdsNameFormProps) {
           variant="ghost"
           disabled={loading}
           className="rounded-full border border-white/40 bg-transparent px-4 text-xs font-medium uppercase tracking-wide text-white hover:bg-white/10"
-          onClick={() => router.push(welcomePath({ pds_plan: pdsPlan }))}
+          onClick={() => router.push(subscribePath({ pds_plan: pdsPlan }))}
         >
           Back
         </Button>

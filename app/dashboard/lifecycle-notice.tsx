@@ -1,7 +1,7 @@
 import { ButtonLink } from "@/components/button-link";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
-import { welcomePath } from "@/lib/onboarding";
+import { subscribePath } from "@/lib/onboarding";
 import type {
   PdsLifecycleReason,
   PdsLifecycleStatus,
@@ -50,7 +50,7 @@ export function LifecycleGraceBanner({
         lost.
       </Paragraph>
       <ButtonLink
-        href={welcomePath({ pds_plan: pdsPlan })}
+        href={subscribePath({ pds_plan: pdsPlan })}
         className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
       >
         {reason === "past_due" ? "Update payment" : "Resubscribe"}
@@ -84,7 +84,7 @@ export function LifecycleBlocked({
             } — resubscribe to restore it.`}
       </Paragraph>
       <ButtonLink
-        href={welcomePath({ pds_plan: pdsPlan })}
+        href={subscribePath({ pds_plan: pdsPlan })}
         className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
       >
         {isDeleted ? "Get started" : "Resubscribe"}

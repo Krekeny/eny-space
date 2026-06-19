@@ -10,7 +10,7 @@ import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import { Button } from "@/actions/components/ui/button";
 import { ButtonLink } from "@/components/button-link";
-import { welcomeNamePath } from "@/lib/onboarding";
+import { subscribeNamePath } from "@/lib/onboarding";
 
 interface DashboardClientProps {
   subscribed: boolean;
@@ -44,7 +44,7 @@ export default function DashboardClient({
           again to regain access.
         </Paragraph>
         <ButtonLink
-          href={welcomeNamePath({ pds_plan: pdsPlan })}
+          href={subscribeNamePath({ pds_plan: pdsPlan })}
           className="mt-1 inline-flex rounded-full bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-neutral-950 hover:bg-primary/80"
         >
           Subscribe again

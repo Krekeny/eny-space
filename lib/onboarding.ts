@@ -16,12 +16,12 @@ export function onboardingQueryString(params?: OnboardingSearchParams): string {
   return sp.toString();
 }
 
-export function welcomePath(params?: OnboardingSearchParams): string {
+export function subscribePath(params?: OnboardingSearchParams): string {
   const qs = onboardingQueryString(params);
-  return qs ? `/welcome?${qs}` : "/welcome";
+  return qs ? `/subscribe?${qs}` : "/subscribe";
 }
 
-export function welcomeNamePath(params?: OnboardingSearchParams): string {
+export function subscribeNamePath(params?: OnboardingSearchParams): string {
   const qs = onboardingQueryString(params);
-  return qs ? `/welcome/name?${qs}` : "/welcome/name";
+  return qs ? `/subscribe/name?${qs}` : "/subscribe/name";
 }

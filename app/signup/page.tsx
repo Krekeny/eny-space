@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { SignUpForm } from "./signup-form";
-import { welcomePath, type OnboardingSearchParams } from "@/lib/onboarding";
+import { subscribePath, type OnboardingSearchParams } from "@/lib/onboarding";
 
 type SignUpPageProps = {
   searchParams?: Promise<OnboardingSearchParams>;
@@ -11,7 +11,7 @@ type SignUpPageProps = {
 export default async function SignUpPage({ searchParams }: SignUpPageProps) {
   const params = await searchParams;
   const onboarding = { pds_plan: params?.pds_plan };
-  const next = welcomePath(onboarding);
+  const next = subscribePath(onboarding);
 
   const supabase = await createClient();
   const {

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { welcomePath, type OnboardingSearchParams } from "@/lib/onboarding";
+import { subscribePath, type OnboardingSearchParams } from "@/lib/onboarding";
 import { LoginForm } from "./login-form";
 
 type LoginPageProps = {
@@ -14,7 +14,7 @@ type LoginPageProps = {
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
   const onboarding = { pds_plan: params?.pds_plan };
-  const next = welcomePath(onboarding);
+  const next = subscribePath(onboarding);
 
   const supabase = await createClient();
   const {

@@ -6,7 +6,7 @@ import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 import type { OnboardingSearchParams } from "@/lib/onboarding";
-import { welcomeNamePath } from "@/lib/onboarding";
+import { subscribeNamePath } from "@/lib/onboarding";
 import { PlanCards } from "@/components/pricing/plan-cards";
 import { OnboardingSteps } from "./onboarding-steps";
 
@@ -35,7 +35,7 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
 
   if (params?.pds_plan) {
     const plan = getPlanCatalogEntry(params.pds_plan);
-    redirect(welcomeNamePath({ pds_plan: plan.key }));
+    redirect(subscribeNamePath({ pds_plan: plan.key }));
   }
 
   // A non-null subscription with no active access = the user had a plan that

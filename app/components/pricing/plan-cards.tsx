@@ -7,7 +7,7 @@ import {
 import { ButtonLink } from "@/components/button-link";
 import { Paragraph } from "@/components/paragraph";
 import { formatStripePrice } from "@/lib/format-stripe-price";
-import { welcomeNamePath } from "@/lib/onboarding";
+import { subscribeNamePath } from "@/lib/onboarding";
 import { PLAN_CATALOG } from "@/lib/plan-catalog";
 import { getStripePlanAmounts, PLAN_KEYS } from "@/lib/stripe-plans";
 import { SUPPORT_MAILTO } from "@/lib/site-config";
@@ -32,7 +32,7 @@ export async function PlanCards({
 
         const onboarding = { pds_plan: plan.key };
         const ctaHref = isLoggedIn
-          ? welcomeNamePath(onboarding)
+          ? subscribeNamePath(onboarding)
           : `/signup?${new URLSearchParams(onboarding).toString()}`;
 
         return (
