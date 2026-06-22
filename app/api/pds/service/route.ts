@@ -90,23 +90,11 @@ export async function GET() {
         );
       }
 
-      // Redact sensitive secrets before sending to the browser.
-      if (data && typeof data === "object") {
-        const d: any = data;
-        if (d.encrypted_config && typeof d.encrypted_config === "object") {
-          if ("adminPassword" in d.encrypted_config) {
-            d.encrypted_config.adminPassword = "redacted";
-          }
-          if ("jwtSecret" in d.encrypted_config) {
-            d.encrypted_config.jwtSecret = "redacted";
-          }
-          if ("plcRotationKey" in d.encrypted_config) {
-            d.encrypted_config.plcRotationKey = "redacted";
-          }
-        }
-      }
-
-      return NextResponse.json(data);
+      const d = (data ?? {}) as Record<string, any>;
+      return NextResponse.json({
+        state: d.state ?? null,
+        hostname: d.hostname || d.encrypted_config?.hostname || null,
+      });
     }
 
     const bodyText = await res.text();
