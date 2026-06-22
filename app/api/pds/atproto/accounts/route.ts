@@ -62,7 +62,17 @@ export async function GET() {
     }
 
     const { infos = [] } = await infoRes.json();
-    return NextResponse.json({ accounts: infos });
+    // Only expose what the dashboard renders — not the full admin account view
+    // (invites, invitedBy, inviteNote, threatSignatures, …).
+    const accounts = (infos as Record<string, unknown>[]).map((a) => ({
+      did: a.did,
+      handle: a.handle,
+      email: a.email,
+      indexedAt: a.indexedAt,
+      emailConfirmedAt: a.emailConfirmedAt,
+      deactivatedAt: a.deactivatedAt,
+    }));
+    return NextResponse.json({ accounts });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     const status = (error as any)?.status ?? 500;
