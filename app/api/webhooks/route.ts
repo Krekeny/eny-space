@@ -248,7 +248,7 @@ export async function POST(req: Request) {
     }
   }
 
-  // Post-subscription lifecycle (grace -> suspended -> deleted) transitions.
+  // Post-subscription lifecycle transitions.
   if (event.type === "customer.subscription.deleted") {
     const sub = event.data.object as Stripe.Subscription;
     const customerId =

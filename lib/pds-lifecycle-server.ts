@@ -47,12 +47,8 @@ export async function getLifecycle(userId: string) {
   return getRow(createAdminClient(), userId);
 }
 
-/**
- * Begin the grace period (cancel or payment failure): persist the timestamps
- * only. The PDS STAYS UP during grace — the infra DELETE is fired later, at the
- * grace→suspended transition (see sweepLifecycles). No-op if a lifecycle is
- * already in progress, so a later event can't override an in-flight grace.
- */
+/** Begin the grace period (cancel / payment failure). No-op if one is already
+ *  in progress, so a later event can't override an in-flight grace. */
 export async function startPdsGrace(
   userId: string,
   reason: PdsLifecycleReason,
@@ -129,9 +125,8 @@ export async function resetPdsLifecycle(userId: string) {
   return { ok: true };
 }
 
-/** Advance grace -> suspended -> deleted labels for all in-progress rows, and
- *  fire the infra DELETE when a row first crosses grace -> suspended (the pod
- *  goes down then, with termination_date = delete_at). */
+/** Advance lifecycle labels for in-progress rows and run the teardown when a
+ *  row leaves grace. Driven by the lifecycle cron. */
 export async function sweepLifecycles() {
   const supabase = createAdminClient();
   const { data: rows, error } = await supabase
@@ -161,10 +156,7 @@ export async function sweepLifecycles() {
     console.log(`[lifecycle] ${row.user_id}: ${status} -> ${next}`);
     transitions.push({ user_id: row.user_id, from: status, to: next });
 
-    // Leaving "grace" is when the pod actually goes down: fire the DELETE with
-    // termination_date = delete_at (data kept until then). Covers grace→suspended
-    // and the grace→deleted skip if the sweep lagged (delete_at already past →
-    // backend deletes ~now).
+    // Run the teardown once the row leaves grace.
     if (status === "grace" && next !== "grace" && row.pds_service_id && deleteAtDate) {
       try {
         await schedulePdsTermination(Number(row.pds_service_id), deleteAtDate);

@@ -4,16 +4,8 @@ import { sweepLifecycles } from "@/lib/pds-lifecycle-server";
 
 export const dynamic = "force-dynamic";
 
-// Advances the persisted lifecycle label (grace -> suspended -> deleted) AND,
-// when a row first crosses grace -> suspended, fires the infra DELETE that takes
-// the pod down (with termination_date = delete_at). This is REQUIRED: nothing
-// else triggers the post-grace teardown, so without this cron running a
-// cancellation stays in grace forever (pod up, never deleted).
-//
-// Scheduled hourly via vercel.json. Protected with CRON_SECRET (Vercel Cron
-// sends `Authorization: Bearer $CRON_SECRET` automatically when it's set).
-// Manual trigger:
-//   curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/pds-lifecycle
+// Required scheduled job (see vercel.json). Advances the subscription lifecycle.
+// Protected by CRON_SECRET (Vercel Cron sends it as a Bearer token).
 
 function authorized(req: Request): boolean {
   const secret = process.env.CRON_SECRET;

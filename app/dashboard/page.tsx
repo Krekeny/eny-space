@@ -59,18 +59,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   let lifecycle = resolveLifecycle(lifecycleRow);
 
-  // Self-heal UP: Stripe is the source of truth. Active subscription but a stale
-  // degraded lifecycle (missed reactivation webhook) → reset to active.
+  // Reconcile against Stripe (the source of truth) in case a webhook was missed.
   if (active && lifecycle !== "active") {
     await reactivatePds(user.id);
     lifecycle = "active";
   }
 
-  // Self-heal DOWN: Stripe canceled but the lifecycle is still "active" and the
-  // user has a provisioned PDS → the customer.subscription.deleted webhook was
-  // missed. Start grace so they keep read-only access + the migration window,
-  // instead of being bounced to onboarding. Gated on Stripe active===false
-  // (unforgeable truth) and an existing PDS, so it can't be abused.
   if (!active && lifecycle === "active" && lifecycleRow) {
     await startPdsGrace(user.id, "canceled");
     const refetched = await supabase
@@ -86,12 +80,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     null) as PdsLifecycleReason | null;
   const readOnly = lifecycle === "grace";
 
-  // The lifecycle drives the degraded states; the subscription's "active" flag
-  // only decides full-access vs onboarding when the lifecycle is active.
-  //   grace               -> read-only access + banner (below); PDS still on
-  //   suspended / deleted  -> blocked screen (pod off / permanently gone)
-  //   active + no sub      -> onboarding
-  //   active + sub         -> full access
   if (lifecycle === "suspended" || lifecycle === "deleted") {
     return (
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 sm:px-6">
