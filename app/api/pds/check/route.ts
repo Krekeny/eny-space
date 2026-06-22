@@ -72,7 +72,11 @@ export async function POST(req: Request) {
   const contentType = res.headers.get("content-type") || "";
   const data = contentType.includes("application/json")
     ? await res.json()
-    : await res.text();
+    : null;
 
-  return NextResponse.json(data, { status: res.status });
+  if (!res.ok) {
+    return NextResponse.json({ error: "Availability check failed" }, { status: 502 });
+  }
+
+  return NextResponse.json({ exists: !!(data as { exists?: boolean })?.exists });
 }

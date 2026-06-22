@@ -45,7 +45,8 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json(payload);
+    const p = (payload ?? {}) as { code?: string; inviteCode?: string };
+    return NextResponse.json({ code: p.code ?? p.inviteCode ?? null });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     const status = (error as any)?.status ?? 500;

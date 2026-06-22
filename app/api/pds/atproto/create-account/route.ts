@@ -86,11 +86,8 @@ export async function POST(req: Request) {
       );
     }
 
-    if (payload && typeof payload === "object") {
-      return NextResponse.json({ ...(payload as any), emailUsed: emailToUse });
-    }
 
-    return NextResponse.json({ payload, emailUsed: emailToUse });
+    return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     const status = (error as any)?.status ?? 500;
