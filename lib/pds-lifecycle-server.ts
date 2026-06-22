@@ -49,7 +49,8 @@ export async function getLifecycle(userId: string) {
 
 /**
  * Begin the grace period (cancel or payment failure): persist the timestamps
- * and schedule the infra termination at the grace end. No-op if a lifecycle is
+ * only. The PDS STAYS UP during grace — the infra DELETE is fired later, at the
+ * grace→suspended transition (see sweepLifecycles). No-op if a lifecycle is
  * already in progress, so a later event can't override an in-flight grace.
  */
 export async function startPdsGrace(
@@ -78,13 +79,6 @@ export async function startPdsGrace(
     `[lifecycle] grace started (${reason}) for ${userId}: grace_until=${graceUntil.toISOString()} delete_at=${deleteAt.toISOString()}`,
   );
 
-  if (row.pds_service_id) {
-    try {
-      await schedulePdsTermination(Number(row.pds_service_id), graceUntil);
-    } catch (e) {
-      console.error("[lifecycle] schedulePdsTermination failed", e);
-    }
-  }
   return { ok: true };
 }
 
@@ -135,12 +129,14 @@ export async function resetPdsLifecycle(userId: string) {
   return { ok: true };
 }
 
-/** Advance grace -> suspended -> deleted labels for all in-progress rows. */
+/** Advance grace -> suspended -> deleted labels for all in-progress rows, and
+ *  fire the infra DELETE when a row first crosses grace -> suspended (the pod
+ *  goes down then, with termination_date = delete_at). */
 export async function sweepLifecycles() {
   const supabase = createAdminClient();
   const { data: rows, error } = await supabase
     .from("pds_services")
-    .select("user_id, lifecycle_status, grace_until, delete_at")
+    .select("user_id, pds_service_id, lifecycle_status, grace_until, delete_at")
     .in("lifecycle_status", ["grace", "suspended"]);
   if (error) throw error;
 
@@ -149,19 +145,32 @@ export async function sweepLifecycles() {
 
   for (const row of rows ?? []) {
     const status = (row.lifecycle_status ?? "active") as PdsLifecycleStatus;
+    const deleteAtDate = row.delete_at ? new Date(row.delete_at) : null;
     const next = effectiveLifecycle({
       status,
       graceUntil: row.grace_until ? new Date(row.grace_until) : null,
-      deleteAt: row.delete_at ? new Date(row.delete_at) : null,
+      deleteAt: deleteAtDate,
       now,
     });
-    if (next !== status) {
-      await supabase
-        .from("pds_services")
-        .update({ lifecycle_status: next })
-        .eq("user_id", row.user_id);
-      console.log(`[lifecycle] ${row.user_id}: ${status} -> ${next}`);
-      transitions.push({ user_id: row.user_id, from: status, to: next });
+    if (next === status) continue;
+
+    await supabase
+      .from("pds_services")
+      .update({ lifecycle_status: next })
+      .eq("user_id", row.user_id);
+    console.log(`[lifecycle] ${row.user_id}: ${status} -> ${next}`);
+    transitions.push({ user_id: row.user_id, from: status, to: next });
+
+    // Leaving "grace" is when the pod actually goes down: fire the DELETE with
+    // termination_date = delete_at (data kept until then). Covers grace→suspended
+    // and the grace→deleted skip if the sweep lagged (delete_at already past →
+    // backend deletes ~now).
+    if (status === "grace" && next !== "grace" && row.pds_service_id && deleteAtDate) {
+      try {
+        await schedulePdsTermination(Number(row.pds_service_id), deleteAtDate);
+      } catch (e) {
+        console.error("[lifecycle] schedulePdsTermination failed", e);
+      }
     }
   }
 

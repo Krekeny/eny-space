@@ -15,9 +15,10 @@ const PDS_STATE_LABELS: Record<number, string> = {
   1: "Setting up your PDS…",
   2: "Almost ready…",
   3: "Running",
-  // canceled: still reachable during the grace window — the grace banner
-  // conveys the cancellation, so the card just shows it's up.
-  4: "Running",
+  // canceled = the pod has been taken DOWN (replicas 0) but data is retained
+  // and it's restorable until termination_date. During grace the state is still
+  // 3 (running); 4 only appears once suspended, where the blocked screen shows.
+  4: "Suspended",
   5: "Terminated",
   9: "Setup failed — please contact support",
 };
@@ -27,9 +28,9 @@ export type PdsStateType = "pending" | "ready" | "failed";
 export function pdsStateType(state: number | string | null | undefined): PdsStateType {
   if (state === null || state === undefined) return "pending";
   const n = typeof state === "number" ? state : Number(state);
-  if (n === 3 || n === 4) return "ready"; // done / canceled-but-running
+  if (n === 3) return "ready"; // done / running
   if (n === 5 || n === 9) return "failed"; // terminated / error
-  return "pending"; // created / deployment / creating user
+  return "pending"; // 0,1,2 provisioning · 4 suspended (down, not reachable)
 }
 
 export function pdsStateLabel(state: number | string | null | undefined): string {

@@ -88,8 +88,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   // The lifecycle drives the degraded states; the subscription's "active" flag
   // only decides full-access vs onboarding when the lifecycle is active.
-  //   grace               -> read-only access + banner (below)
-  //   suspended / deleted  -> blocked screen
+  //   grace               -> read-only access + banner (below); PDS still on
+  //   suspended / deleted  -> blocked screen (pod off / permanently gone)
   //   active + no sub      -> onboarding
   //   active + sub         -> full access
   if (lifecycle === "suspended" || lifecycle === "deleted") {

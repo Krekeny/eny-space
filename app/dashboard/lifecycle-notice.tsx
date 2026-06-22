@@ -23,15 +23,15 @@ type NoticeProps = {
   pdsPlan?: string;
 };
 
-/** Banner shown above a read-only dashboard during the grace period. */
+/** Banner above a read-only dashboard during grace — the PDS is still ON. */
 export function LifecycleGraceBanner({
   reason,
   graceUntil,
   deleteAt,
   pdsPlan,
 }: NoticeProps) {
-  const graceDate = fmtDate(graceUntil);
-  const deleteDate = fmtDate(deleteAt);
+  const graceDate = fmtDate(graceUntil); // when the PDS is switched off
+  const deleteDate = fmtDate(deleteAt); // when data is permanently deleted
   const headline =
     reason === "past_due"
       ? "Payment failed — your PDS is at risk"
@@ -45,7 +45,7 @@ export function LifecycleGraceBanner({
       <Paragraph className="mt-1 text-sm text-amber-50/90">
         Your PDS is still reachable but read-only
         {graceDate ? ` until ${graceDate}` : ""}. After that it is switched off
-        {deleteDate ? `, and permanently deleted on ${deleteDate}` : ""}.
+        {deleteDate ? `, and your data is kept until ${deleteDate}` : ""}.
         Resubscribe any time before then to restore full access — no data is
         lost.
       </Paragraph>
@@ -59,13 +59,15 @@ export function LifecycleGraceBanner({
   );
 }
 
-/** Full-screen state when the PDS is suspended or deleted. */
+/** Full-screen state when the PDS is suspended (off, recoverable) or deleted. */
 export function LifecycleBlocked({
   status,
   reason,
   deleteAt,
   pdsPlan,
-}: NoticeProps & { status: Extract<PdsLifecycleStatus, "suspended" | "deleted"> }) {
+}: NoticeProps & {
+  status: Extract<PdsLifecycleStatus, "suspended" | "deleted">;
+}) {
   const deleteDate = fmtDate(deleteAt);
   const isDeleted = status === "deleted";
 
@@ -81,7 +83,7 @@ export function LifecycleBlocked({
               reason === "past_due" ? " after a failed payment" : ""
             }. Your data is retained${
               deleteDate ? ` until ${deleteDate}` : ""
-            } — resubscribe to restore it.`}
+            } — resubscribe to bring it back online with your data.`}
       </Paragraph>
       <ButtonLink
         href={subscribePath({ pds_plan: pdsPlan })}

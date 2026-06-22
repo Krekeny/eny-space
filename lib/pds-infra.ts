@@ -29,11 +29,17 @@ export function formatTerminationDate(date: Date): string {
 }
 
 /**
- * Flag a service for suspension + scheduled deletion.
+ * Schedule a service for deletion.
  *
  * Calls `DELETE /service/{id}` with `termination_date`. Per the backend: the
- * service keeps running until `terminationDate`, then is suspended, and the pod
- * is permanently deleted ~30 days after that. Passing no date means "now".
+ * pod is taken down now and the data is retained until `termination_date`, when
+ * it's permanently destroyed (helm uninstall → state 5). Reversible until then
+ * via `reactivatePdsService` (PUT cancel_termination).
+ *
+ *   - pass a future Date → destroyed on that date.
+ *   - pass today's Date  → instant (same-day) deletion — e.g. a future
+ *     "Delete my PDS" action: schedulePdsTermination(id, new Date()).
+ *   - omit the arg        → backend DEFAULT of now + 30 days (NOT immediate).
  */
 export async function schedulePdsTermination(
   serviceId: number,
