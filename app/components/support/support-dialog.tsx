@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
-import { XIcon } from "lucide-react";
+import { MessageCircleIcon, XIcon } from "lucide-react";
 import { submitFeedback } from "@/actions/feedback";
 import { Button } from "@/actions/components/ui/button";
 import { Textarea } from "@/actions/components/ui/textarea";
@@ -28,6 +28,8 @@ type SupportDialogProps = {
   userEmail?: string | null;
   /** Extra context lines to show (e.g. PDS name + status). */
   details?: { label: string; value?: string | null }[];
+  /** "link" = inline dotted text (default); "fab" = floating action button. */
+  variant?: "link" | "fab";
 };
 
 export function SupportDialog({
@@ -36,6 +38,7 @@ export function SupportDialog({
   defaultCategory = "support",
   userEmail,
   details,
+  variant = "link",
 }: SupportDialogProps) {
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState<Category>(defaultCategory);
@@ -81,13 +84,25 @@ export function SupportDialog({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="underline decoration-dotted underline-offset-2 transition-colors hover:text-white"
-      >
-        {children ?? "contact support"}
-      </button>
+      {variant === "fab" ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Say hello"
+          className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full border border-white/15 bg-slate-900/90 px-4 py-3 text-sm font-medium text-white shadow-lg backdrop-blur transition-colors hover:border-white/30 hover:bg-slate-800"
+        >
+          <MessageCircleIcon className="size-4" aria-hidden />
+          <span className="hidden sm:inline">{children ?? "Say hi"}</span>
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="underline decoration-dotted underline-offset-2 transition-colors hover:text-white"
+        >
+          {children ?? "contact support"}
+        </button>
+      )}
 
       {open &&
         mounted &&

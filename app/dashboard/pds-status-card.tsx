@@ -79,7 +79,7 @@ export function PdsStatusCard({
         {isError && (
           <Paragraph className="text-sm text-white/60">
             Oops — we can see your PDS isn&apos;t deploying correctly, and
-            we&apos;re already on it. If you have anything to add, or just want
+            we&apos;re already on it.<br />If you have anything to add, or just want
             to say hello, you can{" "}
             <SupportDialog
               context="pds-setup-error"
