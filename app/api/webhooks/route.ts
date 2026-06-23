@@ -115,11 +115,9 @@ async function provisionPdsForUser({
     : await deployRes.text();
 
   if (!deployRes.ok) {
-    // Persist failure status for easier debugging
     await supabase.from("pds_services").upsert({
       user_id: userId,
       hostname,
-      status: "deploy_failed",
     });
     throw new Error(
       `PDS deploy failed (${deployRes.status}) for hostname "${hostname}": ${
@@ -147,7 +145,6 @@ async function provisionPdsForUser({
     user_id: userId,
     pds_service_id,
     hostname,
-    status: pds_service_id ? "provisioning" : "deploy_succeeded_no_id",
   });
 
   return { skipped: false, pds_service_id };
