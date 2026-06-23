@@ -64,7 +64,7 @@ export default async function RootLayout({ children }: LayoutProps) {
         <SiteBackground />
         <SiteHeader user={user} isRecovery={isRecovery} />
         <main className="flex-1">{children}</main>
-        <Footer />
+        <Footer fabInset={!!user} />
         {user && (
           <SupportDialog
             variant="fab"

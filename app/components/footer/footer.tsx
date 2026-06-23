@@ -2,12 +2,16 @@ import Link from "next/link";
 import { Paragraph } from "@/components/paragraph";
 import { LEGAL_NOTICE_URL, PRIVACY_POLICY_URL } from "@/lib/site-config";
 
-export function Footer() {
+export function Footer({ fabInset = false }: { fabInset?: boolean }) {
   const year = new Date().getFullYear();
 
   return (
     <footer className="w-full border-t border-white/10 bg-slate-950/90">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div
+        className={`mx-auto flex max-w-7xl flex-col gap-6 px-4 pt-8 sm:flex-row sm:items-center sm:justify-between sm:px-6 ${
+          fabInset ? "pb-28 sm:pb-24" : "pb-8"
+        }`}
+      >
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
