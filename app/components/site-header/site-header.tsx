@@ -80,11 +80,12 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
             : "h-14 max-w-7xl rounded-none border-transparent bg-transparent px-4 sm:px-6"
         }`}
       >
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
-          onClick={() => setMobileOpen(false)}
-        >
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+            onClick={() => setMobileOpen(false)}
+          >
           {/* Decorative animated pixel planet — plain img so SMIL plays. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -116,7 +117,11 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
               </span>
             </div>
           </div>
-        </Link>
+          </Link>
+          <span className="shrink-0 self-center rounded border border-white/30 bg-white/10 px-2 py-0.5 font-heading text-xs uppercase leading-none tracking-widest text-white/80">
+            Beta
+          </span>
+        </div>
 
         <div className="hidden items-center gap-2 md:flex">
           {user && !isRecovery ? (
