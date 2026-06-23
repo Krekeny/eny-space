@@ -14,7 +14,8 @@ type LoginPageProps = {
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
   const onboarding = { pds_plan: params?.pds_plan };
-  const next = subscribePath(onboarding);
+  // (active / grace / suspended / onboarding). Only continue into the subscribe
+  const next = params?.pds_plan ? subscribePath(onboarding) : "/dashboard";
 
   const supabase = await createClient();
   const {

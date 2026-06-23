@@ -7,6 +7,10 @@ import { Paragraph } from "@/components/paragraph";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 import type { OnboardingSearchParams } from "@/lib/onboarding";
 import { subscribeNamePath } from "@/lib/onboarding";
+import {
+  effectiveLifecycle,
+  type PdsLifecycleStatus,
+} from "@/lib/pds-lifecycle";
 import { PlanCards } from "@/components/pricing/plan-cards";
 import { OnboardingSteps } from "./onboarding-steps";
 
@@ -43,6 +47,33 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
   // plan" — they may not realize their subscription has ended.
   const subscriptionLapsed = subscription !== null;
 
+  // During grace the PDS is still online, so don't say "inactive". Show the
+  // shut-off date instead.
+  let graceUntil: string | null = null;
+  if (subscriptionLapsed) {
+    const { data: row } = await supabase
+      .from("pds_services")
+      .select("lifecycle_status, grace_until, delete_at")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (row) {
+      const lc = effectiveLifecycle({
+        status: (row.lifecycle_status ?? "active") as PdsLifecycleStatus,
+        graceUntil: row.grace_until ? new Date(row.grace_until) : null,
+        deleteAt: row.delete_at ? new Date(row.delete_at) : null,
+      });
+      if (lc === "grace") graceUntil = row.grace_until;
+    }
+  }
+  const graceDate = graceUntil
+    ? new Date(graceUntil).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+      })
+    : null;
+
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
       <div className="mb-8 text-center space-y-6">
@@ -52,8 +83,9 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
           <div className="mx-auto flex max-w-2xl items-start gap-3 rounded-lg border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-left text-sm text-amber-200">
             <TriangleAlertIcon className="mt-0.5 size-4 shrink-0" aria-hidden />
             <span>
-              Your subscription has ended, so your PDS is currently inactive.
-              Choose a plan below to resubscribe and bring it back online.
+              {graceDate
+                ? `Your subscription has ended, but your PDS is still online during the grace period — it will be shut down on ${graceDate}. Resubscribe to keep it running, no data lost.`
+                : "Your subscription has ended, so your PDS is currently inactive. Choose a plan below to resubscribe and bring it back online."}
             </span>
           </div>
         )}

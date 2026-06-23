@@ -199,8 +199,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       {/* Billing & Subscription */}
       <CollapsibleSection
         title="Billing & Subscription"
-        warn={subscription?.cancel_at_period_end === true}
-        warnLabel="Cancellation scheduled"
+        warn={subscription?.cancel_at_period_end === true || lifecycle === "grace"}
+        warnTone={lifecycle === "grace" ? "danger" : "warning"}
+        warnLabel={
+          lifecycle === "grace"
+            ? "Subscription canceled"
+            : "Cancellation scheduled"
+        }
       >
         <DashboardClient
           subscribed={subscribed}

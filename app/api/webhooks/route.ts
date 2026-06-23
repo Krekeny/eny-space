@@ -71,26 +71,14 @@ async function provisionPdsForUser({
 
   const supabase = createAdminClient();
 
-  // Idempotency: if we already have a service_id stored, don't redeploy
   const { data: existing } = await supabase
     .from("pds_services")
-    .select("pds_service_id,status")
+    .select("pds_service_id")
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (existing) {
-    if (existing.pds_service_id) {
-      return { skipped: true, pds_service_id: existing.pds_service_id };
-    }
-    // Retry deploy for known retryable states where id may be missing.
-    // Keep skipping for everything else to avoid duplicate provisioning.
-    const retryableStatuses = new Set([
-      "deploy_failed",
-      "deploy_succeeded_no_id",
-    ]);
-    if (existing.status && !retryableStatuses.has(existing.status)) {
-      return { skipped: true, pds_service_id: null };
-    }
+  if (existing?.pds_service_id) {
+    return { skipped: true, pds_service_id: existing.pds_service_id };
   }
 
   const deployRes = await fetch(`${PDS_API_BASE_URL}/deploy`, {

@@ -8,9 +8,9 @@ interface CollapsibleSectionProps {
   children: React.ReactNode;
   defaultOpen?: boolean;
   className?: string;
-  /** Shows an amber warning icon in the header — visible even when collapsed. */
   warn?: boolean;
-  /** Accessible description of why the warning shows. */
+  /** Icon color: amber for an upcoming issue, red for one already in effect. */
+  warnTone?: "warning" | "danger";
   warnLabel?: string;
 }
 
@@ -20,6 +20,7 @@ export function CollapsibleSection({
   defaultOpen = false,
   className,
   warn = false,
+  warnTone = "warning",
   warnLabel = "Needs attention",
 }: CollapsibleSectionProps) {
   return (
@@ -32,7 +33,10 @@ export function CollapsibleSection({
           {title}
           {warn && (
             <TriangleAlertIcon
-              className="size-4 text-amber-400"
+              className={cn(
+                "size-4",
+                warnTone === "danger" ? "text-rose-500" : "text-amber-400",
+              )}
               aria-label={warnLabel}
             />
           )}
