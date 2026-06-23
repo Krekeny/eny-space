@@ -149,14 +149,7 @@ export async function sweepLifecycles() {
     });
     if (next === status) continue;
 
-    await supabase
-      .from("pds_services")
-      .update({ lifecycle_status: next })
-      .eq("user_id", row.user_id);
-    console.log(`[lifecycle] ${row.user_id}: ${status} -> ${next}`);
-    transitions.push({ user_id: row.user_id, from: status, to: next });
-
-    // Run the teardown once the row leaves grace.
+    // Run the teardown once the row leaves grace (uses the live service id).
     if (status === "grace" && next !== "grace" && row.pds_service_id && deleteAtDate) {
       try {
         await schedulePdsTermination(Number(row.pds_service_id), deleteAtDate);
@@ -164,6 +157,22 @@ export async function sweepLifecycles() {
         console.error("[lifecycle] schedulePdsTermination failed", e);
       }
     }
+
+    const update: Record<string, unknown> = { lifecycle_status: next };
+    if (next === "deleted") {
+      // PDS + data are gone — clear the stale infra refs so the user starts
+      // fresh: the name is released and a resubscribe won't skip provisioning.
+      update.pds_service_id = null;
+      update.hostname = null;
+      update.grace_until = null;
+      update.delete_at = null;
+    }
+    await supabase
+      .from("pds_services")
+      .update(update)
+      .eq("user_id", row.user_id);
+    console.log(`[lifecycle] ${row.user_id}: ${status} -> ${next}`);
+    transitions.push({ user_id: row.user_id, from: status, to: next });
   }
 
   return { scanned: rows?.length ?? 0, transitions };
