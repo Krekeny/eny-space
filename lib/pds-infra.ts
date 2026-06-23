@@ -13,8 +13,10 @@ function requireConfig(): { baseUrl: string; token: string } {
   return { baseUrl: PDS_API_BASE_URL, token };
 }
 
+// Full ISO 8601 datetime in UTC (e.g. 2026-06-23T14:02:00.000Z) — not a bare
+// date, which the backend would read as 00:00 (in the past later in the day).
 export function formatTerminationDate(date: Date): string {
-  return date.toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+  return date.toISOString();
 }
 
 /** Schedule a service for deletion (optionally on a given date; omitted = backend default). */
@@ -22,9 +24,15 @@ export async function schedulePdsTermination(
   serviceId: number,
   terminationDate?: Date,
 ): Promise<void> {
-  const body = terminationDate
-    ? { termination_date: formatTerminationDate(terminationDate) }
-    : {};
+  // Never send a past date — the backend rejects "termination date must be
+  // today or in the future". If the target is already in the past (a lagged
+  // sweep, or a backdated test), clamp to now → delete today.
+  let body: Record<string, string> = {};
+  if (terminationDate) {
+    const now = new Date();
+    const when = terminationDate.getTime() > now.getTime() ? terminationDate : now;
+    body = { termination_date: formatTerminationDate(when) };
+  }
 
   if (!LIFECYCLE_ENABLED) {
     console.log(
@@ -35,29 +43,31 @@ export async function schedulePdsTermination(
   }
 
   const { baseUrl, token } = requireConfig();
-  console.log(
-    `[pds-infra] DELETE /service/${serviceId} — flagging pod for termination`,
-    body,
-  );
-  const res = await fetch(`${baseUrl}/service/${serviceId}`, {
+  const url = `${baseUrl}/service/${serviceId}`;
+  const requestBody = JSON.stringify(body);
+  console.log(`[pds-infra] → DELETE ${url}  body=${requestBody}`);
+
+  const res = await fetch(url, {
     method: "DELETE",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(body),
+    body: requestBody,
   });
 
+  const responseBody = await res.text().catch(() => "");
+  console.log(
+    `[pds-infra] ← DELETE /service/${serviceId} ${res.status} ${res.statusText} ` +
+      `ct=${res.headers.get("content-type") ?? "?"}  body=${responseBody || "<empty>"}`,
+  );
+
   if (!res.ok) {
-    const detail = await res.text().catch(() => "");
     throw new Error(
-      `PDS termination failed for service ${serviceId} (${res.status}): ${detail}`,
+      `PDS termination failed for service ${serviceId} (${res.status}): ${responseBody}`,
     );
   }
-  console.log(
-    `[pds-infra] ✅ service ${serviceId} flagged for termination (${res.status})`,
-  );
 }
 
 /** Cancel a scheduled termination so a resubscribing user keeps their data. */

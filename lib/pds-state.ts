@@ -5,7 +5,7 @@ const PDS_STATE_LABELS: Record<number, string> = {
   3: "Running",
   4: "Suspended",
   5: "Terminated",
-  9: "Setup failed — please contact support",
+  9: "Setup failed",
 };
 
 export type PdsStateType = "pending" | "ready" | "failed";

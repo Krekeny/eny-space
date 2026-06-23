@@ -147,7 +147,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         />
       )}
 
-      <PdsStatusCard initialState={pdsState} initialHostname={pdsHostname} />
+      <PdsStatusCard
+        initialState={pdsState}
+        initialHostname={pdsHostname}
+        userEmail={user.email}
+      />
 
       {/* Forms — only shown when PDS is reachable */}
       {ready ? (

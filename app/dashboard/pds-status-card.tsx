@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "@/actions/components/ui/card";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import { pdsStateLabel, pdsStateType } from "@/lib/pds-state";
+import { SupportDialog } from "@/components/support/support-dialog";
 import { PdsHealthClient } from "./pds-health-client";
 
 const POLL_INTERVAL_MS = 5000;
@@ -13,15 +14,21 @@ const POLL_INTERVAL_MS = 5000;
 type Props = {
   initialState: number | string | null;
   initialHostname: string | null;
+  userEmail?: string | null;
 };
 
-export function PdsStatusCard({ initialState, initialHostname }: Props) {
+export function PdsStatusCard({
+  initialState,
+  initialHostname,
+  userEmail,
+}: Props) {
   const router = useRouter();
   const [state, setState] = useState(initialState);
   const [hostname, setHostname] = useState(initialHostname);
 
   const stateType = pdsStateType(state);
   const statusLabel = pdsStateLabel(state);
+  const isError = Number(state) === 9;
 
   const poll = useCallback(async () => {
     try {
@@ -67,6 +74,24 @@ export function PdsStatusCard({ initialState, initialHostname }: Props) {
         {hostname && (
           <Paragraph className="text-sm text-white/60 font-mono">
             {hostname}
+          </Paragraph>
+        )}
+        {isError && (
+          <Paragraph className="text-sm text-white/60">
+            Oops — we can see your PDS isn&apos;t deploying correctly, and
+            we&apos;re already on it. If you have anything to add, or just want
+            to say hello, you can{" "}
+            <SupportDialog
+              context="pds-setup-error"
+              userEmail={userEmail}
+              details={[
+                { label: "PDS", value: hostname },
+                { label: "Status", value: statusLabel },
+              ]}
+            >
+              write us
+            </SupportDialog>{" "}
+            any time.
           </Paragraph>
         )}
       </CardHeader>
