@@ -13,12 +13,17 @@ function unitMs(): number {
   return Number.isFinite(n) && n > 0 ? n : DAY_MS;
 }
 
+function envInt(name: string, fallback: number): number {
+  const n = Number(process.env[name]);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
 export const GRACE_UNITS: Record<PdsLifecycleReason, number> = {
-  canceled: 14,
-  past_due: 30,
+  canceled: envInt("PDS_GRACE_UNITS_CANCELED", 14),
+  past_due: envInt("PDS_GRACE_UNITS_PAST_DUE", 30),
 };
 
-export const SUSPENDED_UNITS = 30;
+export const SUSPENDED_UNITS = envInt("PDS_SUSPENDED_UNITS", 30);
 
 export function graceUntil(
   reason: PdsLifecycleReason,

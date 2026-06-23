@@ -163,6 +163,29 @@ export async function getActivePlanKey(): Promise<PlanKey | null> {
 }
 
 /**
+ * lock the user back to the exact plan their (still-recoverable) PDS was provisioned with.
+ */
+export async function getPreviousPlanKey(): Promise<PlanKey | null> {
+  const customerId = await getStripeCustomerId();
+  if (!customerId) return null;
+  try {
+    const subscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "all",
+      limit: 10,
+    });
+    const latest = subscriptions.data
+      .slice()
+      .sort((a, b) => b.created - a.created)[0];
+    const priceId = latest?.items?.data?.[0]?.price?.id;
+    return getPlanKeyForPriceId(priceId ?? null);
+  } catch (error) {
+    console.error("Error resolving previous plan from Stripe:", error);
+    return null;
+  }
+}
+
+/**
  * Verify active subscription for protected routes (always checks Stripe)
  */
 export async function verifyActiveSubscription(): Promise<{

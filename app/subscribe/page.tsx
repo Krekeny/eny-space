@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 import { TriangleAlertIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getSubscriptionStatus } from "@/actions/subscription";
+import {
+  getSubscriptionStatus,
+  getPreviousPlanKey,
+} from "@/actions/subscription";
 import { Heading } from "@/components/heading";
 import { Paragraph } from "@/components/paragraph";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
@@ -31,48 +34,54 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
 
   const { active, subscription } = await getSubscriptionStatus();
 
-  // Bounce users who still have access (incl. cancel-at-period-end) to the
-  // dashboard rather than back into onboarding.
+  // Still have access (incl. cancel-at-period-end) → dashboard, not onboarding.
   if (active) {
     redirect("/dashboard");
   }
 
+  // Resolve the user's PDS lifecycle once.
+  const { data: row } = await supabase
+    .from("pds_services")
+    .select("pds_service_id, lifecycle_status, grace_until, delete_at")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const lifecycle = row
+    ? effectiveLifecycle({
+        status: (row.lifecycle_status ?? "active") as PdsLifecycleStatus,
+        graceUntil: row.grace_until ? new Date(row.grace_until) : null,
+        deleteAt: row.delete_at ? new Date(row.delete_at) : null,
+      })
+    : "active";
+
+  // Recoverable PDS (grace/suspended): lock resubscribe to that exact plan and skip plan selection
+  const recoverable =
+    !!row?.pds_service_id &&
+    (lifecycle === "grace" || lifecycle === "suspended");
+  if (recoverable) {
+    const previousPlan = await getPreviousPlanKey();
+    if (previousPlan) {
+      redirect(subscribeNamePath({ pds_plan: previousPlan }));
+    }
+  }
+
+  // New user who already picked a plan (post-signup / plan card) → name step.
   if (params?.pds_plan) {
     const plan = getPlanCatalogEntry(params.pds_plan);
     redirect(subscribeNamePath({ pds_plan: plan.key }));
   }
 
-  // A non-null subscription with no active access = the user had a plan that
-  // lapsed/was canceled. Tell them why they're here instead of just "choose a
-  // plan" — they may not realize their subscription has ended.
+  // A non-null subscription with no active access = a lapsed plan; tell the user
+  // why they're here.
   const subscriptionLapsed = subscription !== null;
-
-  // During grace the PDS is still online, so don't say "inactive". Show the
-  // shut-off date instead.
-  let graceUntil: string | null = null;
-  if (subscriptionLapsed) {
-    const { data: row } = await supabase
-      .from("pds_services")
-      .select("lifecycle_status, grace_until, delete_at")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (row) {
-      const lc = effectiveLifecycle({
-        status: (row.lifecycle_status ?? "active") as PdsLifecycleStatus,
-        graceUntil: row.grace_until ? new Date(row.grace_until) : null,
-        deleteAt: row.delete_at ? new Date(row.delete_at) : null,
-      });
-      if (lc === "grace") graceUntil = row.grace_until;
-    }
-  }
-  const graceDate = graceUntil
-    ? new Date(graceUntil).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-        timeZone: "UTC",
-      })
-    : null;
+  const graceDate =
+    lifecycle === "grace" && row?.grace_until
+      ? new Date(row.grace_until).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          timeZone: "UTC",
+        })
+      : null;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
