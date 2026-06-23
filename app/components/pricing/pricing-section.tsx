@@ -27,7 +27,7 @@ export async function PricingSection() {
           as="h2"
           className="text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-4xl"
         >
-          Simple Pricing for Individuals, Developers and Communities.
+          Simple Pricing for Individuals, Developers and Communities
         </Heading>
         <Paragraph className="mt-4 text-sm text-white/70 sm:text-base">
           Whether you're an indie developer, a power user, or running a

@@ -125,6 +125,27 @@
       transform: translate3d(-50%, 0, 0);
     }
   }
+
+  /* Periodic attention wiggle (rests, then wiggles ~every 5s). */
+  --animate-beta-wiggle: beta-wiggle 5s ease-in-out infinite;
+
+  @keyframes beta-wiggle {
+    0%, 90%, 100% {
+      transform: rotate(0deg);
+    }
+    92% {
+      transform: rotate(-7deg);
+    }
+    94% {
+      transform: rotate(6deg);
+    }
+    96% {
+      transform: rotate(-5deg);
+    }
+    98% {
+      transform: rotate(3deg);
+    }
+  }
 }
 
 @layer base {

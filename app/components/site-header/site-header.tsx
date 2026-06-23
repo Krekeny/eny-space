@@ -7,6 +7,7 @@ import { Button } from "@/actions/components/ui/button";
 import { ArrowUpRightIcon, MenuIcon, XIcon } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { MobileMenu } from "./mobile-menu";
+import { BetaBadge } from "./beta-badge";
 
 interface SiteHeaderProps {
   user: User | null;
@@ -118,9 +119,7 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
             </div>
           </div>
           </Link>
-          <span className="shrink-0 self-center rounded border border-white/30 bg-white/10 px-2 py-0.5 font-heading text-xs uppercase leading-none tracking-widest text-white/80">
-            Beta
-          </span>
+          <BetaBadge />
         </div>
 
         <div className="hidden items-center gap-2 md:flex">

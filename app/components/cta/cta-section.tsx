@@ -11,7 +11,7 @@ export function CTASection() {
           as="h2"
           className="text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-4xl"
         >
-          Explore your PDS like a real space,<br />not just an API.
+          Explore your PDS like a real space,<br />not just an API
         </Heading>
         <Paragraph className="max-w-2xl text-sm text-white/70 sm:text-base">
           Spin up a managed PDS in a few clicks and explore it through a clean,

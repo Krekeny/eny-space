@@ -7,6 +7,7 @@ interface FeatureCardProps {
   title: string;
   description: string;
   className?: string;
+  upcoming?: boolean;
 }
 
 export function FeatureCard({
@@ -14,6 +15,7 @@ export function FeatureCard({
   title,
   description,
   className,
+  upcoming = false,
 }: FeatureCardProps) {
   return (
     <div
@@ -22,6 +24,11 @@ export function FeatureCard({
         className,
       )}
     >
+      {upcoming && (
+        <span className="absolute right-3 top-3 rounded-full border border-fuchsia-400/30 bg-fuchsia-400/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-fuchsia-200">
+          Coming soon
+        </span>
+      )}
       <div className="mb-1 inline-flex size-10 items-center justify-center rounded-xl bg-fuchsia-400/15 text-fuchsia-300 shadow-[0_0_30px_rgba(232,121,249,0.6)]">
         {icon}
       </div>
