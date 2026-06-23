@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/actions/components/ui/card";
 import { Heading } from "@/components/heading";
@@ -15,12 +15,19 @@ type Props = {
   initialState: number | string | null;
   initialHostname: string | null;
   userEmail?: string | null;
+  startedAt?: string | null;
 };
+
+// Fake-but-honest setup bar: ~3 min, capped below 100% until the PDS is ready.
+// What? A relatively accurate fake bar is better than nothing
+const SETUP_DURATION_MS = 3 * 60 * 1000;
+const SETUP_CAP = 0.95;
 
 export function PdsStatusCard({
   initialState,
   initialHostname,
   userEmail,
+  startedAt,
 }: Props) {
   const router = useRouter();
   const [state, setState] = useState(initialState);
@@ -29,6 +36,26 @@ export function PdsStatusCard({
   const stateType = pdsStateType(state);
   const statusLabel = pdsStateLabel(state);
   const isError = Number(state) === 9;
+  const isPending = stateType === "pending";
+
+  const startMs = useMemo(() => {
+    const t = startedAt ? new Date(startedAt).getTime() : Date.now();
+    return Number.isFinite(t) ? t : Date.now();
+  }, [startedAt]);
+
+  const computeProgress = useCallback(
+    () => Math.min(SETUP_CAP, Math.max(0, (Date.now() - startMs) / SETUP_DURATION_MS)),
+    [startMs],
+  );
+  // Start at 0 (deterministic for SSR), then the effect catches up to elapsed.
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    if (!isPending) return;
+    setProgress(computeProgress());
+    const id = setInterval(() => setProgress(computeProgress()), 1000);
+    return () => clearInterval(id);
+  }, [isPending, computeProgress]);
 
   const poll = useCallback(async () => {
     try {
@@ -75,6 +102,20 @@ export function PdsStatusCard({
           <Paragraph className="text-sm text-white/60 font-mono">
             {hostname}
           </Paragraph>
+        )}
+        {isPending && (
+          <div className="mt-3 space-y-1.5">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+              <div
+                className="h-full rounded-full bg-amber-400 transition-[width] duration-1000 ease-linear"
+                style={{ width: `${Math.round(progress * 100)}%` }}
+              />
+            </div>
+            <Paragraph className="text-xs text-white/40">
+              This usually takes a few minutes. You can leave and come back —
+              we&apos;ll keep going.
+            </Paragraph>
+          </div>
         )}
         {isError && (
           <Paragraph className="text-sm text-white/60">

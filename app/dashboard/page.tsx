@@ -11,6 +11,7 @@ import { getPdsServiceForCurrentUser } from "../api/pds/atproto/helpers";
 import { subscribePath, type OnboardingSearchParams } from "@/lib/onboarding";
 import { isPdsReady } from "@/lib/pds-state";
 import { PdsStatusCard } from "./pds-status-card";
+import { PdsReachabilityGate } from "./pds-reachability-gate";
 import { UserDashboardClient } from "./user-dashboard-client";
 import DashboardClient from "./dashboard-client";
 import { CollapsibleSection } from "./collapsible-section";
@@ -41,7 +42,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   // Resolve the PDS lifecycle (RLS scopes this to the user's own row).
   const LIFECYCLE_SELECT =
-    "lifecycle_status, lifecycle_reason, grace_until, delete_at";
+    "lifecycle_status, lifecycle_reason, grace_until, delete_at, created_at";
   let { data: lifecycleRow } = await supabase
     .from("pds_services")
     .select(LIFECYCLE_SELECT)
@@ -151,17 +152,22 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         initialState={pdsState}
         initialHostname={pdsHostname}
         userEmail={user.email}
+        startedAt={lifecycleRow?.created_at ?? null}
       />
 
       {/* Forms — only shown when PDS is reachable */}
       {ready ? (
         <Card>
           <CardContent className="pt-6">
-            <UserDashboardClient
-              readOnly={readOnly}
-              canInvite={canInvite}
-              maxAccounts={planMaxAccounts}
-            />
+            <PdsReachabilityGate
+              pdsHost={pdsHostname ? `https://${pdsHostname}` : null}
+            >
+              <UserDashboardClient
+                readOnly={readOnly}
+                canInvite={canInvite}
+                maxAccounts={planMaxAccounts}
+              />
+            </PdsReachabilityGate>
           </CardContent>
         </Card>
       ) : (

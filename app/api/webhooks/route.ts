@@ -133,6 +133,7 @@ async function provisionPdsForUser({
     user_id: userId,
     pds_service_id,
     hostname,
+    created_at: new Date().toISOString(),
   });
 
   return { skipped: false, pds_service_id };
