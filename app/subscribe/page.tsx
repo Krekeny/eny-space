@@ -94,7 +94,9 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
             <span>
               {graceDate
                 ? `Your subscription has ended, but your PDS is still online during the grace period — it will be shut down on ${graceDate}. Resubscribe to keep it running, no data lost.`
-                : "Your subscription has ended, so your PDS is currently inactive. Choose a plan below to resubscribe and bring it back online."}
+                : lifecycle === "deleted"
+                  ? "Your previous PDS and its data were permanently deleted. Pick a plan below to set up a new one."
+                  : "Your subscription has ended and your PDS is offline, but your data is retained. Pick a plan below to bring it back online."}
             </span>
           </div>
         )}
@@ -104,9 +106,11 @@ export default async function WelcomePage({ searchParams }: WelcomePageProps) {
             {subscriptionLapsed ? "Welcome back" : "Choose a plan"}
           </Heading>
           <Paragraph className="mt-2 text-sm text-white/60">
-            {subscriptionLapsed
-              ? "Pick a plan to reactivate your PDS."
-              : "Pick a plan to activate your PDS."}
+            {!subscriptionLapsed
+              ? "Pick a plan to activate your PDS."
+              : lifecycle === "deleted"
+                ? "Pick a plan to set up a new PDS."
+                : "Pick a plan to reactivate your PDS."}
           </Paragraph>
         </div>
       </div>
