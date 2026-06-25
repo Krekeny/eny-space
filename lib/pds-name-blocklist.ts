@@ -37,7 +37,8 @@ const EXACT_BLOCKLIST = new Set([
 
   // ---- Our brand ----
   "eny", "enyspace", "eny-space",
-  "krekeny", "frx",
+  // "krekeny" temporarily allowed so we can register our corporate PDS hehe
+  "frx",
 
   // ---- Big tech / common brands ----
   "google", "gmail", "youtube", "googledrive", "googlecloud",
