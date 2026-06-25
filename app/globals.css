@@ -126,6 +126,18 @@
     }
   }
 
+  /* Indeterminate progress: a segment sliding across the track. */
+  --animate-progress-indeterminate: progress-indeterminate 1.4s ease-in-out infinite;
+
+  @keyframes progress-indeterminate {
+    0% {
+      transform: translateX(-120%);
+    }
+    100% {
+      transform: translateX(450%);
+    }
+  }
+
   /* Periodic attention wiggle (rests, then wiggles ~every 5s). */
   --animate-beta-wiggle: beta-wiggle 5s ease-in-out infinite;
 

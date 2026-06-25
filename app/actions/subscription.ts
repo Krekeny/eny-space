@@ -250,6 +250,9 @@ export async function createSubscriptionCheckout(
 
   // All plan config (price, disk size) comes from the server-side catalog
   const plan = getPlanCatalogEntry(planKey);
+  if (plan.disabled) {
+    throw new Error("This plan isn't available yet.");
+  }
   const priceId = getPriceIdForPlan(plan.key);
   if (!priceId) {
     throw new Error("Plan price is not configured. Contact support.");
