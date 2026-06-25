@@ -9,7 +9,9 @@ import { pdsStateLabel, pdsStateType } from "@/lib/pds-state";
 import { SupportDialog } from "@/components/support/support-dialog";
 import { PdsHealthClient } from "./pds-health-client";
 
-const POLL_INTERVAL_MS = 5000;
+// Provisioning takes minutes, so poll calmly — fast enough to catch "ready"
+// within ~15s, but ~3x fewer backend hits than a 5s loop.
+const POLL_INTERVAL_MS = 10000;
 
 type Props = {
   initialState: number | string | null;
@@ -106,10 +108,14 @@ export function PdsStatusCard({
         {isPending && (
           <div className="mt-3 space-y-1.5">
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-              <div
-                className="h-full rounded-full bg-amber-400 transition-[width] duration-1000 ease-linear"
-                style={{ width: `${Math.round(progress * 100)}%` }}
-              />
+              {progress >= SETUP_CAP ? (
+                <div className="h-full w-1/4 rounded-full bg-amber-400 motion-safe:animate-progress-indeterminate" />
+              ) : (
+                <div
+                  className="h-full rounded-full bg-amber-400 transition-[width] duration-1000 ease-linear"
+                  style={{ width: `${Math.round(progress * 100)}%` }}
+                />
+              )}
             </div>
             <Paragraph className="text-xs text-white/40">
               This usually takes a few minutes. You can leave and come back —
