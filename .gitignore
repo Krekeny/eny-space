@@ -42,3 +42,6 @@ supabase/.branches/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Internal-only docs
+DEVELOPMENT.md
