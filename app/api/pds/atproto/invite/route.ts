@@ -1,25 +1,51 @@
 import { NextResponse } from "next/server";
 
 import {
-  assertCanAddAccount,
+  remainingAccountSlots,
   getPdsAdminAuth,
   getPdsServiceForCurrentUser,
 } from "../helpers";
 import { getActivePlanKey } from "@/actions/subscription";
 import { getPlanCatalogEntry } from "@/lib/plan-catalog";
 
+const MAX_INVITE_USES = 50;
+
 export async function POST(req: Request) {
   try {
     const { useCount } = (await req.json()) as { useCount?: number };
 
+    const planKey = await getActivePlanKey();
+    if (!planKey) {
+      return NextResponse.json(
+        { message: "No active subscription" },
+        { status: 403 },
+      );
+    }
+
     const { service } = await getPdsServiceForCurrentUser();
     const { pdsBaseUrl, authHeader } = getPdsAdminAuth(service);
 
-    // Gate by the plan's account limit (an invite fills the same limit as a
-    // direct create). This still allows a migration code while the single slot
-    // is open, but blocks once the limit is reached.
-    const plan = getPlanCatalogEntry(await getActivePlanKey());
-    await assertCanAddAccount(pdsBaseUrl, plan);
+    const plan = getPlanCatalogEntry(planKey);
+    const remaining = await remainingAccountSlots(pdsBaseUrl, authHeader, plan);
+    if (remaining <= 0) {
+      return NextResponse.json(
+        {
+          message: `Your ${plan.name} plan allows ${plan.maxAccounts} account${
+            plan.maxAccounts === 1 ? "" : "s"
+          }. Upgrade to host more.`,
+        },
+        { status: 403 },
+      );
+    }
+
+    const requested =
+      Number.isInteger(useCount) && (useCount as number) > 0
+        ? (useCount as number)
+        : 1;
+    const grant = Math.min(
+      requested,
+      Number.isFinite(remaining) ? remaining : MAX_INVITE_USES,
+    );
 
     const res = await fetch(
       `${pdsBaseUrl}/xrpc/com.atproto.server.createInviteCode`,
@@ -29,7 +55,7 @@ export async function POST(req: Request) {
           "Content-Type": "application/json",
           Authorization: authHeader,
         },
-        body: JSON.stringify({ useCount: useCount ?? 1 }),
+        body: JSON.stringify({ useCount: grant }),
       },
     );
 

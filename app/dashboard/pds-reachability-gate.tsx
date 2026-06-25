@@ -63,7 +63,7 @@ export function PdsReachabilityGate({
         <Paragraph className="text-sm text-amber-100/90">
           After it&apos;s first created, DNS and certificates can take a few
           minutes to propagate. Account creation, migration and invites will
-          unlock automatically once it&apos;s reachable — no need to refresh.
+          unlock automatically once it&apos;s reachable. No need to refresh.
         </Paragraph>
       </div>
     </div>

@@ -1,14 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { SupportDialog } from "@/components/support/support-dialog";
+import { SUPPORT_MAILTO } from "@/lib/site-config";
 
-export function BetaBadge() {
+export function BetaBadge({ userEmail }: { userEmail?: string | null }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const onDoc = (e: MouseEvent) => {
+      const el = e.target as Element | null;
+      // Keep the popover mounted while the feedback dialog (a portal) is open.
+      if (el?.closest?.("[role='dialog']")) return;
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
@@ -48,6 +53,27 @@ export function BetaBadge() {
           <p className="mt-2 text-xs leading-relaxed text-white/70">
             Your PDS itself is untouched and backed up, so{" "}
             <span className="text-white">no data is lost</span>.
+          </p>
+          <p className="mt-3 border-t border-white/10 pt-3 text-xs leading-relaxed text-white/70">
+            We want your feedback anytime — feature requests, questions,
+            anything.{" "}
+            {userEmail ? (
+              <SupportDialog
+                context="beta-popover"
+                defaultCategory="feedback"
+                userEmail={userEmail}
+              >
+                Send it here
+              </SupportDialog>
+            ) : (
+              <a
+                href={SUPPORT_MAILTO}
+                className="underline decoration-dotted underline-offset-2 hover:text-white"
+              >
+                Email us
+              </a>
+            )}
+            .
           </p>
         </div>
       )}

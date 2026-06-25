@@ -40,12 +40,22 @@ export async function POST(req: Request) {
       );
     }
 
+    // Require a live subscription — no active plan, no management actions
+    // (also blocks grace/suspended, where there's no active Stripe sub).
+    const planKey = await getActivePlanKey();
+    if (!planKey) {
+      return NextResponse.json(
+        { message: "No active subscription" },
+        { status: 403 },
+      );
+    }
+
     const { service } = await getPdsServiceForCurrentUser();
     const { pdsBaseUrl, authHeader } = getPdsAdminAuth(service);
 
     // Enforce the plan's account limit (single account on the personal plan).
-    const plan = getPlanCatalogEntry(await getActivePlanKey());
-    await assertCanAddAccount(pdsBaseUrl, plan);
+    const plan = getPlanCatalogEntry(planKey);
+    await assertCanAddAccount(pdsBaseUrl, authHeader, plan);
 
     let emailToUse = body.email;
     if (!emailToUse) {

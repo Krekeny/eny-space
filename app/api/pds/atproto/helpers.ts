@@ -150,16 +150,76 @@ export async function countPdsAccounts(pdsBaseUrl: string): Promise<number> {
 }
 
 /**
+ * Uses still available on the PDS's live (non-disabled) admin invite codes.
+ * These are pending accounts — counting them stops a finite plan from minting
+ * several codes that together exceed the limit. Fails closed (throws) if the
+ * count can't be read, so we never over-issue.
+ */
+async function outstandingInviteUses(
+  pdsBaseUrl: string,
+  authHeader: string,
+): Promise<number> {
+  const url = new URL(`${pdsBaseUrl}/xrpc/com.atproto.admin.getInviteCodes`);
+  url.searchParams.set("sort", "recent");
+  url.searchParams.set("limit", "100");
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: { Accept: "application/json", Authorization: authHeader },
+  });
+  if (!res.ok) {
+    throw Object.assign(new Error("Could not verify invite capacity"), {
+      status: 502,
+    });
+  }
+  const data = (await res.json().catch(() => ({}))) as {
+    codes?: { available?: number; disabled?: boolean; uses?: unknown[] }[];
+  };
+  return (data.codes ?? []).reduce((sum, c) => {
+    if (c.disabled) return sum;
+    const used = Array.isArray(c.uses) ? c.uses.length : 0;
+    const available = typeof c.available === "number" ? c.available : 0;
+    return sum + Math.max(0, available - used);
+  }, 0);
+}
+
+/**
+ * Remaining account slots for a plan = maxAccounts minus accounts already
+ * created minus pending invite uses. Infinity for unlimited plans.
+ */
+export async function remainingAccountSlots(
+  pdsBaseUrl: string,
+  authHeader: string,
+  plan: PlanCatalogEntry,
+): Promise<number> {
+  if (!Number.isFinite(plan.maxAccounts)) return Infinity;
+  const accounts = await countPdsAccounts(pdsBaseUrl);
+  let pending = 0;
+  try {
+    pending = await outstandingInviteUses(pdsBaseUrl, authHeader);
+  } catch (e) {
+    // getInviteCodes unsupported/unreachable: degrade to account-count only.
+    // The arbitrary-useCount exploit is still closed (grant is clamped to the
+    // remaining slots); only the narrow "several unconsumed single-use codes"
+    // gap stays open. Log it so the gap is visible rather than silent.
+    console.warn(
+      "[pds] outstanding-invite check failed; clamping by account count only",
+      e,
+    );
+  }
+  return Math.max(0, plan.maxAccounts - accounts - pending);
+}
+
+/**
  * Enforce a plan's account limit before creating/onboarding another account.
  * Throws a status-tagged 403 error (handled by route catch blocks) when full.
  */
 export async function assertCanAddAccount(
   pdsBaseUrl: string,
+  authHeader: string,
   plan: PlanCatalogEntry,
 ): Promise<void> {
-  if (!Number.isFinite(plan.maxAccounts)) return; // unlimited
-  const count = await countPdsAccounts(pdsBaseUrl);
-  if (count >= plan.maxAccounts) {
+  const remaining = await remainingAccountSlots(pdsBaseUrl, authHeader, plan);
+  if (remaining <= 0) {
     throw Object.assign(
       new Error(
         `Your ${plan.name} plan allows ${plan.maxAccounts} account${

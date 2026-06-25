@@ -36,6 +36,34 @@ function isValidFqdn(host: string) {
   });
 }
 
+function extractServiceId(body: unknown, depth = 0): number | null {
+  if (body == null || depth > 4) return null;
+  if (typeof body === "number") return Number.isFinite(body) ? body : null;
+  if (typeof body === "string") {
+    const n = Number(body.trim());
+    return body.trim() !== "" && Number.isFinite(n) ? n : null;
+  }
+  if (typeof body !== "object") return null;
+  const obj = body as Record<string, unknown>;
+  for (const key of ["service_id", "serviceId", "pds_service_id", "pdsServiceId"]) {
+    if (key in obj) {
+      const v = extractServiceId(obj[key], depth + 1);
+      if (v != null) return v;
+    }
+  }
+  if ("id" in obj) {
+    const v = extractServiceId(obj.id, depth + 1);
+    if (v != null) return v;
+  }
+  for (const key of ["data", "result", "service", "pds", "payload"]) {
+    if (key in obj) {
+      const v = extractServiceId(obj[key], depth + 1);
+      if (v != null) return v;
+    }
+  }
+  return null;
+}
+
 async function provisionPdsForUser({
   userId,
   userEmail,
@@ -73,14 +101,17 @@ async function provisionPdsForUser({
 
   const { data: existing } = await supabase
     .from("pds_services")
-    .select("pds_service_id")
+    .select("pds_service_id, lifecycle_status")
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (existing?.pds_service_id) {
+  if (existing?.pds_service_id && existing.lifecycle_status !== "deleted") {
     return { skipped: true, pds_service_id: existing.pds_service_id };
   }
 
+  console.log(
+    `[pds-backend] → POST /deploy  hostname=${hostname}  username=${pdsUsername}`,
+  );
   const deployRes = await fetch(`${PDS_API_BASE_URL}/deploy`, {
     method: "POST",
     headers: {
@@ -96,38 +127,40 @@ async function provisionPdsForUser({
       disksize,
     }),
   });
+  console.log(
+    `[pds-backend] ← /deploy ${deployRes.status}  hostname=${hostname}`,
+  );
 
-  const deployContentType = deployRes.headers.get("content-type") || "";
-  const deployBody = deployContentType.includes("application/json")
-    ? await deployRes.json()
-    : await deployRes.text();
+  // Read as text, then parse JSON regardless of content-type — some backends
+  // return JSON without an `application/json` header, which would otherwise be
+  // kept as a plain string and yield no service id.
+  const deployRaw = await deployRes.text();
+  let deployBody: unknown;
+  try {
+    deployBody = JSON.parse(deployRaw);
+  } catch {
+    deployBody = deployRaw;
+  }
 
   if (!deployRes.ok) {
-    await supabase.from("pds_services").upsert({
-      user_id: userId,
-      hostname,
-    });
+    await supabase.from("pds_services").upsert({ user_id: userId, hostname });
+    // Don't include the response body — it can carry confidential infra data.
     throw new Error(
-      `PDS deploy failed (${deployRes.status}) for hostname "${hostname}": ${
-        typeof deployBody === "string" ? deployBody : JSON.stringify(deployBody)
-      }`,
+      `PDS deploy failed (${deployRes.status}) for hostname "${hostname}"`,
     );
   }
 
-  const maybeServiceId =
-    (typeof deployBody === "object" && deployBody !== null
-      ? ((deployBody as any).service_id ??
-        (deployBody as any).serviceId ??
-        (deployBody as any).id ??
-        (deployBody as any).service?.id ??
-        (deployBody as any).data?.id ??
-        (deployBody as any).data?.serviceId)
-      : undefined) ?? null;
-
-  const pds_service_id =
-    typeof maybeServiceId === "string" || typeof maybeServiceId === "number"
-      ? Number(maybeServiceId)
-      : null;
+  const pds_service_id = extractServiceId(deployBody);
+  console.log(
+    `[pds-backend] deploy stored  hostname=${hostname}  service_id=${pds_service_id}`,
+  );
+  if (pds_service_id == null) {
+    // Deploy succeeded but no id parsed — the row would be unusable (dashboard
+    // 404). Surfaced without logging the raw (confidential) response.
+    console.error(
+      `[pds-backend] no service id parsed from deploy response for ${hostname}`,
+    );
+  }
 
   await supabase.from("pds_services").upsert({
     user_id: userId,

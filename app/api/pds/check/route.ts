@@ -59,6 +59,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ exists: false, blocked: true });
   }
 
+  // console.log(`[pds-backend] → POST /check-pds  hostname=${hostname}`);
   const res = await fetch(`${PDS_API_BASE_URL}/check-pds`, {
     method: "POST",
     headers: {
@@ -68,6 +69,7 @@ export async function POST(req: Request) {
     },
     body: JSON.stringify({ hostname }),
   });
+  // console.log(`[pds-backend] ← /check-pds ${res.status}  hostname=${hostname}`);
 
   const contentType = res.headers.get("content-type") || "";
   const data = contentType.includes("application/json")

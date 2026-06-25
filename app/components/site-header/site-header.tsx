@@ -119,7 +119,7 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
             </div>
           </div>
           </Link>
-          <BetaBadge />
+          <BetaBadge userEmail={user?.email ?? null} />
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
