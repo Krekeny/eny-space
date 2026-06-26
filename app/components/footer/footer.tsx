@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Paragraph } from "@/components/paragraph";
 import { LEGAL_NOTICE_URL, PRIVACY_POLICY_URL } from "@/lib/site-config";
+import { APP_VERSION } from "@/lib/version";
 
 export function Footer({ fabInset = false }: { fabInset?: boolean }) {
   const year = new Date().getFullYear();
@@ -29,6 +30,9 @@ export function Footer({ fabInset = false }: { fabInset?: boolean }) {
             </Paragraph>
             <Paragraph className="text-xs text-white/40">
               eny.space is a brand of krekeny GmbH.
+            </Paragraph>
+            <Paragraph className="font-mono text-[10px] text-white/30">
+              v{APP_VERSION}
             </Paragraph>
           </div>
         </div>
