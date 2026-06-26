@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Footer } from "@/components/footer";
 import { SiteBackground } from "@/components/site-background";
 import { SupportDialog } from "@/components/support/support-dialog";
+import { EnvBanner } from "@/components/env-banner";
 
 import "./globals.css";
 import { Doto, Fira_Mono } from "next/font/google";
@@ -61,6 +62,7 @@ export default async function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="en" className={`${firaMono.variable} ${doto.variable}`}>
       <body className="min-h-screen flex flex-col">
+        <EnvBanner />
         <SiteBackground />
         <SiteHeader user={user} isRecovery={isRecovery} />
         <main className="flex-1">{children}</main>
