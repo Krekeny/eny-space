@@ -459,27 +459,38 @@ function MigrateSection({ pdsBareHost }: { pdsBareHost: string }) {
           </div>
         </div>
 
-        {/* 2. goat CLI */}
-        <div className="flex items-start gap-3 rounded-md border border-white/10 bg-white/5 p-3">
-          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white">
-            <TerminalIcon className="size-4" aria-hidden />
-          </span>
-          <div className="min-w-0 flex-1 space-y-1.5">
-            <Paragraph className="text-sm font-semibold text-white">
-              Command line (goat)
-            </Paragraph>
-            <Paragraph className="text-xs text-white/60">
-              For power users — the official AT Protocol CLI.
-            </Paragraph>
-            <button
-              type="button"
-              onClick={() => setShowCli((s) => !s)}
-              className="text-xs text-white/50 underline underline-offset-2 transition-colors hover:text-white"
-            >
-              {showCli ? "Hide commands" : "Show commands"}
-            </button>
-            {showCli && (
-              <pre className="mt-1 overflow-auto rounded bg-neutral-900/90 p-3 text-[11px] leading-relaxed text-neutral-100">
+        {/* 2. goat CLI — collapsible (developer method) */}
+        <div className="rounded-md border border-white/10 bg-white/5">
+          <button
+            type="button"
+            onClick={() => setShowCli((s) => !s)}
+            aria-expanded={showCli}
+            className="flex w-full items-center gap-3 p-3 text-left"
+          >
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white">
+              <TerminalIcon className="size-4" aria-hidden />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <Paragraph className="text-sm font-semibold text-white">
+                  Command line (goat)
+                </Paragraph>
+                <span className="rounded-full bg-sky-400/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-sky-300">
+                  Developer
+                </span>
+              </div>
+              <Paragraph className="text-xs text-white/60">
+                For power users — the official AT Protocol CLI.
+              </Paragraph>
+            </div>
+            <ChevronDownIcon
+              className={`size-4 shrink-0 text-white/40 transition-transform ${showCli ? "rotate-180" : ""}`}
+              aria-hidden
+            />
+          </button>
+          {showCli && (
+            <div className="px-3 pb-3">
+              <pre className="overflow-auto rounded bg-neutral-900/90 p-3 text-[11px] leading-relaxed text-neutral-100">
 {`# 1. Install goat
 brew install goat
 # or
@@ -500,8 +511,8 @@ goat account migrate \\
   --new-email <your-email> \\
   --plc-token <THE-TOKEN-FROM-YOUR-EMAIL>`}
               </pre>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* 3. Built-in — coming soon */}
