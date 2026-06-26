@@ -7,6 +7,8 @@ import {
   SparklesIcon,
   ChevronDownIcon,
   AtSignIcon,
+  MailIcon,
+  LockIcon,
   EyeIcon,
   EyeOffIcon,
 } from "lucide-react";
@@ -180,6 +182,7 @@ function CreateUserSection({
   onCreated: () => void;
 }) {
   const [handle, setHandle] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -209,9 +212,11 @@ function CreateUserSection({
       await apiCall("/api/pds/atproto/create-account", {
         handle: fullHandle,
         password,
+        ...(email.trim() ? { email: email.trim() } : {}),
       });
       setSuccess(`Account created: ${fullHandle}`);
       setHandle("");
+      setEmail("");
       setPassword("");
       onCreated();
     } catch (e) {
@@ -249,6 +254,36 @@ function CreateUserSection({
               autoCapitalize="none"
               autoComplete="off"
               spellCheck={false}
+              data-1p-ignore="true"
+              data-lpignore="true"
+              data-bwignore="true"
+              data-form-type="other"
+              className="h-10 pl-9 focus-visible:border-fuchsia-400/70 focus-visible:ring-fuchsia-400/30"
+            />
+          </div>
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="new-email">
+            Email <span className="font-normal text-white/40">(optional)</span>
+          </Label>
+          <div className="group relative">
+            <MailIcon
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/40 transition-colors group-focus-within:text-fuchsia-400"
+              aria-hidden
+            />
+            <Input
+              id="new-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="leave blank to auto-generate"
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              data-1p-ignore="true"
+              data-lpignore="true"
+              data-bwignore="true"
+              data-form-type="other"
               className="h-10 pl-9 focus-visible:border-fuchsia-400/70 focus-visible:ring-fuchsia-400/30"
             />
           </div>
@@ -266,6 +301,10 @@ function CreateUserSection({
             </button>
           </div>
           <div className="group relative">
+            <LockIcon
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/40 transition-colors group-focus-within:text-fuchsia-400"
+              aria-hidden
+            />
             <Input
               id="new-password"
               type={showPassword ? "text" : "password"}
@@ -273,7 +312,10 @@ function CreateUserSection({
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               autoComplete="new-password"
-              className="h-10 pr-10 font-mono focus-visible:border-fuchsia-400/70 focus-visible:ring-fuchsia-400/30"
+              data-1p-ignore="true"
+              data-lpignore="true"
+              data-bwignore="true"
+              className="h-10 pl-9 pr-10 font-mono focus-visible:border-fuchsia-400/70 focus-visible:ring-fuchsia-400/30"
             />
             <button
               type="button"
@@ -618,6 +660,28 @@ function AccountRow({
   const [busy, setBusy] = useState(false);
   const [rowError, setRowError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [resetState, setResetState] = useState<
+    "idle" | "sending" | "sent" | "error"
+  >("idle");
+
+  const sendReset = async () => {
+    if (!account.email) return;
+    setResetState("sending");
+    setRowError(null);
+    try {
+      const res = await fetch("/api/pds/atproto/request-password-reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: account.email }),
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(payload?.message || "Failed to send reset");
+      setResetState("sent");
+    } catch (e) {
+      setResetState("error");
+      setRowError(e instanceof Error ? e.message : String(e));
+    }
+  };
 
   const deleteAccount = async () => {
     setBusy(true);
@@ -700,6 +764,22 @@ function AccountRow({
                 )}
               </dd>
             </dl>
+          )}
+          {open && !readOnly && account.email && (
+            <div className="mt-2 ml-5">
+              <button
+                type="button"
+                onClick={sendReset}
+                disabled={resetState === "sending" || resetState === "sent"}
+                className="text-xs font-medium text-fuchsia-300/90 transition-colors hover:text-fuchsia-200 disabled:opacity-50"
+              >
+                {resetState === "sending"
+                  ? "Sending…"
+                  : resetState === "sent"
+                    ? "Reset email sent ✓"
+                    : "Send password reset"}
+              </button>
+            </div>
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
