@@ -481,18 +481,24 @@ function MigrateSection({ pdsBareHost }: { pdsBareHost: string }) {
             {showCli && (
               <pre className="mt-1 overflow-auto rounded bg-neutral-900/90 p-3 text-[11px] leading-relaxed text-neutral-100">
 {`# 1. Install goat
+brew install goat
+# or
 go install github.com/bluesky-social/indigo/cmd/goat@latest
 
-# 2. Log in to your CURRENT account
+# 2. Log in to your CURRENT account (old provider)
 goat account login -u <your-current-handle> -p <app-password>
 
-# 3. Migrate (see \`goat account migrate --help\` for all flags)
+# 3. Request a PLC token from your old PDS (authorizes the identity move)
+goat account plc request-token
+
+# 4. Check your email for the token, then migrate
 goat account migrate \\
   --pds-host ${host} \\
-  --invite-code ${code ?? "<generate a code above>"}
-
-# goat emails you a confirmation token from your old PDS to
-# authorize the identity (PLC) update — paste it when prompted.`}
+  --invite-code ${code ?? "<generate a code above>"} \\
+  --new-handle <your-handle> \\
+  --new-password <your-new-secure-password> \\
+  --new-email <your-email> \\
+  --plc-token <THE-TOKEN-FROM-YOUR-EMAIL>`}
               </pre>
             )}
           </div>
