@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import {
   startLifecycle,
   effectiveLifecycle,
+  lifecycleEnabled,
   type PdsLifecycleReason,
   type PdsLifecycleStatus,
 } from "@/lib/pds-lifecycle";
@@ -128,6 +129,9 @@ export async function resetPdsLifecycle(userId: string) {
 /** Advance lifecycle labels for in-progress rows and run the teardown when a
  *  row leaves grace. Driven by the lifecycle cron. */
 export async function sweepLifecycles() {
+  if (!lifecycleEnabled()) {
+    return { scanned: 0, transitions: [], disabled: true };
+  }
   const supabase = createAdminClient();
   const { data: rows, error } = await supabase
     .from("pds_services")

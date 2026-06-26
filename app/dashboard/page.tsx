@@ -17,6 +17,7 @@ import DashboardClient from "./dashboard-client";
 import { CollapsibleSection } from "./collapsible-section";
 import {
   effectiveLifecycle,
+  lifecycleEnabled,
   type PdsLifecycleStatus,
   type PdsLifecycleReason,
 } from "@/lib/pds-lifecycle";
@@ -66,7 +67,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     lifecycle = "active";
   }
 
-  if (!active && lifecycle === "active" && lifecycleRow) {
+  // Only auto-start grace when the lifecycle is actually enabled
+  if (!active && lifecycle === "active" && lifecycleRow && lifecycleEnabled()) {
     await startPdsGrace(user.id, "canceled");
     const refetched = await supabase
       .from("pds_services")

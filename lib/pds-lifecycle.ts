@@ -68,3 +68,10 @@ export function hasPdsAccess(status: PdsLifecycleStatus): boolean {
 export function isReadOnly(status: PdsLifecycleStatus): boolean {
   return status === "grace";
 }
+
+/**
+ * Master switch. When not exactly "true", NO lifecycle state changes happen
+ */
+export function lifecycleEnabled(): boolean {
+  return process.env.PDS_LIFECYCLE_ENABLED === "true";
+}
