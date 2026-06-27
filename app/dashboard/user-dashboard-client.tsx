@@ -551,7 +551,11 @@ goat account migrate \\
   --new-handle <your-handle> \\
   --new-password <your-new-secure-password> \\
   --new-email <your-email> \\
-  --plc-token <THE-TOKEN-FROM-YOUR-EMAIL>`}
+  --plc-token <THE-TOKEN-FROM-YOUR-EMAIL>
+
+# 5. Activate the new account (REQUIRED — until you do this your
+#    account stays deactivated and won't appear on Bluesky)
+goat account activate`}
               </pre>
             </div>
           )}
