@@ -48,6 +48,9 @@ export function Footer({ fabInset = false }: { fabInset?: boolean }) {
             <Link href="/#faq" className="hover:text-white">
               FAQ
             </Link>
+            <Link href="/blog" className="hover:text-white">
+              Blog
+            </Link>
             <a
               href={LEGAL_NOTICE_URL}
               target="_blank"

@@ -1,0 +1,89 @@
+import Link from "next/link";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { ArrowLeftIcon } from "lucide-react";
+import { Heading } from "@/components/heading";
+import { getAllSlugs, getPost } from "@/lib/blog";
+
+export const revalidate = 3600;
+
+export function generateStaticParams() {
+  return getAllSlugs().map((slug) => ({ slug }));
+}
+
+type PageProps = { params: Promise<{ slug: string }> };
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPost(slug);
+  if (!post) return {};
+  return {
+    title: post.title,
+    description: post.description,
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: "article",
+      publishedTime: post.publishedAt,
+    },
+  };
+}
+
+export default async function BlogPostPage({ params }: PageProps) {
+  const { slug } = await params;
+  const post = await getPost(slug);
+  if (!post) notFound();
+
+  // Per-post proof of the standard.site record. The AT-URI is computable from
+  // DID + slug; App Router hoists this <link> into <head>.
+  const did = process.env.ATP_DID;
+
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-16 sm:py-24">
+      {did && (
+        <link
+          rel="site.standard.document"
+          href={`at://${did}/site.standard.document/${post.slug}`}
+        />
+      )}
+
+      <Link
+        href="/blog"
+        className="inline-flex items-center gap-1.5 text-sm text-white/50 transition-colors hover:text-white"
+      >
+        <ArrowLeftIcon className="size-4" aria-hidden />
+        All posts
+      </Link>
+
+      <article className="mt-8">
+        <header className="mb-8">
+          <time
+            dateTime={post.publishedAt}
+            className="text-xs uppercase tracking-widest text-white/40"
+          >
+            {formatDate(post.publishedAt)}
+          </time>
+          <Heading className="mt-3 text-3xl tracking-tight text-white sm:text-4xl">
+            {post.title}
+          </Heading>
+          {post.description && (
+            <p className="mt-3 text-lg text-white/60">{post.description}</p>
+          )}
+        </header>
+
+        <div
+          className="prose prose-invert max-w-none prose-headings:font-heading prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-code:text-white prose-code:before:content-none prose-code:after:content-none prose-pre:bg-neutral-900/90 prose-pre:text-neutral-100"
+          dangerouslySetInnerHTML={{ __html: post.html }}
+        />
+      </article>
+    </div>
+  );
+}
