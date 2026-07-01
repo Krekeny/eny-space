@@ -120,6 +120,13 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
           </div>
           </Link>
           <BetaBadge userEmail={user?.email ?? null} />
+          <Link
+            href="/blog"
+            className="hidden text-xs font-medium uppercase tracking-wide text-white/50 transition-colors hover:text-white sm:inline-block"
+            onClick={() => setMobileOpen(false)}
+          >
+            Blog
+          </Link>
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
