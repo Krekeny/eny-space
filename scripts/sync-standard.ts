@@ -61,9 +61,13 @@ async function main() {
   }
 
   // 1. Upsert the publication.
+  // publication.url points at the blog so "view publication" lands on /blog;
+  // documents then use a bare `/<slug>` path (canonical = url + path, no /blog/blog).
+  const publicationUrl =
+    process.env.PUBLICATION_URL || `${SITE_URL.replace(/\/+$/, "")}/blog`;
   const publication = {
     $type: "site.standard.publication",
-    url: SITE_URL,
+    url: publicationUrl,
     name: PUBLICATION_NAME,
     description: PUBLICATION_DESCRIPTION,
     ...(icon ? { icon } : {}),
@@ -89,7 +93,7 @@ async function main() {
       site: siteUri,
       title: post.title,
       // Canonical URL = publication.url + path → https://eny.space/blog/<slug>.
-      path: `/blog/${post.slug}`,
+      path: `/${post.slug}`,
       description: post.description,
       publishedAt: post.publishedAt,
       ...(post.tags.length ? { tags: post.tags } : {}),
