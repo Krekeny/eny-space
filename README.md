@@ -44,6 +44,7 @@ Deploy to any Next.js host — Vercel is recommended, as `vercel.json` already d
 - `lib/` — Stripe/Supabase clients, plan catalog, PDS lifecycle & infra helpers
 - `supabase/migrations/` — database migrations (apply in order)
 - `scripts/` — local development helpers
+- `scripts/og/` — Open Graph / social card generator (`pnpm og`); see [scripts/og/README.md](scripts/og/README.md)
 
 ## Mirroring
 
