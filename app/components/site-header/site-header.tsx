@@ -75,7 +75,7 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
       }`}
     >
       <div
-        className={`mx-auto flex items-center justify-between gap-4 border transition-all duration-300 ${
+        className={`relative mx-auto flex items-center justify-between gap-4 border transition-all duration-300 ${
           scrolled
             ? "h-12 max-w-2xl rounded-full border-white/10 bg-slate-950/85 px-5 shadow-lg shadow-black/30 backdrop-blur-md"
             : "h-14 max-w-7xl rounded-none border-transparent bg-transparent px-4 sm:px-6"
@@ -120,14 +120,19 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
           </div>
           </Link>
           <BetaBadge userEmail={user?.email ?? null} />
+        </div>
+
+        {/* Centered nav — absolutely centered so it stays mid-bar regardless of
+            the logo / CTA cluster widths. */}
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 md:block">
           <Link
             href="/blog"
-            className="hidden text-xs font-medium uppercase tracking-wide text-white/50 transition-colors hover:text-white sm:inline-block"
+            className="text-xs font-medium uppercase tracking-wide text-white/50 transition-colors hover:text-white"
             onClick={() => setMobileOpen(false)}
           >
             Blog
           </Link>
-        </div>
+        </nav>
 
         <div className="hidden items-center gap-2 md:flex">
           {user && !isRecovery ? (
