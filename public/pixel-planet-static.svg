@@ -1,0 +1,76 @@
+<svg viewBox="0 0 24 24" width="768" height="768" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <defs>
+    <!-- The planet disc, used to clip the surface -->
+    <clipPath id="disc">
+      <rect x="9" y="5"  width="4"  height="1" />
+      <rect x="7" y="6"  width="8"  height="1" />
+      <rect x="6" y="7"  width="10" height="1" />
+      <rect x="5" y="8"  width="12" height="1" />
+      <rect x="5" y="9"  width="12" height="1" />
+      <rect x="4" y="10" width="14" height="1" />
+      <rect x="4" y="11" width="14" height="1" />
+      <rect x="4" y="12" width="14" height="1" />
+      <rect x="4" y="13" width="14" height="1" />
+      <rect x="5" y="14" width="12" height="1" />
+      <rect x="5" y="15" width="12" height="1" />
+      <rect x="6" y="16" width="10" height="1" />
+      <rect x="7" y="17" width="8"  height="1" />
+      <rect x="9" y="18" width="4"  height="1" />
+    </clipPath>
+  </defs>
+
+  <!-- Ring (back half: behind the planet) -->
+  <g fill="#9ca3af">
+    <rect x="13" y="7"  width="7" height="1" />
+    <rect x="10" y="8"  width="3" height="1" />
+    <rect x="20" y="8"  width="1" height="2" />
+    <rect x="8"  y="9"  width="2" height="1" />
+    <rect x="6"  y="10" width="2" height="1" />
+    <rect x="3"  y="11" width="3" height="1" />
+    <rect x="2"  y="12" width="1" height="1" />
+    <rect x="1"  y="13" width="1" height="2" />
+  </g>
+
+  <!-- Surface, clipped to the disc (single static frame) -->
+  <g clip-path="url(#disc)">
+    <!-- Ocean base -->
+    <rect x="4" y="5" width="14" height="14" fill="#6b7280" />
+
+    <!-- Continents -->
+    <g fill="#d4d4d8">
+      <rect x="5"  y="8"  width="2" height="1" />
+      <rect x="5"  y="9"  width="3" height="1" />
+      <rect x="6"  y="10" width="2" height="1" />
+      <rect x="10" y="11" width="3" height="1" />
+      <rect x="10" y="12" width="4" height="1" />
+      <rect x="11" y="13" width="3" height="1" />
+      <rect x="12" y="14" width="2" height="1" />
+      <rect x="14" y="7"  width="2" height="1" />
+      <rect x="15" y="8"  width="1" height="1" />
+      <rect x="6"  y="15" width="2" height="1" />
+      <rect x="7"  y="16" width="1" height="1" />
+    </g>
+
+    <!-- Darkened limb for a spherical feel -->
+    <rect x="14" y="5" width="4" height="14" fill="#000000" opacity="0.18" />
+  </g>
+
+  <!-- Specular highlight -->
+  <g fill="#f4f4f5">
+    <rect x="7" y="7" width="1" height="1" />
+    <rect x="8" y="7" width="1" height="1" />
+    <rect x="7" y="8" width="1" height="1" />
+  </g>
+
+  <!-- Ring (front half: in front of the planet) -->
+  <g fill="#d4d4d8">
+    <rect x="19" y="10" width="1" height="1" />
+    <rect x="18" y="11" width="2" height="1" />
+    <rect x="16" y="12" width="2" height="1" />
+    <rect x="14" y="13" width="2" height="1" />
+    <rect x="12" y="14" width="2" height="1" />
+    <rect x="9"  y="15" width="3" height="1" />
+    <rect x="1"  y="15" width="1" height="1" />
+    <rect x="2"  y="16" width="7" height="1" />
+  </g>
+</svg>
