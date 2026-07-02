@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Paragraph } from "@/components/paragraph";
-import { LEGAL_NOTICE_URL, PRIVACY_POLICY_URL } from "@/lib/site-config";
+import { LEGAL_NOTICE_URL, PRIVACY_POLICY_URL, TERMS_URL } from "@/lib/site-config";
 import { APP_VERSION } from "@/lib/version";
 
 export function Footer({ fabInset = false }: { fabInset?: boolean }) {
@@ -59,14 +59,12 @@ export function Footer({ fabInset = false }: { fabInset?: boolean }) {
             >
               Impressum
             </a>
-            <a
-              href={PRIVACY_POLICY_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-white"
-            >
+            <Link href={PRIVACY_POLICY_URL} className="hover:text-white">
               Privacy
-            </a>
+            </Link>
+            <Link href={TERMS_URL} className="hover:text-white">
+              Terms
+            </Link>
           </nav>
         </div>
       </div>
