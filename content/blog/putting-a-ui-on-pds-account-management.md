@@ -6,18 +6,20 @@ tags: ["atproto", "pds"]
 ---
 
 *Our first milestone for eny.space: a web UI for creating, managing, and migrating AT
-Protocol accounts — so the parts that are currently a fragile terminal exercise become
+Protocol accounts so the parts that are currently a fragile terminal exercise become
 something you can do safely, yourself, from a browser.*
+
+> Edit: corrected after helpful feedback from [@pds.dad](https://bsky.app/profile/pds.dad). Thanks, Bailey 🦀
 
 ## What eny.space is (and is becoming)
 
-eny.space started as the infrastructure under an app we're building (eny.social) — but it's
+eny.space started as the infrastructure under an app we're building (eny.social) but it's
 turning into its own thing, and account management is its first milestone.
 
 Right now it's **managed PDS hosting**: you get started directly, without touching Docker, a
 VPS, or any of the devops underneath. From there the plan is to grow into a **full PDS
 management interface** – the subject of this post – and, further out, something closer to a
-**personal social cloud provider**: your own corner of the atmosphere — a store you control
+**personal social cloud provider**: your own corner of the atmosphere: a store you control
 that any number of apps can build on, rather than data locked inside one platform. Dan
 Abramov's post [*A Social Filesystem*](https://overreacted.io/a-social-filesystem/)
 makes the case for exactly this: treating your social data like files you own, with open
@@ -39,20 +41,26 @@ command line; [PDS MOOver](https://pdsmoover.com/) even brings migration into th
 with a real UI, and adds automated backups and a missing-blob recovery step on top. None of
 this is a knock on them. But they share a property that keeps the risk around: the migration
 itself runs **client-side**. You (your browser tab) drive a stateful, ~~hard-to-undo~~
-change to your identity and data, and if it stalls, you own the mess. ~~(That a tool needs a
+recoverable change to your identity and data, and if it stalls, you're the one who has to
+notice and pick it back up. Nothing is final until you sign the PLC update, and reimporting
+the repo or blobs dedups. So a stalled run can be safely re-run. ~~(That a tool needs a
 "find your missing blobs" feature at all is a fair sign of how lossy a client-side move can
-be.)~~
+be.)~~ (a "find your missing blobs"-step exists because the PDS rate limits blob uploads
+to ~1,000/day per IP. A large account often cant move every blob in one pass, no matter
+which tool you are using.)
 
-Migration is the sharp edge. The flow creates a deactivated account, exports your repo,
-imports everything (blobs included and it takes a while), updates your DID document,
-and activates. If any of that stalls – your laptop sleeps, the network drops,
-a step errors halfway – ~~there's no resume, no pause, no checkpoint~~. You're left in a
-partial state, ~~and in the worst case looking at what feels like data loss~~.
-We hit exactly this ourselves (more below).
+The genuinely sharp part isn't the tech, it's how it *feels*. Migration is a run of
+alarming-*looking* steps: create a deactivated account, export the repo, rewrite your DID, sign
+a PLC operation that hands your identity to the new server. It's raw enough that
+when a step stalls (laptop sleeps, network drops) you assume you've lost everything. That's
+exactly what we assumed. ~~no resume, no pause, no checkpoint; in the worst case, data loss~~.
+But it isn't actually that risky. The tools track state on the PDS and resume, re-imports
+dedup and nothing is final until you sign that PLC update. So the actual problem we face hereis
+the UX. A recoverable process that feels like a cliff edge (more below).
 
-That's the motivation: a UI where you can do all of this yourself, with the fragile,
-stateful parts handled on a server that can actually track progress and recover, instead of
-one-shotting commands in your terminal.
+That's the motivation: a place to do all of this yourself without touching the terminal, or
+worrying about the tech underneath. We run the PDS and handle the fiddly parts, so you get a
+button instead of a checklist of XRPC calls.
 
 We see people who go selfhosted, testing it first with one or two test users, before finally switching.
 With an easy and safe way to do it, we want to encourage more users migrating their identities
@@ -89,21 +97,23 @@ work off the client.
 Account create / migrate / invite / reset is the starting set. The same admin surface
 supports a lot more, and these are the directions we want to explore:
 
-- **Resumable migration.** The highest-value one, ~~and the gap a client-side tool, browser
-  or CLI, structurally can't close~~: a server-tracked migration that can pause, resume, and
-  recover from a half-finished state ~~instead of dying with the tab~~. The work runs on
-  infrastructure that's already holding your account, so it can checkpoint and retry.
+- **Rate-limit-aware migration.** ~~The highest-value one, and the gap a client-side tool, browser
+  or CLI, structurally can't close~~ Client-side tools already pause, resume, and recover
+  ~~instead of dying with the tab~~. Where running the host actually helps is the blob rate limit:
+  because we operate the PDS *and* the migration flow, we can raise the ~1,000/day per-IP
+  upload cap server-side and move a large account in one pass. Something a standalone migrator
+  can't, unless the host sets it for it (as eurosky and blacksky do).
 - **Identity operations.** Handle changes (`updateAccountHandle`), email updates
   (`updateAccountEmail`), and PLC rotation / recovery-key management so a lost credential
   isn't a lost account.
-- **Backups & portability.** `com.atproto.sync.getRepo` returns the full repo as a CAR file
-  — the basis for one-click export and scheduled off-site backups. MOOver already offers
+- **Backups & portability.** `com.atproto.sync.getRepo` returns the full repo as a CAR file,
+  the basis for one-click export and scheduled off-site backups. MOOver already offers
   this as a standalone service; the difference for a host is having it built in by default,
   for the account it's already keeping.
 - **Account state & moderation.** Activate / deactivate without deleting, and the takedown /
   suspension surface (`updateSubjectStatus`) for anyone hosting more than themselves.
 - **Capacity & health.** `listRepos` plus repo sizes is a storage view; the firehose gives
-  activity and — importantly — whether your PDS is actually being seen by the relay.
+  activity and whether your PDS is actually being seen by the relay.
 
 We haven't built these yet, and we're not claiming to be the only ones who could. For us it
 just make sense to have it all in one place (space, hehe).
@@ -121,7 +131,7 @@ profile 404s, and it looks like the data is gone. It isn't, but nothing tells yo
 
 There's a subtler half: a self-hosted PDS only reaches the network's relay if it's told to
 announce itself (`PDS_CRAWLERS=https://bsky.network`). Miss it and you can activate all day
-while the AppView never hears about it — a manual `com.atproto.sync.requestCrawl` unsticks
+while the AppView never hears about it. A manual `com.atproto.sync.requestCrawl` unsticks
 it. ([hose.cam's PDS debugger](https://debug.hose.cam/) is good for catching exactly this.
 It checks identity resolution and relay visibility, and gives you a manual crawl button in
 one place.)
