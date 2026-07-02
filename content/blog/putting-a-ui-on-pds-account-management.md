@@ -38,16 +38,16 @@ There are good tools for this, and they genuinely help. `goat` and `pdsadmin` co
 command line; [PDS MOOver](https://pdsmoover.com/) even brings migration into the browser
 with a real UI, and adds automated backups and a missing-blob recovery step on top. None of
 this is a knock on them. But they share a property that keeps the risk around: the migration
-itself runs **client-side**. You (your browser tab) drive a stateful, hard-to-undo
-change to your identity and data, and if it stalls, you own the mess. (That a tool needs a
+itself runs **client-side**. You (your browser tab) drive a stateful, ~~hard-to-undo~~
+change to your identity and data, and if it stalls, you own the mess. ~~(That a tool needs a
 "find your missing blobs" feature at all is a fair sign of how lossy a client-side move can
-be.)
+be.)~~
 
 Migration is the sharp edge. The flow creates a deactivated account, exports your repo,
 imports everything (blobs included and it takes a while), updates your DID document,
 and activates. If any of that stalls – your laptop sleeps, the network drops,
-a step errors halfway – there's **no resume, no pause, no checkpoint**. You're left in a
-partial state, and in the worst case looking at what feels like data loss.
+a step errors halfway – ~~there's no resume, no pause, no checkpoint~~. You're left in a
+partial state, ~~and in the worst case looking at what feels like data loss~~.
 We hit exactly this ourselves (more below).
 
 That's the motivation: a UI where you can do all of this yourself, with the fragile,
@@ -89,9 +89,9 @@ work off the client.
 Account create / migrate / invite / reset is the starting set. The same admin surface
 supports a lot more, and these are the directions we want to explore:
 
-- **Resumable migration.** The highest-value one, and the gap a client-side tool, browser
-  or CLI, structurally can't close: a server-tracked migration that can pause, resume, and
-  recover from a half-finished state instead of dying with the tab. The work runs on
+- **Resumable migration.** The highest-value one, ~~and the gap a client-side tool, browser
+  or CLI, structurally can't close~~: a server-tracked migration that can pause, resume, and
+  recover from a half-finished state ~~instead of dying with the tab~~. The work runs on
   infrastructure that's already holding your account, so it can checkpoint and retry.
 - **Identity operations.** Handle changes (`updateAccountHandle`), email updates
   (`updateAccountEmail`), and PLC rotation / recovery-key management so a lost credential
