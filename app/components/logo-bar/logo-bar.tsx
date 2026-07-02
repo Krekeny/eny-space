@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ChevronDownIcon } from "lucide-react";
 import { Paragraph } from "@/components/paragraph";
+import { SUPPORT_MAILTO } from "@/lib/site-config";
 
 const ATMOSPHERE_APPS: { label: string; href?: string; icon: string }[] = [
   {
@@ -175,14 +177,39 @@ function LogoBarScroll() {
 }
 
 export function LogoBar() {
+  const [open, setOpen] = useState(false);
+
   return (
     <section className="w-full">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <Paragraph className="mx-auto max-w-2xl text-center text-base text-white/60">
           Built for AT Protocol and Bluesky power users who want to see and
           manage their Personal Data Server through a modern interface instead
-          of raw APIs and command‑line tools.
+          of raw APIs and command‑line tools.{" "}
+          <button
+            type="button"
+            onClick={() => setOpen((prev) => !prev)}
+            aria-expanded={open}
+            aria-label="Your tool isn't listed?"
+            className="inline-flex size-5 translate-y-0.5 items-center justify-center rounded-full text-white/50 transition-colors hover:text-white"
+          >
+            <ChevronDownIcon
+              className={`size-4 transition-transform ${open ? "rotate-180" : ""}`}
+              aria-hidden
+            />
+          </button>
         </Paragraph>
+
+        {open && (
+          <Paragraph className="mx-auto mt-3 max-w-2xl text-center text-sm text-white/50">
+            Your atmosphere tool or platform isn&apos;t listed?{" "}
+            <a href={SUPPORT_MAILTO} className="text-primary hover:underline">
+              Contact us
+            </a>
+            . Soon you&apos;ll be able to open a PR.
+          </Paragraph>
+        )}
+
         <LogoBarScroll />
       </div>
     </section>
