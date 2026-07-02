@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { createClient } from "@/lib/supabase/server";
@@ -26,6 +26,10 @@ const doto = Doto({
 interface LayoutProps {
   children: React.ReactNode;
 }
+
+export const viewport: Viewport = {
+  themeColor: "#020617", // slate-950 — matches the dark background on mobile browser chrome
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://eny.space"),

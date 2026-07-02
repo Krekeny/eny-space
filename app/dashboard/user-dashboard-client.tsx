@@ -434,8 +434,7 @@ function MigrateSection({ pdsBareHost }: { pdsBareHost: string }) {
           Migrate an existing account
         </Paragraph>
         <Paragraph className="text-xs text-white/50 mt-1">
-          Already have an AT Protocol account elsewhere? Move it here — you keep
-          your DID and handle. Pick a method below.
+          Already have an AT Protocol account elsewhere? Move it here. You keep your DID and handle. Pick a method below.
         </Paragraph>
       </div>
 
@@ -487,8 +486,8 @@ function MigrateSection({ pdsBareHost }: { pdsBareHost: string }) {
             <Paragraph className="text-xs text-white/60">
               Migrate in your browser: log in with your current handle + app
               password, set the destination to the URL above, and paste the
-              migration code when asked. Use a desktop and keep the tab open —
-              blob uploads take 20–30 min.
+              migration code when asked. Use a desktop and keep the tab open.
+              Blob uploads can take a while.
             </Paragraph>
             <a
               href="https://pdsmoover.com"
@@ -522,7 +521,7 @@ function MigrateSection({ pdsBareHost }: { pdsBareHost: string }) {
                 </span>
               </div>
               <Paragraph className="text-xs text-white/60">
-                For power users — the official AT Protocol CLI.
+                The official AT Protocol CLI.
               </Paragraph>
             </div>
             <ChevronDownIcon
@@ -576,8 +575,7 @@ goat account activate`}
               </span>
             </div>
             <Paragraph className="text-xs text-white/50">
-              We&apos;re building guided migration right into eny.space — no
-              external tools, all in one place.
+              We&apos;re building guided migration right into eny.space
             </Paragraph>
           </div>
         </div>
