@@ -44,7 +44,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   // Per-post proof of the standard.site record. The AT-URI is computable from
   // DID + slug; App Router hoists this <link> into <head>.
-  const did = process.env.ATP_DID;
+  const did = process.env.ATP_DID?.trim();
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:py-24">

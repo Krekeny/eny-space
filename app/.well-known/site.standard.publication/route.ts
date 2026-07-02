@@ -4,8 +4,9 @@
 export const dynamic = "force-dynamic";
 
 export function GET() {
-  const PUBLICATION_RKEY = process.env.ATP_PUB_RKEY || "eny-space";
-  const did = process.env.ATP_DID;
+  // Trim so a stray space/tab in the env value can't corrupt the AT-URI.
+  const PUBLICATION_RKEY = (process.env.ATP_PUB_RKEY || "eny-space").trim();
+  const did = process.env.ATP_DID?.trim();
   if (!did) {
     return new Response("ATP_DID not configured", { status: 503 });
   }
