@@ -77,7 +77,7 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
       <div
         className={`relative mx-auto flex items-center justify-between gap-4 border transition-all duration-300 ${
           scrolled
-            ? "h-12 max-w-2xl rounded-full border-white/10 bg-slate-950/85 px-5 shadow-lg shadow-black/30 backdrop-blur-md"
+            ? "h-12 max-w-2xl rounded-full border-white/10 bg-slate-950/50 px-5 shadow-lg shadow-black/30 backdrop-blur-md"
             : "h-14 max-w-7xl rounded-none border-transparent bg-transparent px-4 sm:px-6"
         }`}
       >
