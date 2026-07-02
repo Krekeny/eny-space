@@ -90,7 +90,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         </header>
 
         <div
-          className="prose prose-invert max-w-none prose-headings:font-heading prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-code:text-white prose-code:before:content-none prose-code:after:content-none prose-pre:border prose-pre:border-violet-400/20 prose-pre:bg-violet-500/10 prose-pre:text-violet-50"
+          className="prose prose-invert max-w-none prose-headings:font-heading prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-code:text-white prose-code:before:content-none prose-code:after:content-none prose-pre:border prose-pre:border-violet-400/20 prose-pre:bg-violet-500/10 prose-pre:text-violet-50 [&_del]:text-white/35 [&_del]:decoration-white/25"
           dangerouslySetInnerHTML={{ __html: post.html }}
         />
       </article>
