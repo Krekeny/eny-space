@@ -651,6 +651,121 @@ function DeleteDialog({
   );
 }
 
+function VerifyEmailInline({
+  account,
+  onVerified,
+}: {
+  account: PdsAccount;
+  onVerified: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [password, setPassword] = useState("");
+  const [token, setToken] = useState("");
+  const [codeSent, setCodeSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const call = async (action: "request" | "confirm") => {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/pds/atproto/verify-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          identifier: account.handle,
+          password,
+          action,
+          token,
+          email: account.email,
+        }),
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(payload?.message || "Request failed");
+      if (action === "request") setCodeSent(true);
+      else onVerified();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="text-xs font-medium text-amber-300/90 transition-colors hover:text-amber-200"
+      >
+        Verify email
+      </button>
+    );
+  }
+
+  return (
+    <div className="space-y-2 rounded-md border border-white/10 bg-white/5 p-2.5">
+      <Paragraph className="text-[11px] text-white/50">
+        Verifying needs this account&apos;s password — email confirmation is
+        account-scoped. We send a code to {account.email}, then you enter it.
+      </Paragraph>
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Account password"
+        autoComplete="off"
+        data-1p-ignore
+        data-lpignore="true"
+        className="w-full rounded border border-white/15 bg-neutral-900/60 px-2 py-1 text-xs text-white placeholder:text-white/30"
+      />
+      {!codeSent ? (
+        <button
+          type="button"
+          onClick={() => call("request")}
+          disabled={busy || !password}
+          className="text-xs font-medium text-fuchsia-300/90 transition-colors hover:text-fuchsia-200 disabled:opacity-50"
+        >
+          {busy ? "Sending…" : "Send code"}
+        </button>
+      ) : (
+        <>
+          <input
+            type="text"
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+            placeholder="Code from email"
+            className="w-full rounded border border-white/15 bg-neutral-900/60 px-2 py-1 text-xs text-white placeholder:text-white/30"
+          />
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => call("confirm")}
+              disabled={busy || !token}
+              className="text-xs font-medium text-emerald-300/90 transition-colors hover:text-emerald-200 disabled:opacity-50"
+            >
+              {busy ? "Confirming…" : "Confirm"}
+            </button>
+            <button
+              type="button"
+              onClick={() => call("request")}
+              disabled={busy}
+              className="text-xs text-white/40 transition-colors hover:text-white/70 disabled:opacity-50"
+            >
+              Resend
+            </button>
+          </div>
+        </>
+      )}
+      {error && (
+        <Paragraph className="text-[11px] text-rose-300 break-all">
+          {error}
+        </Paragraph>
+      )}
+    </div>
+  );
+}
+
 function AccountRow({
   account,
   onRefresh,
@@ -783,6 +898,11 @@ function AccountRow({
                     ? "Reset email sent ✓"
                     : "Send password reset"}
               </button>
+            </div>
+          )}
+          {open && !readOnly && account.email && !account.emailConfirmedAt && (
+            <div className="mt-2 ml-5">
+              <VerifyEmailInline account={account} onVerified={onRefresh} />
             </div>
           )}
         </div>
