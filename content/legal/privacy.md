@@ -1,4 +1,4 @@
-# Privacy Policy — eny.space
+# Privacy Policy – eny.space
 
 _Effective 1 July 2026_
 
@@ -8,12 +8,12 @@ eny.space is operated by **Krekeny GmbH**, Karlstr. 54, 63065 Offenbach am Main,
 
 For any privacy question or data-subject request, contact us at **hello+eny-space@krekeny.com**.
 
-## 2. Controller vs. processor — an important distinction
+## 2. Controller vs. processor
 
 eny.space provides managed hosting for your own Personal Data Server (PDS) on the AT Protocol. Because of this, our role depends on which data we're talking about:
 
 - **We are the _controller_** for the data we collect to run your eny.space account: your email address, your account identifier, and your billing link to Stripe. This policy governs that data.
-- **We are a _processor_ (host)** for the content inside your PDS — your repository, records, blobs, and any accounts your end-users create on it. That data is yours. We store and serve it so your PDS runs, but we don't decide what's in it, and **we do not curate or moderate your users**. You are the controller for that content, and responsible for your own users under applicable law.
+- **We are a _processor_ (host)** for the content inside your PDS, your repository, records, blobs, and any accounts your end-users create on it. That data is yours. We store and serve it so your PDS runs, but we don't decide what's in it, and **we do not curate or moderate your users**. You are the controller for that content, and responsible for your own users under applicable law.
 
 ## 3. What we collect and why
 
@@ -29,7 +29,7 @@ We do **not** sell your data or use it for advertising.
 
 ## 4. PDS content and account lifecycle
 
-All data on your PDS belongs to you. You can migrate it in or out at any time using standard AT Protocol tooling — your DID and repository are portable by design.
+All data on your PDS belongs to you. You can migrate it in or out at any time using standard AT Protocol tooling. Your DID and repository are portable by design.
 
 When a subscription ends, we keep your PDS available for a grace period so nothing is lost by accident:
 
@@ -44,15 +44,15 @@ When a subscription ends, we keep your PDS available for a grace period so nothi
 
 We use a small number of providers to run the service. Each processes data on our behalf:
 
-- **Stripe** (Stripe Payments Europe, Ltd.) — payment processing. We store only a customer-ID link; card data is handled by Stripe directly.
-- **Resend** — sending transactional email (eny.space account mails and PDS mails).
-- **Vercel** — hosts our website and dashboard and provides Vercel Analytics. Vercel processes standard request and runtime logs (which may include IP addresses) on our behalf, retained short-term per their plan — on our Pro plan, about **1 day**. Vercel Analytics is cookieless and aggregated.
-- **Froxlor** — operates the server infrastructure in Frankfurt, Germany on which your PDS runs (sub-processor).
-- **AWS** — user database, currently in Ireland (eu-west-1), migrating to Frankfurt (eu-central-1) soon.
+- **Stripe** (Stripe Payments Europe, Ltd.): payment processing. We store only a customer-ID link; card data is handled by Stripe directly.
+- **Resend**: sending transactional email (eny.space account mails and PDS mails).
+- **Vercel**: hosts our website and dashboard and provides Vercel Analytics. Vercel processes standard request and runtime logs (which may include IP addresses) on our behalf, retained about **1 day**. Vercel Analytics is cookieless and aggregated.
+- **Froxlor**: operates the server infrastructure in Frankfurt, Germany on which your PDS runs (sub-processor).
+- **AWS**: user database, currently in Ireland (eu-west-1), migrating to Frankfurt (eu-central-1) soon.
 
 ## 6. Cookies
 
-We use **strictly necessary cookies** only — an authentication session cookie set when you sign in to your eny.space account. It is required for the service to function and is not used for tracking. Vercel Analytics (see §5) is cookieless. We do not use advertising or third-party tracking cookies.
+We use **strictly necessary cookies**: one authentication session cookie set when you sign in to your eny.space account. It is required for the service to function and is not used for tracking. Vercel Analytics (see §5) is cookieless. We do not use advertising or third-party tracking cookies.
 
 ## 7. Where your data is stored
 
@@ -70,11 +70,11 @@ We use appropriate technical and organisational measures to protect personal dat
 
 ## 10. Your rights
 
-Under the GDPR you have the right to access, correct, delete, restrict, and port your data, and to object to processing. Because your PDS is portable, you can export or migrate its contents yourself at any time. To exercise any right regarding data we control, contact us at hello+eny-space@krekeny.com. You may also lodge a complaint with your local data protection authority — for us that is Der Hessische Beauftragte für Datenschutz und Informationsfreiheit (Hesse).
+Under the GDPR you have the right to access, correct, delete, restrict, and port your data, and to object to processing. Because your PDS is portable, you can export or migrate its contents yourself at any time. To exercise any right regarding data we control, contact us at hello+eny-space@krekeny.com. You may also lodge a complaint with your local data protection authority. For us that is Der Hessische Beauftragte für Datenschutz und Informationsfreiheit (Hesse).
 
 ## 11. Children
 
-eny.space is not directed at children, and we do not knowingly collect personal data from anyone under the age required to consent to online services in their country. [[CONFIRM: minimum age to state, e.g. 16 in Germany]]
+eny.space is not directed at children. Our Terms of Service require you to be at least **18 years old** to use the service, and we do not knowingly collect personal data from anyone under 18. If you believe a minor has provided us with personal data, contact us at hello+eny-space@krekeny.com and we will delete it.
 
 ## 12. Changes to this policy
 

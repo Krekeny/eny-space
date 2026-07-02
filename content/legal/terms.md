@@ -1,4 +1,4 @@
-# Terms of Service — eny.space
+# Terms of Service – eny.space
 
 _Effective 1 July 2026_
 
