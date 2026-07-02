@@ -9,6 +9,7 @@
  * Not part of the build — run at commit time or manually via `pnpm sync:standard`.
  * A flaky network or expired app password must never break a deploy.
  */
+import fs from "node:fs";
 import "dotenv/config";
 import { AtpAgent } from "@atproto/api";
 
@@ -22,6 +23,9 @@ const {
   ATP_PUB_RKEY = "eny-space",
   PUBLICATION_NAME = "eny.space",
   PUBLICATION_DESCRIPTION = "Managed PDS hosting for the atmosphere.",
+  // Square PNG (>=256px) for site.standard.publication.icon. Re-uploaded each
+  // run; content-addressed, so the same file yields the same blob (no dupes).
+  PUBLICATION_ICON_PATH = "public/pixel-planet-static.png",
 } = process.env;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -43,12 +47,26 @@ async function main() {
   const did = agent.session!.did;
   console.log(`Logged in as ${identifier} (${did})`);
 
+  // Upload the publication icon blob if the file exists (optional).
+  let icon: unknown;
+  try {
+    const bytes = fs.readFileSync(PUBLICATION_ICON_PATH);
+    const up = await agent.uploadBlob(bytes, { encoding: "image/png" });
+    icon = up.data.blob;
+    console.log(`Icon blob uploaded from ${PUBLICATION_ICON_PATH}`);
+  } catch (e) {
+    console.warn(
+      `No publication icon set (${PUBLICATION_ICON_PATH}): ${e instanceof Error ? e.message : e}`,
+    );
+  }
+
   // 1. Upsert the publication.
   const publication = {
     $type: "site.standard.publication",
     url: SITE_URL,
     name: PUBLICATION_NAME,
     description: PUBLICATION_DESCRIPTION,
+    ...(icon ? { icon } : {}),
     preferences: { showInDiscover: true },
   };
   await agent.com.atproto.repo.putRecord({
