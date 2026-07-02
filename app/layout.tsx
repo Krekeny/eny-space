@@ -28,10 +28,12 @@ interface LayoutProps {
 }
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://eny.space"),
   title: {
     default: "eny.space",
     template: "%s | eny.space",
   },
+  description: "one-click PDS hosting for the atmosphere. your data, your space — use it enywhere.",
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
@@ -41,9 +43,17 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
     shortcut: "/favicon.ico",
   },
+  openGraph: {
+    type: "website",
+    siteName: "eny.space",
+    title: "eny.space",
+    description: "one-click PDS hosting for the atmosphere. your data, your space — use it enywhere.",
+    images: [{ url: "/og.png", width: 1200, height: 630 }],
+  },
   twitter: {
     card: "summary_large_image",
     description: "eny.space – your data, your space, use it enywhere.",
+    images: ["/og.png"],
   },
 };
 

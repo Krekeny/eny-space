@@ -25,6 +25,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) return {};
+  // Use the generic site OG card for now. A post-specific card exists
+  // (public/og-blog.png, generated via `pnpm og`) but is intentionally not
+  // wired up yet.
+  const ogImage = "/og.png";
+
   return {
     title: post.title,
     description: post.description,
@@ -33,6 +38,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: post.description,
       type: "article",
       publishedTime: post.publishedAt,
+      images: [{ url: ogImage, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: [ogImage],
     },
   };
 }
