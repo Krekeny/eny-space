@@ -130,7 +130,7 @@ export function SiteHeader({ user, isRecovery = false }: SiteHeaderProps) {
             className="text-xs font-medium uppercase tracking-wide text-white/50 transition-colors hover:text-white"
             onClick={() => setMobileOpen(false)}
           >
-            Blog
+            News
           </Link>
         </nav>
 

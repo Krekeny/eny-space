@@ -39,6 +39,9 @@ export function Footer({ fabInset = false }: { fabInset?: boolean }) {
 
         <div className="flex flex-wrap items-center gap-4 text-xs text-white/60">
           <nav className="flex flex-wrap items-center gap-4">
+            <Link href="/blog" className="hover:text-white">
+              News
+            </Link>
             <Link href="/#features" className="hover:text-white">
               Features
             </Link>
@@ -47,9 +50,6 @@ export function Footer({ fabInset = false }: { fabInset?: boolean }) {
             </Link>
             <Link href="/#faq" className="hover:text-white">
               FAQ
-            </Link>
-            <Link href="/blog" className="hover:text-white">
-              Blog
             </Link>
             <a
               href={LEGAL_NOTICE_URL}

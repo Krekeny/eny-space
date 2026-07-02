@@ -20,7 +20,7 @@ export function MobileMenu({ user, isRecovery = false, open, onClose }: MobileMe
     <div className="fixed right-3 top-14 z-40 max-h-[calc(100vh-3.5rem)] w-1/3 overflow-y-auto rounded-xl border border-fuchsia-300/30 bg-slate-900/75 px-4 pb-4 pt-3 shadow-[0_0_30px_rgba(232,121,249,0.2)] backdrop-blur-md md:hidden">
       <nav className="flex flex-col gap-2">
         <Link href="/blog" onClick={onClose} className={mobileLinkClass}>
-          Blog
+          News
         </Link>
       </nav>
 
