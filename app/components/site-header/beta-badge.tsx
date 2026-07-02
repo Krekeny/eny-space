@@ -47,7 +47,7 @@ export function BetaBadge({ userEmail }: { userEmail?: string | null }) {
             We&apos;re in open beta
           </p>
           <p className="mt-1.5 text-xs leading-relaxed text-white/70">
-            Expect the occasional breaking change — this dashboard and the
+            Expect the occasional breaking change, the dashboard and the
             services around your PDS may still be unstable.
           </p>
           <p className="mt-2 text-xs leading-relaxed text-white/70">

@@ -47,13 +47,13 @@ const FAQ_ITEMS: FaqItem[] = [
     id: "managed-infra",
     question: "Who runs the infrastructure, and what if my PDS goes down?",
     answer:
-      "eny.space is managed hosting: you create a PDS in a click and we run the infrastructure, TLS, updates and uptime — no kubectl or cloud console. The underlying hardware is held by a dedicated hosting partner that monitors the pods and provides operational support, so failures are detected and recovered at the infrastructure layer without you having to do anything. Your PDS is backed up as part of the managed service. (We don't publish a formal uptime SLA yet.)",
+      "eny.space is managed hosting: you create a PDS in a click and we run the infrastructure, TLS, updates and uptime. The underlying hardware is held by our dedicated hosting partner in Frankfurt (Germany). Your PDS is monitored, so failures are detected and recovered at the infrastructure layer without you having to do anything. Your PDS is backed up as part of the managed service.",
   },
   {
     id: "why-no-atmosphere-login",
     question: 'Why can\'t I log in with my "@" handle or Atmosphere account?',
     answer:
-      "Your eny.space account is separate from your AT Protocol identity on purpose. Allowing Atmosphere login before your PDS is fully set up could lock you out of your own server. We're working on Atmosphere login as an option, but an email address will always be required as a secure fallback.",
+      "Your eny.space account is separate from your AT Protocol identity on purpose. Allowing Atmosphere login before your PDS is fully set up could lock you out of your own server. We're working on Atmosphere login as an option, but an email address will always be required as a secure fallback and billing address.",
   },
 ];
 
