@@ -1,13 +1,11 @@
 // @ts-nocheck
-/* ATpreakout ATProto: OAuth login + friends-based leaderboard + score write.
-   Requires client-metadata.json served at CFG.clientId and the app loaded over https. */
 import { BrowserOAuthClient } from '@atproto/oauth-client-browser';
 import { Agent } from '@atproto/api';
 
 export function initAtproto(root: HTMLElement): void {
 const CFG={
   nsid:'space.eny.atpreakout.score',
-  clientId:'https://eny.space/atpreakout/client-metadata.json',
+  clientId:(typeof window!=='undefined'?window.location.origin:'https://eny.space')+'/atpreakout/client-metadata.json',
   handleResolver:'https://bsky.social',
   jetstream:'wss://jetstream2.us-east.bsky.network/subscribe',
   appview:'https://public.api.bsky.app'

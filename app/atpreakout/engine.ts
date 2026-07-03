@@ -199,7 +199,7 @@ function render(counts){
   $('playbar').style.display='flex';
 }
 
-const GBRICK={1:'#3b1d6e',2:'#7c3aed',3:'#a855f7',4:'#d8b4fe'};
+const GBRICK={1:'#475569',2:'#64748b',3:'#94a3b8',4:'#e2e8f0'};
 const GPTS={1:1,2:2,3:3,4:5};
 const iconCache={};
 function getIcon(nsid){ const dom=groupDomain(groupKey(nsid));
@@ -310,18 +310,18 @@ function startGame(){
       else { ball.stuck=true; ball.x=pad.x+pad.w/2; ball.y=pad.y-8; ball.vx=ball.vy=0; phase='ready'; } }
     hud();
   }
-  function txt(s,sub){ ctx.textAlign='center'; ctx.fillStyle='#ece3ff'; ctx.font='14px "Press Start 2P"';
+  function txt(s,sub){ ctx.textAlign='center'; ctx.fillStyle='#e2e8f0'; ctx.font='14px "Press Start 2P"';
     ctx.fillText(s,G.W/2,G.H/2-4);
-    if(sub){ ctx.fillStyle='#a291d0'; ctx.font='18px VT323'; ctx.fillText(sub,G.W/2,G.H/2+22); }
+    if(sub){ ctx.fillStyle='#94a3b8'; ctx.font='18px VT323'; ctx.fillText(sub,G.W/2,G.H/2+22); }
     ctx.textAlign='left'; }
   function draw(){
     ctx.clearRect(0,0,G.W,G.H);
     for(const b of bricks){ if(!b.alive) continue;
       ctx.fillStyle=GBRICK[b.l]; ctx.fillRect(b.x,b.y,b.w,b.h);
       ctx.fillStyle='rgba(0,0,0,.22)'; ctx.fillRect(b.x,b.y+b.h-2,b.w,2); }
-    ctx.fillStyle='#a855f7'; ctx.fillRect(pad.x,pad.y,pad.w,pad.h);
+    ctx.fillStyle='#e879f9'; ctx.fillRect(pad.x,pad.y,pad.w,pad.h);
     ctx.fillStyle='rgba(255,255,255,.25)'; ctx.fillRect(pad.x,pad.y,pad.w,2);
-    ctx.fillStyle='#e9d5ff'; ctx.fillRect(ball.x-ball.size/2,ball.y-ball.size/2,ball.size,ball.size);
+    ctx.fillStyle='#f0abfc'; ctx.fillRect(ball.x-ball.size/2,ball.y-ball.size/2,ball.size,ball.size);
     drawParts();
     if(phase==='ready') txt('click to launch','move the paddle');
     if(phase==='over') txt('game over','click to retry');

@@ -1,11 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 
 .atpreakout{
-    --bg:#120f1f; --panel:#1e1830; --ink:#0c0916;
-    --border:#4a3d6e; --border-lo:#332a4d;
-    --text:#ece3ff; --muted:#a291d0;
-    --empty:#271f3c; --l1:#3b1d6e; --l2:#7c3aed; --l3:#a855f7; --l4:#d8b4fe;
-    --acc:#a855f7; --acc-dk:#3f1178;
+    /* Matched to eny.space: monochrome slate, with pink/fuchsia for CTAs only. */
+    --bg:#020617; --panel:#0f172a; --ink:#080a16;
+    --border:#334155; --border-lo:#1e293b;
+    --text:#e2e8f0; --muted:#94a3b8;
+    --empty:#1e293b; --l1:#475569; --l2:#64748b; --l3:#94a3b8; --l4:#e2e8f0;
+    --acc:#d946ef; --acc-dk:#a21caf;
     --px:'VT323',monospace; --head:'Press Start 2P',monospace;
   }
   .atpreakout,.atpreakout *{box-sizing:border-box}
@@ -32,7 +33,7 @@
   .atpreakout .ac .txt{display:flex;flex-direction:column;min-width:0}
   .atpreakout .ac .nm{font-size:19px;color:var(--text);line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .atpreakout .ac .hd{font-size:15px;color:var(--muted)}
-  .atpreakout button{height:46px;padding:0 20px;border:3px solid var(--acc-dk);background:var(--acc);color:#1c0836;
+  .atpreakout button{height:46px;padding:0 20px;border:3px solid var(--acc-dk);background:var(--acc);color:#fff;
     font:12px var(--head);cursor:pointer;border-radius:0;box-shadow:5px 5px 0 rgba(0,0,0,.45);
     text-transform:uppercase;transition:transform .08s ease,box-shadow .08s ease}
   .atpreakout button:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 rgba(0,0,0,.5)}
@@ -89,7 +90,7 @@
   .atpreakout .hud{display:flex;gap:20px;align-items:center;margin-bottom:12px;font-family:var(--head);font-size:11px;color:var(--acc)}
   .atpreakout .hud b{color:var(--text);font-weight:normal}
   .atpreakout .hud .sp{flex:1}
-  .atpreakout .mini{height:36px;padding:0 12px;border:2px solid var(--acc-dk);background:var(--acc);color:#1c0836;
+  .atpreakout .mini{height:36px;padding:0 12px;border:2px solid var(--acc-dk);background:var(--acc);color:#fff;
     font:9px var(--head);cursor:pointer;box-shadow:3px 3px 0 rgba(0,0,0,.45);text-transform:uppercase;
     transition:transform .08s ease,box-shadow .08s ease}
   .atpreakout .mini:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 rgba(0,0,0,.5)}
