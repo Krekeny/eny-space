@@ -65,6 +65,9 @@ export function Footer({ fabInset = false }: { fabInset?: boolean }) {
             <Link href={TERMS_URL} className="hover:text-white">
               Terms
             </Link>
+            <Link href="/atpreakout" className="hover:text-white">
+              🕹️ atpreakout
+            </Link>
           </nav>
         </div>
       </div>
