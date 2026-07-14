@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react";
 import { Heading } from "@/components/heading";
 import { getAllSlugs, getPost } from "@/lib/blog";
+import { AuthorByline } from "../author-byline";
 
 export const revalidate = 3600;
 
@@ -86,6 +87,11 @@ export default async function BlogPostPage({ params }: PageProps) {
           </Heading>
           {post.description && (
             <p className="mt-3 text-lg text-white/60">{post.description}</p>
+          )}
+          {post.author && (
+            <div className="mt-5">
+              <AuthorByline author={post.author} />
+            </div>
           )}
         </header>
 

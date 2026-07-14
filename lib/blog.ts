@@ -13,6 +13,14 @@ import remarkHtml from "remark-html";
 const BLOG_DIR = path.join(process.cwd(), "content", "blog");
 const POST_EXTENSIONS = [".md", ".mdx"];
 
+export type Author = {
+  /** Optional; if omitted, resolved from the Bluesky profile (handle/did). */
+  name?: string;
+  /** Bluesky handle, e.g. "samsour.de" — used to build the profile link + fetch avatar. */
+  handle?: string;
+  did?: string;
+};
+
 export type PostMeta = {
   slug: string;
   title: string;
@@ -22,6 +30,8 @@ export type PostMeta = {
   /** Normalized ISO-8601, used for sorting and the standard.site record. */
   publishedAt: string;
   tags: string[];
+  /** Optional byline. Frontmatter `author` may be a string (name) or an object. */
+  author?: Author;
 };
 
 export type Post = PostMeta & { html: string };
@@ -45,6 +55,24 @@ function toIso(value: unknown): string {
     throw new Error(`Unparseable post date: ${String(value)}`);
   }
   return d.toISOString();
+}
+
+function parseAuthor(value: unknown): Author | undefined {
+  if (!value) return undefined;
+  if (typeof value === "string") return { name: value };
+  if (typeof value === "object") {
+    const o = value as Record<string, unknown>;
+    const author: Author = {
+      name: o.name ? String(o.name) : undefined,
+      handle: o.handle ? String(o.handle) : undefined,
+      did: o.did ? String(o.did) : undefined,
+    };
+    // Any one of name / handle / did is enough — the rest is fetched from the
+    // Bluesky profile at render time.
+    if (!author.name && !author.handle && !author.did) return undefined;
+    return author;
+  }
+  return undefined;
 }
 
 function isPostFile(file: string): boolean {
@@ -78,6 +106,7 @@ function parseFile(file: string): { meta: PostMeta; body: string } {
       date: String(data.date),
       publishedAt: toIso(data.date),
       tags,
+      author: parseAuthor(data.author),
     },
     body: content,
   };
