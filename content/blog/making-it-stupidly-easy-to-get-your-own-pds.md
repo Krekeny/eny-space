@@ -47,4 +47,4 @@ In fact, we are integrating our one-click PDS service deeply into our upcoming a
 
 ![Frankfurt skyline at golden hour, with a little red Honda Grom parked on a bridge over the Main.](/blog/making-it-stupidly-easy-to-get-your-own-pds/instagram-filter-2018.jpg)
 
-*Golden hour over the Main, ~2018. Filter very much included.*
+*Golden hour over the Main in Frankfurt, 2018. Filter very much included haha.*

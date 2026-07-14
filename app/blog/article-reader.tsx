@@ -110,7 +110,7 @@ export function ArticleReader({
         </header>
 
         <div
-          className={`prose prose-invert max-w-none prose-p:leading-[1.9] prose-li:leading-[1.9] prose-headings:leading-snug prose-img:mx-auto prose-img:max-h-[70vh] prose-img:w-auto prose-img:rounded-xl prose-img:border prose-img:border-white/10 prose-figcaption:text-center [&_*]:transition-[color,background-color,border-color,font-size] [&_*]:duration-300 [&_del]:text-white/35 [&_del]:decoration-white/25 ${
+          className={`prose prose-invert max-w-none prose-p:leading-[1.9] prose-li:leading-[1.9] prose-headings:leading-snug prose-img:mx-auto prose-img:max-h-[70vh] prose-img:w-auto prose-img:rounded-xl prose-img:border prose-img:border-white/10 prose-figcaption:text-center [&_p:has(>img)+p]:!mt-3 [&_p:has(>img)+p]:text-center [&_p:has(>img)+p]:text-sm [&_p:has(>img)+p]:text-white/40 [&_*]:transition-[color,background-color,border-color,font-size] [&_*]:duration-300 [&_del]:text-white/35 [&_del]:decoration-white/25 ${
             isReader ? READER : FANCY
           }`}
           dangerouslySetInnerHTML={{ __html: html }}
