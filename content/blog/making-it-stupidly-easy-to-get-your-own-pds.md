@@ -1,6 +1,6 @@
 ---
 title: "Making it stupidly easy to get your own PDS"
-date: "2026-07-14"
+date: "2026-07-15"
 description: "Why should protecting your data privacy require a computer science degree? From vintage Instagram filters to the AT Protocol."
 tags: ["atproto", "pds", "app"]
 author:
@@ -44,3 +44,7 @@ Our mission: eliminate the technical gatekeeping and make the decentralized web 
 As part of the Atmosphere (AT Protocol ecosystem), your identity and content live on a PDS (Personal Data Server). In a decentralized web, your PDS is what uncouples your data from the application layer. It ensures that if you ever want to switch apps, your network, posts and media move with you. Because you own the identity and the data attached to it. And ultimately, in our case, own the whole server this whole stuff lives on.
 
 In fact, we are integrating our one-click PDS service deeply into our upcoming app [eny.social](https://eny.social) so that users can spin up their own dedicated PDS with a single button click directly in the onboarding flow. No external accounts to create, nothing else technical to manage. Just instant sovereign social cloud hosting for the next generation of the web.
+
+![Frankfurt skyline at golden hour, with a little red Honda Grom parked on a bridge over the Main.](/blog/making-it-stupidly-easy-to-get-your-own-pds/instagram-filter-2018.jpg)
+
+*Golden hour over the Main, ~2018. Filter very much included.*
