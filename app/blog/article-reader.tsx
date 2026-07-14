@@ -51,16 +51,16 @@ export function ArticleReader({
 
   return (
     <>
-      {/* Reader mode dims the fancy site background for a calmer read. */}
-      {isReader && (
-        <div
-          aria-hidden
-          className="pointer-events-none fixed inset-0 -z-4 bg-slate-950/80"
-        />
-      )}
+      {/* Reader mode dims the fancy site background — fades in/out. */}
+      <div
+        aria-hidden
+        className={`pointer-events-none fixed inset-0 -z-4 bg-slate-950/80 transition-opacity duration-500 ${
+          isReader ? "opacity-100" : "opacity-0"
+        }`}
+      />
 
       <article
-        className="mt-8"
+        className="mt-8 transition-[font-size,line-height,color] duration-300"
         style={isReader ? { fontFamily: READER_FONT } : undefined}
       >
         <div className="mb-6 flex items-center justify-between gap-4">
@@ -110,7 +110,7 @@ export function ArticleReader({
         </header>
 
         <div
-          className={`prose prose-invert max-w-none prose-p:leading-[1.9] prose-li:leading-[1.9] prose-headings:leading-snug prose-img:mx-auto prose-img:max-h-[70vh] prose-img:w-auto prose-img:rounded-xl prose-img:border prose-img:border-white/10 prose-figcaption:text-center [&_del]:text-white/35 [&_del]:decoration-white/25 ${
+          className={`prose prose-invert max-w-none prose-p:leading-[1.9] prose-li:leading-[1.9] prose-headings:leading-snug prose-img:mx-auto prose-img:max-h-[70vh] prose-img:w-auto prose-img:rounded-xl prose-img:border prose-img:border-white/10 prose-figcaption:text-center [&_*]:transition-[color,background-color,border-color,font-size] [&_*]:duration-300 [&_del]:text-white/35 [&_del]:decoration-white/25 ${
             isReader ? READER : FANCY
           }`}
           dangerouslySetInnerHTML={{ __html: html }}
