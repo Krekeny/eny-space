@@ -2,9 +2,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react";
-import { Heading } from "@/components/heading";
 import { getAllSlugs, getPost } from "@/lib/blog";
 import { AuthorByline } from "../author-byline";
+import { ArticleReader } from "../article-reader";
 
 export const revalidate = 3600;
 
@@ -74,32 +74,14 @@ export default async function BlogPostPage({ params }: PageProps) {
         All posts
       </Link>
 
-      <article className="mt-8">
-        <header className="mb-8">
-          <time
-            dateTime={post.publishedAt}
-            className="text-xs uppercase tracking-widest text-white/40"
-          >
-            {formatDate(post.publishedAt)}
-          </time>
-          <Heading className="mt-3 text-3xl tracking-tight text-white sm:text-4xl">
-            {post.title}
-          </Heading>
-          {post.description && (
-            <p className="mt-3 text-lg text-white/60">{post.description}</p>
-          )}
-          {post.author && (
-            <div className="mt-5">
-              <AuthorByline author={post.author} />
-            </div>
-          )}
-        </header>
-
-        <div
-          className="prose prose-invert max-w-none prose-headings:font-heading prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-code:text-white prose-code:before:content-none prose-code:after:content-none prose-pre:border prose-pre:border-violet-400/20 prose-pre:bg-violet-500/10 prose-pre:text-violet-50 [&_del]:text-white/35 [&_del]:decoration-white/25"
-          dangerouslySetInnerHTML={{ __html: post.html }}
-        />
-      </article>
+      <ArticleReader
+        title={post.title}
+        dateLabel={formatDate(post.publishedAt)}
+        publishedAt={post.publishedAt}
+        description={post.description}
+        html={post.html}
+        authorSlot={post.author ? <AuthorByline author={post.author} /> : null}
+      />
     </div>
   );
 }

@@ -53,7 +53,9 @@ export default function BlogIndexPage() {
                     {post.title}
                   </Heading>
                   {post.description && (
-                    <p className="mt-2 text-white/60">{post.description}</p>
+                    <p className="mt-2 leading-relaxed text-white/60">
+                      {post.description}
+                    </p>
                   )}
                   {post.tags.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-2">
