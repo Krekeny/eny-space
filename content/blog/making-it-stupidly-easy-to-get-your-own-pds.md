@@ -5,7 +5,7 @@ description: "Why should protecting your data privacy require a computer science
 tags: ["atproto", "pds", "app"]
 author:
   did: did:plc:vmqt4a4pf5jxvtalzjz2zsqk
-canonical: "https://eny.social/blog/making-it-stupidly-easy-to-get-your-own-pds"
+canonical: "https://eny.social/blog/why-does-protecting-your-privacy-require-a-cs-degree"
 canonicalNote: "This post was originally published on eny.social, our upcoming social app designed to bring ownership and simplicity back to the social web."
 ---
 
