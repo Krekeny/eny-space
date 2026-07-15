@@ -5,6 +5,8 @@ description: "Why should protecting your data privacy require a computer science
 tags: ["atproto", "pds", "app"]
 author:
   did: did:plc:vmqt4a4pf5jxvtalzjz2zsqk
+canonical: "https://eny.social/blog/making-it-stupidly-easy-to-get-your-own-pds"
+canonicalNote: "This post was originally published on eny.social, our upcoming social app designed to bring ownership and simplicity back to the social web."
 ---
 
 I somehow miss the days when our biggest worry was whether the *X-Pro II* or *Toaster* would make our pizzas and burgers look tastier. Looking back at my old photos, I really wonder what emotional trauma I was trying to mask with that heavy *X-Pro II* vignette. it was the (at least for me) golden age of mobile photography. Blurry concert stages and dramatic sunsets had to be AGGRESSIVELY desaturated and heavily bordered before approving them to be worthy of being shown in my friend's Instagram feed.
@@ -37,13 +39,13 @@ And there is no need for a 100% selfhosted home-made cloud infrastructure in you
 
 The beauty of this decentralized architecture lies in data sovereignty. *Selfhosting* is brilliant. But only viable if you actually know how to do it. Like said, **it should not be a privilege** reserved exclusively for tech people. Everybody deserves the peace of mind that comes with knowing their data belongs to them. This should be the **baseline standard**, not an engineering challenge.
 
-Because we were utterly fed up with this barrier to entry, we decided to build a way out (and into atproto). We created one-click Personal Data Servers (PDS).
+Because we were utterly fed up with this barrier to entry, we decided to build a way out (and into atproto). We created one-click *Personal Data Servers* (in short: PDS, your personal digital "backpack").
 
-As part of the Atmosphere (AT Protocol ecosystem), your identity and content live on a PDS (Personal Data Server). In a decentralized web, your PDS is what uncouples your data from the application layer. It ensures that if you ever want to switch apps, your network, posts and media move with you. Because you own the identity and the data attached to it. And ultimately, in our case, own the whole server this whole stuff lives on.
+As part of the Atmosphere (AT Protocol ecosystem), your posts, photos, and friends don't belong to the app. They belong to you. Think of it like your phone number: if you get tired of your phone provider, you can switch to a new one and keep your exact same number and contacts. Like this, you can change apps without losing your digital life.
 
-Our mission: eliminate the technical gatekeeping and make the decentralized web more accessible to absolutely everyone. In fact, we are integrating our one-click PDS service deeply into our upcoming app [eny.social](https://eny.social) so that users can spin up their own dedicated PDS with a single button click directly in the onboarding flow. No external accounts to create, nothing else technical to manage. Just instant sovereign social cloud hosting for the next generation of the web.
+Our motivation: eliminate the technical gatekeeping and make the decentralized web more accessible to absolutely everyone. In fact, we are integrating our one-click PDS service deeply into our upcoming app [eny.social](https://eny.social) so that users can spin up their own dedicated PDS with a single button click directly in the onboarding flow. No external accounts to create, nothing else technical to manage. Just a private slice of the web that actually belongs to you. For the next generation of the web.
 
-Unfortunately we got used to expecting free apps and platforms. We payed the big tech platforms with our privacy. We don't do that. Our managed hosting is not free because we run an honest and transparent infrastructure. You pay for your server space and in return your data belongs to 100% you. It's as simple as that.
+Unfortunately we got used to expecting free apps and platforms. We paid the big tech platforms with our privacy. We don't do that. Our managed hosting is not free because we run an honest and transparent infrastructure. You pay for your server space and in return your data belongs to 100% you. It's as simple as that.
 
 We are trying to bring back the effortless joy of 2012 but equipping it with the data independence we desperately need in 2026.
 

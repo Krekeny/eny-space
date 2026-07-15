@@ -34,11 +34,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: post.title,
     description: post.description,
+    // Cross-posted originals point at their canonical home; otherwise the post
+    // self-canonicals (resolved to absolute via metadataBase).
+    alternates: {
+      canonical: post.canonical || `/blog/${post.slug}`,
+    },
     openGraph: {
       title: post.title,
       description: post.description,
       type: "article",
       publishedTime: post.publishedAt,
+      url: post.canonical || `/blog/${post.slug}`,
       images: [{ url: ogImage, width: 1200, height: 630 }],
     },
     twitter: {
@@ -81,6 +87,8 @@ export default async function BlogPostPage({ params }: PageProps) {
         description={post.description}
         html={post.html}
         authorSlot={post.author ? <AuthorByline author={post.author} /> : null}
+        canonicalNote={post.canonicalNote}
+        canonicalUrl={post.canonical}
       />
     </div>
   );

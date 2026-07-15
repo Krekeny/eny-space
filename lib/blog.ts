@@ -32,6 +32,14 @@ export type PostMeta = {
   tags: string[];
   /** Optional byline. Frontmatter `author` may be a string (name) or an object. */
   author?: Author;
+  /**
+   * Optional canonical URL. Set when the post is cross-posted and the canonical
+   * copy lives elsewhere (e.g. "https://eny.social/blog/<slug>"). Defaults to the
+   * post's own URL when omitted.
+   */
+  canonical?: string;
+  /** Optional visible cross-post note, e.g. "Originally published on eny.social…". */
+  canonicalNote?: string;
 };
 
 export type Post = PostMeta & { html: string };
@@ -107,6 +115,10 @@ function parseFile(file: string): { meta: PostMeta; body: string } {
       publishedAt: toIso(data.date),
       tags,
       author: parseAuthor(data.author),
+      canonical: data.canonical ? String(data.canonical) : undefined,
+      canonicalNote: data.canonicalNote
+        ? String(data.canonicalNote)
+        : undefined,
     },
     body: content,
   };

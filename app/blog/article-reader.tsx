@@ -22,6 +22,8 @@ export function ArticleReader({
   description,
   html,
   authorSlot,
+  canonicalNote,
+  canonicalUrl,
 }: {
   title: string;
   dateLabel: string;
@@ -29,6 +31,8 @@ export function ArticleReader({
   description?: string;
   html: string;
   authorSlot?: React.ReactNode;
+  canonicalNote?: string;
+  canonicalUrl?: string;
 }) {
   const [mode, setMode] = useState<"fancy" | "reader">("fancy");
 
@@ -108,6 +112,23 @@ export function ArticleReader({
           )}
           {authorSlot && <div className="mt-5">{authorSlot}</div>}
         </header>
+
+        {canonicalNote && (
+          <aside className="mb-8 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm leading-relaxed text-white/50">
+            {canonicalNote}
+            {canonicalUrl && (
+              <>
+                {" "}
+                <a
+                  href={canonicalUrl}
+                  className="whitespace-nowrap text-primary hover:underline"
+                >
+                  Read the original →
+                </a>
+              </>
+            )}
+          </aside>
+        )}
 
         <div
           className={`prose prose-invert max-w-none prose-p:leading-[1.9] prose-li:leading-[1.9] prose-headings:leading-snug prose-img:mx-auto prose-img:max-h-[70vh] prose-img:w-auto prose-img:rounded-xl prose-img:border prose-img:border-white/10 prose-figcaption:text-center [&_p:has(>img)+p]:!mt-3 [&_p:has(>img)+p]:text-center [&_p:has(>img)+p]:text-sm [&_p:has(>img)+p]:text-white/40 [&_*]:transition-[color,background-color,border-color,font-size] [&_*]:duration-300 [&_del]:text-white/35 [&_del]:decoration-white/25 ${
