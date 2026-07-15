@@ -49,6 +49,6 @@ Unfortunately we got used to expecting free apps and platforms. We paid the big 
 
 We are trying to bring back the effortless joy of 2012 but equipping it with the data independence we desperately need in 2026.
 
-![Frankfurt skyline at golden hour, with a little red Honda Grom parked on a bridge over the Main.](/blog/making-it-stupidly-easy-to-get-your-own-pds/instagram-filter-2018.jpg)
+![Frankfurt skyline at golden hour, with a little red Honda Grom parked on a bridge over the Main.](https://eny.social/images/blog/why-does-protecting-your-privacy-require-a-cs-degree/instagram-filter-2018.jpg)
 
 *Golden hour over the Main in Frankfurt, 2018. Filter very much included haha.*
